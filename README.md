@@ -65,7 +65,7 @@ Thank you to [YunChuan Wang](https://github.com/supermanwasd) for setting up the
 
 ## Tutorials
 
-[1. Processing bam, creating gene accesibility files](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/tree/main/vignettes/test123.html)
+[1. Processing bam, creating gene accesibility files](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2-/blob/main/test123.html)
 
 [1. Processing bam, creating gene accesibility files test](https://rawcdn.githack.com/yanhaidong1/Socrates2/tree/main/vignettes/test.html)
 
