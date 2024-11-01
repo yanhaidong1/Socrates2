@@ -1,0 +1,18 @@
+<hr />
+<h2 id="process-bam-files-obtained-from-cellranger-atac-tool">Process
+BAM files obtained from cellranger-atac tool</h2>
+<p><strong>Inputs</strong> (Required): 1. -open_procBAM yes 2.
+-script_dir (a script directory downloaded from GitHub:
+Socrates2/utils/input_other_required_scripts_dir) 3. -BAM_fl (a bam file
+built from cellranger-atac output) 4. -o output_dir (mkdir
+output_dir)</p>
+<p><strong>Parameters:</strong> <strong>-core 1</strong> number of cores
+used for the running (Default: 1) <strong>-mpq 10</strong> a mapping
+score for filtering out multiple mapped reads (Default: 10)</p>
+<p><strong>Outputs:</strong> 1. opt_tn5_mq10.bed</p>
+<p><strong>Running:</strong> python
+Socrates2/utils/prepare_tn5_gene_accessibiliy.py<br />
+-BAM_fl /Path/to/bam_fl.bam<br />
+-core 1<br />
+-mpq 10<br />
+-o output_dir</p>
