@@ -64,16 +64,30 @@ Thank you to [YunChuan Wang](https://github.com/supermanwasd) for setting up the
 ---
 
 ## Tutorials
-
 [1. Processing bam](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/process_BAM.html)
-
 
 [2. Loading data, quality control, identifying cells, and creating a Socrates object](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Load_and_QC_data.html)
 
-[2. Loading pre-processed data, dimensionality reduction, and clustering](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_simple_clustering_tutorial.html)
+[3. Loading pre-processed data, dimensionality reduction, and clustering](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_simple_clustering_tutorial.html)
 
-[3. Comparison of normalization methods](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_clustering_comparison_tutorial_html.html)
+[4. Comparison of normalization methods](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_clustering_comparison_tutorial_html.html)
+
+[5. Prepare gene accessibility]
+
+[6. Visulize marker genes]
+
+[7. Peak calling per cell type]
+
 
 [4. Identify co-accessible ACRs](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_coACRs_tutorial.html)
+
+
+
+
+
+
+
+
+
 
 ...  more coming soon
