@@ -65,12 +65,10 @@ Thank you to [YunChuan Wang](https://github.com/supermanwasd) for setting up the
 
 ## Tutorials
 
-[1. Processing bam, creating gene accesibility files](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2-/blob/main/test.html)
-
-[1. Processing bam, creating gene accesibility files test](https://rawcdn.githack.com/yanhaidong1/Socrates2/tree/main/vignettes/test.html)
+[1. Processing bam, creating gene accesibility files](http://htmlpreview.github.io/?https://https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/process_BAM.html)
 
 
-[1. Loading data, quality control, identifying cells, and creating a Socrates object](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Load_and_QC_data.html)
+[2. Loading data, quality control, identifying cells, and creating a Socrates object](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Load_and_QC_data.html)
 
 [2. Loading pre-processed data, dimensionality reduction, and clustering](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_simple_clustering_tutorial.html)
 
