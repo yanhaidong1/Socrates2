@@ -1,17 +1,28 @@
 <h2 id="process-bam-files-obtained-from-cellranger-atac-tool">Process
 BAM files obtained from cellranger-atac tool</h2>
+<p>Haidong Yan 11/02/2024</p>
+<p>After running the <strong>cellranger-atac count</strong>, under the
+<strong>outs</strong> directory, there is one file called
+<strong>possorted_bam.bam</strong>, which is the file we will use to be
+input when initiating <strong>-BAM_fl</strong>. The output
+<strong>opt_tn5_mq10.bed</strong> of this pipeline will return
+coordinates of each Tn5 insertions per cell.</p>
 <p><strong>Inputs</strong> (Required):<br />
 1. -open_procBAM yes<br />
 2. -script_dir (a script directory downloaded from GitHub:
 Socrates2/utils/input_other_required_scripts_dir)<br />
 3. -BAM_fl (a bam file built from cellranger-atac output)<br />
 4. -o output_dir (mkdir output_dir)</p>
-<p><strong>Parameters:</strong> <strong>-core 1</strong> number of cores
-used for the running (Default: 1)<br />
+<p><strong>Parameters:</strong><br />
+<strong>-core 1</strong> number of cores used for the running (Default:
+1)<br />
 <strong>-mpq 10</strong> a mapping score for filtering out multiple
 mapped reads (Default: 10)</p>
 <p><strong>Outputs:</strong><br />
 1. opt_tn5_mq10.bed</p>
 <p><strong>Running:</strong><br />
-python Socrates2/utils/prepare_tn5_gene_accessibiliy.py   -BAM_fl
-/Path/to/bam_fl.bam   -core 1   -mpq 10   -o output_dir</p>
+python Socrates2/utils/prepare_tn5_gene_accessibiliy.py<br />
+-BAM_fl /Path/to/possorted_bam.bam<br />
+-core 1<br />
+-mpq 10<br />
+-o output_dir</p>
