@@ -74,12 +74,12 @@ Thank you to [YunChuan Wang](https://github.com/supermanwasd) for setting up the
 
 [5. Prepare gene accessibility](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html)
 
-[6. Visulize marker genes]
+[6. Cell type annotation]
 
 [7. Peak calling per cell type]
 
 
-[4. Identify co-accessible ACRs](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_coACRs_tutorial.html)
+[8. Identify co-accessible ACRs](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_coACRs_tutorial.html)
 
 
 
