@@ -72,17 +72,17 @@ R environment: [3. Loading pre-processed data, dimensionality reduction, and clu
 
 R environment: [4. Comparison of normalization methods](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_clustering_comparison_tutorial_html.html)
 
-Python environment: [5. Prepare gene accessibility](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html)
+Bash environment: [5. Prepare gene accessibility](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html)
 
-Python environment: [6. Annotate cell identity]
+Bash environment: [6. Annotate cell identity]
 
-Python environment: [7. Call peak per cell type]
+Bash environment: [7. Call peak per cell type]
 
-Python environment: [8. Identify cell-type-specific peak]
+Bash environment: [8. Identify cell-type-specific peak]
 
-Python environment: [9. Motif enrichment analysis]
+Bash environment: [9. Motif enrichment analysis]
 
-Python environment: [10. Trjectory analysis analysis]
+Bash environment: [10. Trjectory analysis analysis]
 
 [8. Identify co-accessible ACRs](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_coACRs_tutorial.html)
 
