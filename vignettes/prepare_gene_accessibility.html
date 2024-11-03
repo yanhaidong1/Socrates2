@@ -1,0 +1,81 @@
+<h2 id="calculate-gene-accessibility">Calculate gene accessibility</h2>
+<h3 id="prepare-genes-with-tn5-insertions">Prepare genes with Tn5
+insertions</h3>
+<p>This step is to build a file recording the gene with Tn5 insertions.
+It has three columns: 1) gene ID 2) cell barcode 3) Tn5 insertion
+count.</p>
+<p><strong>Inputs</strong> (Required): 1. -open_geneTn5 yes 2.
+-script_dir (a script directory downloaded from GitHub:
+Socrates2/utils/input_other_required_scripts_dir) 3. -tn5_fl (A file
+obtained from <strong>Process BAM files obtained from cellranger-atac
+tool</strong> step which records the coordinates of each Tn5 insertions
+per cell) 4. -Ggff_fl (A gene gff annotation file) 5. -Genome_fl (A
+genome fasta file) 6. -Gmfai_fl (A genome index file, prepared by
+‘samtools faidx’) 7. -o output_dir (mkdir output_dir)</p>
+<p><strong>Optional parameters</strong> 1. -category (Set gene or
+transcript to be calculated. Default: gene.)</p>
+<p><strong>Outputs</strong>: 1. opt_genome_size.txt 2.
+opt_gene_tn5.sparse 3. opt_genes_500bpTSS_sorted.bed</p>
+<p><strong>Running</strong>: python
+Socrates2/utils/prepare_tn5_gene_accessibiliy.py<br />
+-script_dir Socrates2/utils/input_other_required_scripts_dir<br />
+-o output_dir<br />
+-tn5_fl /Path/to/opt_tn5_mq10.bed<br />
+-Ggff_fl /Path/to/Gene.gff3<br />
+-Genome_fl /Path/to/Genome.fasta<br />
+-Gmfai_fl /Path/to/Genome.fasta.fai</p>
+<h3 id="calculate-gene-accessibility-1">Calculate gene
+accessibility</h3>
+<p>This step is to calculate the gene accessibility. The output file has
+three columns: 1) gene ID 2) cell barcode 3) Accessibility score.</p>
+<p><strong>Inputs</strong> (Required): 1. -open_geneAcc yes 2.
+-script_dir (a script directory downloaded from GitHub:
+Socrates2/utils/input_other_required_scripts_dir) 3. -meta_fl (A meta
+file obtained from <strong><a
+href="https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_simple_clustering_tutorial.html">Loading
+pre-processed data, dimensionality reduction, and
+clustering</a></strong>) 4. -gene_tn5_fl (An
+<strong>opt_gene_tn5.sparse</strong> file obtained from <strong>Prepare
+genes with Tn5 insertions</strong> step) 5. -gene_bed_fl (An
+<strong>opt_genes_500bpTSS_sorted</strong> file obtained from
+<strong>Prepare genes with Tn5 insertions</strong> step) 6. -o
+output_dir (mkdir output_dir)</p>
+<p><strong>Outputs</strong>: 1. opt_gene_body_accessibility_mtx.rds</p>
+<p><strong>Running</strong>: python
+Socrates2/utils/prepare_tn5_gene_accessibiliy.py<br />
+-script_dir Socrates2/utils/input_other_required_scripts_dir<br />
+-o output_dir<br />
+-meta_fl /Path/to/meta.txt<br />
+-gene_tn5_fl /Path/to/opt_gene_tn5.sparse<br />
+-gene_bed_fl /Path/to/opt_genes_500bpTSS_sorted</p>
+<h3 id="smooth-gene-accessibility">Smooth gene accessibility</h3>
+<p>The smooth step will smooth gene accessibility using a published
+method ‘MAGIC’ referred from <a
+href="https://www.cell.com/cell/abstract/S0092-8674(18)30724-4">David
+van Dijk, et al. <strong>Recovering Gene Interactions from Single-Cell
+Data Using Data Diffusion</strong>. 2018. <em>Cell</em></a>.</p>
+<p><strong>Inputs</strong> (Required): 1. -open_smoothGeneAcc yes 2.
+-script_dir (a script directory downloaded from GitHub:
+Socrates2/utils/input_other_required_scripts_dir) 3. -meta_fl (A meta
+file obtained from <strong><a
+href="https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_simple_clustering_tutorial.html">Loading
+pre-processed data, dimensionality reduction, and
+clustering</a></strong>) 4. -svd_fl (A svd file obtained from <strong><a
+href="https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_simple_clustering_tutorial.html">Loading
+pre-processed data, dimensionality reduction, and
+clustering</a></strong>) 5. -gene_acc_fl (An
+<strong>opt_gene_body_accessibility_mtx.rds</strong> file obtained from
+<strong>Calculate gene accessibility</strong> step) 6. -o output_dir
+(mkdir output_dir)</p>
+<p><strong>Optional parameters</strong>: 1. -core (Set cores we will use
+for the parallele analysis. Default: 1.) 2. -clustnm (Set the cell
+cluster name within meta file. Default: LouvainClusters.)</p>
+<p><strong>Outputs</strong>: 1. opt_allgenes_impute.activity.rds</p>
+<p><strong>Running</strong>: python
+Socrates2/utils/prepare_tn5_gene_accessibiliy.py<br />
+-script_dir Socrates2/utils/input_other_required_scripts_dir<br />
+-o output_dir<br />
+-open_smoothGeneAcc yes<br />
+-meta_fl /Path/to/meta.txt<br />
+-svd_fl /Path/to/svd.txt<br />
+-gene_acc_fl /Path/to/opt_gene_body_accessibility_mtx.rds</p>
