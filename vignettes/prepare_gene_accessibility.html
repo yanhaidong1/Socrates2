@@ -10,9 +10,10 @@ count.<br />
 1. -open_geneTn5 yes<br />
 2. -script_dir (a script directory downloaded from GitHub:
 Socrates2/utils/input_other_required_scripts_dir)<br />
-3. -tn5_fl (A file obtained from <strong>Process BAM files obtained from
-cellranger-atac tool</strong> step which records the coordinates of each
-Tn5 insertions per cell)<br />
+3. -tn5_fl (A file obtained from <a
+href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/process_BAM.html">1.
+Processing bam</a> step which records the coordinates of each Tn5
+insertions per cell)<br />
 4. -Ggff_fl (A gene gff annotation file)<br />
 5. -Genome_fl (A genome fasta file)<br />
 6. -Gmfai_fl (A genome index file, prepared by ‘samtools faidx’)<br />
@@ -27,8 +28,8 @@ gene.)<br />
 2. opt_gene_tn5.sparse<br />
 3. opt_genes_500bpTSS_sorted.bed<br />
 </p>
-<p><strong>Running</strong>: python
-Socrates2/utils/prepare_tn5_gene_accessibiliy.py<br />
+<p><strong>Running</strong>:<br />
+python Socrates2/utils/prepare_tn5_gene_accessibiliy.py<br />
 -script_dir Socrates2/utils/input_other_required_scripts_dir<br />
 -o output_dir<br />
 -tn5_fl /Path/to/opt_tn5_mq10.bed<br />
