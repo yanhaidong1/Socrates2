@@ -72,7 +72,7 @@ R environment: [3. Loading pre-processed data, dimensionality reduction, and clu
 
 R environment: [4. Comparison of normalization methods](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_clustering_comparison_tutorial_html.html)
 
-Python environment: [5. Prepare gene accessibility](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility_test.html)
+Python environment: [5. Prepare gene accessibility](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html)
 
 Python environment: [6. Annotate cell identity]
 
