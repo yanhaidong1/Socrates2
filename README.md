@@ -64,20 +64,25 @@ Thank you to [YunChuan Wang](https://github.com/supermanwasd) for setting up the
 ---
 
 ## Tutorials
-[1. Processing bam](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/process_BAM.html)
+Python environment: [1. Processing bam](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/process_BAM.html)
 
-[2. Loading data, quality control, identifying cells, and creating a Socrates object](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Load_and_QC_data.html)
+R environment: [2. Loading data, quality control, identifying cells, and creating a Socrates object](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Load_and_QC_data.html)
 
-[3. Loading pre-processed data, dimensionality reduction, and clustering](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_simple_clustering_tutorial.html)
+R environment: [3. Loading pre-processed data, dimensionality reduction, and clustering](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_simple_clustering_tutorial.html)
 
-[4. Comparison of normalization methods](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_clustering_comparison_tutorial_html.html)
+R environment: [4. Comparison of normalization methods](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_clustering_comparison_tutorial_html.html)
 
-[5. Prepare gene accessibility](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html)
+Python environment: [5. Prepare gene accessibility](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html)
 
-[6. Cell type annotation]
+Python environment: [6. Annotate cell identity]
 
-[7. Peak calling per cell type]
+Python environment: [7. Call peak per cell type]
 
+Python environment: [8. Identify cell-type-specific peak]
+
+Python environment: [9. Motif enrichment analysis]
+
+Python environment: [10. Trjectory analysis analysis]
 
 [8. Identify co-accessible ACRs](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_coACRs_tutorial.html)
 
