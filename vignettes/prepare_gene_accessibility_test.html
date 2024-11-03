@@ -1,0 +1,609 @@
+<h1 id="rrscca-tutorial-comparing-normalization-methods">RRscca
+Tutorial: Comparing Normalization Methods</h1>
+<p>Alexandre P. Marand 10/27/2020</p>
+<h2 id="load-rrscca-and-raw-data">Load RRscca and raw data</h2>
+<p>Here, we demonstrate how to load the following inputs to create an
+<code>RRscca</code> object:</p>
+<ol type="1">
+<li><strong>binary sparse peak x cell matrix</strong> (a gzipped text
+file in triplet tsv format).</li>
+<li><strong>meta-data</strong> saved as a tsv document containing
+various per-cell metrics.</li>
+</ol>
+<p>Meta-data is not necessarily required, but useful for evaluating
+technical effects in clustering, as well as other downstream steps. An
+example of input data formats for 1,500 PBMC cells and how to construct
+an <code>RRscca</code> object from scratch is shown below.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># load library</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">suppressWarnings</span>(<span class="fu">library</span>(<span class="st">&quot;RRscca&quot;</span>))</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># specify paths to raw data in RRscca package</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>input <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;pbmc_atac_10x.1.5K_cells.sparse.gz&quot;</span>, <span class="at">package=</span><span class="st">&quot;RRscca&quot;</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>meta <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;pbmc_atac_10x.1.5K_cells.metadata.txt&quot;</span>, <span class="at">package=</span><span class="st">&quot;RRscca&quot;</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># load raw data for viewing</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>input.format <span class="ot">&lt;-</span> <span class="fu">read.table</span>(input)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>meta.format <span class="ot">&lt;-</span> <span class="fu">read.table</span>(meta)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># view</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(input.format)</span></code></pre></div>
+<pre><code>##                     V1                 V2 V3
+## 1   chr1_713551_714783 CACTGAACAGTTGCAT-1  1
+## 2   chr1_762249_763345 CACTGAACAGTTGCAT-1  1
+## 3   chr1_839587_841090 CACTGAACAGTTGCAT-1  1
+## 4   chr1_911144_911956 CACTGAACAGTTGCAT-1  1
+## 5 chr1_1003706_1006207 CACTGAACAGTTGCAT-1  1
+## 6 chr1_1057212_1058134 CACTGAACAGTTGCAT-1  1</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(meta.format)</span></code></pre></div>
+<pre><code>##                                cellID total duplicate chimeric unmapped lowmapq
+## AGGCCCAAGTGAAGGA-1 AGGCCCAAGTGAAGGA-1 15947      7372      108       91     900
+## GCTTGCTAGGAATGGA-1 GCTTGCTAGGAATGGA-1 31714     15398      353      162    1582
+## ATGTCTTGTTTGATCG-1 ATGTCTTGTTTGATCG-1 23718     10135      228      137    1302
+## GGTAGGATCTTATCAC-1 GGTAGGATCTTATCAC-1 24968     12068      306      139    1449
+## CTACAGATCTGAACGT-1 CTACAGATCTGAACGT-1 18681      9362      219      116    1037
+## TCTATTGAGAGACTCG-1 TCTATTGAGAGACTCG-1 28407     11432      368      171    1602
+##                    mitochondrial passed_filters    cell_id is__cell_barcode
+## AGGCCCAAGTGAAGGA-1             0           7476 _cell_1520                1
+## GCTTGCTAGGAATGGA-1             0          14219 _cell_5602                1
+## ATGTCTTGTTTGATCG-1             5          11911 _cell_1987                1
+## GGTAGGATCTTATCAC-1             0          11006 _cell_6099                1
+## CTACAGATCTGAACGT-1            68           7879 _cell_3691                1
+## TCTATTGAGAGACTCG-1             0          14834 _cell_8134                1
+##                    TSS_fragments DNase_sensitive_region_fragments
+## AGGCCCAAGTGAAGGA-1          3744                             6524
+## GCTTGCTAGGAATGGA-1          6354                            12101
+## ATGTCTTGTTTGATCG-1          4662                             9791
+## GGTAGGATCTTATCAC-1          7051                             9290
+## CTACAGATCTGAACGT-1          4443                             6604
+## TCTATTGAGAGACTCG-1          6619                            12212
+##                    enhancer_region_fragments promoter_region_fragments
+## AGGCCCAAGTGAAGGA-1                       976                      3839
+## GCTTGCTAGGAATGGA-1                      2066                      6511
+## ATGTCTTGTTTGATCG-1                      1886                      4688
+## GGTAGGATCTTATCAC-1                       764                      7376
+## CTACAGATCTGAACGT-1                       705                      4589
+## TCTATTGAGAGACTCG-1                      2003                      6728
+##                    on_target_fragments blacklist_region_fragments
+## AGGCCCAAGTGAAGGA-1                6821                          4
+## GCTTGCTAGGAATGGA-1               12753                         11
+## ATGTCTTGTTTGATCG-1               10371                          6
+## GGTAGGATCTTATCAC-1               10122                          4
+## CTACAGATCTGAACGT-1                7039                          7
+## TCTATTGAGAGACTCG-1               13051                          9
+##                    peak_region_fragments peak_region_cutsites
+## AGGCCCAAGTGAAGGA-1                  5401                10513
+## GCTTGCTAGGAATGGA-1                 10004                19385
+## ATGTCTTGTTTGATCG-1                  7466                14300
+## GGTAGGATCTTATCAC-1                  8811                17346
+## CTACAGATCTGAACGT-1                  5675                11134
+## TCTATTGAGAGACTCG-1                  9959                19264</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># load data into RRscca object</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">loadSparseData</span>(<span class="at">input=</span>input, <span class="at">meta=</span>meta, <span class="at">verbose=</span>T)</span></code></pre></div>
+<pre><code>##  - loading gzipped sparse matrix ...
+
+##  - loading meta data ...</code></pre>
+<hr />
+<h2 id="filter-peaks-and-cells">Filter peaks and cells</h2>
+<p>To reduce the effects of outlier peaks and cells on clustering, it is
+often helpful to remove cells with few accessible peaks, and peaks with
+extreme accessibility profiles (i.e. peaks that are accessible in all,
+or very few cells). Specifically, the cell x peak matrix can be filtered
+by adjusting heurstic frequency thresholds after visual inspection of
+cell and peak accessibility distributions. Let’s investigate these
+distributions further to determine reasonable thresholds for this
+particular data set.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># estimate log10 number of accessible regions per cell</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>cell.counts <span class="ot">&lt;-</span> Matrix<span class="sc">::</span><span class="fu">colSums</span>(obj<span class="sc">$</span>counts)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># estimate peak accessibility frequency across cells</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>site.freq <span class="ot">&lt;-</span> Matrix<span class="sc">::</span><span class="fu">rowMeans</span>(obj<span class="sc">$</span>counts)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># plot distributions</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="fu">layout</span>(<span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>), <span class="at">ncol=</span><span class="dv">2</span>))</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar=</span><span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">1</span>))</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(cell.counts), <span class="at">main=</span><span class="st">&quot;log10 cell counts&quot;</span>, <span class="at">log=</span><span class="st">&quot;x&quot;</span>)</span></code></pre></div>
+<pre><code>## Warning in xy.coords(x, y, xlabel, ylabel, log): 13 x values &lt;= 0 omitted from
+## logarithmic plot</code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v=</span><span class="dv">500</span>, <span class="at">col=</span><span class="st">&quot;red&quot;</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(site.freq), <span class="at">main=</span><span class="st">&quot;peak accessibility frequency&quot;</span>, <span class="at">log=</span><span class="st">&quot;x&quot;</span>)</span></code></pre></div>
+<pre><code>## Warning in xy.coords(x, y, xlabel, ylabel, log): 7 x values &lt;= 0 omitted from
+## logarithmic plot</code></pre>
+<p><img
+src="https://github.com/plantformatics/RRscca/blob/master/tutorial_figures/view_distributions-2.png" /></p>
+<p>It appears that most cells have a median over around 7,000 accessible
+peaks. The cells on the lower tail of the distribution may reflect
+broken nuclei, so we’ll remove cells with less than 1,000 open peaks
+from the analysis. The distribution of average peak accessibilities
+doesnt show any clear (lower-tail) cut-offs, therefore, we will use the
+default thresholds (<code>min.t=0.001, max.t=0.005</code>). The
+arguments <code>min.t</code> and <code>max.t</code> set the minimum peak
+accessibility frequency and upper (99.5%) quantile cut-offs,
+respectively.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># filter matrix </span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">cleanData</span>(obj, <span class="at">min.c=</span><span class="dv">1000</span>, <span class="at">min.t=</span><span class="fl">0.001</span>, <span class="at">max.t=</span><span class="fl">0.005</span>, <span class="at">verbose=</span>T)</span></code></pre></div>
+<pre><code>##    * Input: cells = 1500 | peaks = 89905
+
+##    * Filtered: cells = 1498 | peaks = 88907</code></pre>
+<h4 id="filtering-peaks-enriched-in-pre-computed-clusters">Filtering
+peaks enriched in pre-computed clusters</h4>
+<p><strong>NOTE</strong> If users have generated crude clusters, such as
+<em>in silico</em> sorting described by <a
+href="https://linkinghub.elsevier.com/retrieve/pii/S0092-8674(18)30855-9">Cusanovich
+et al. 2018</a>, the parameters <code>min.p</code> and
+<code>preclusterID</code> allow users to set minimum peak accessibility
+frequencies for pre-specied groups. Below, we constrain peaks to be
+accessible in at least 5% of cells in at least one
+<code>crude_cluster</code>. See <code>?cleanData</code> for more
+details.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># simulate 10 random clusters, </span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>obj<span class="sc">$</span>meta<span class="sc">$</span>crude_clusters <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">factor</span>(<span class="fu">seq</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>)), <span class="fu">nrow</span>(obj<span class="sc">$</span>meta), <span class="at">replace=</span>T)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">cleanData</span>(obj, <span class="at">min.p=</span><span class="fl">0.05</span>, <span class="at">preclusterID=</span><span class="st">&quot;crude_clusters&quot;</span>)</span></code></pre></div>
+<hr />
+<h2 id="normalization">Normalization</h2>
+<p>With a filtered cell x peak matrix in hand, we can now calculate
+normalized accessibility scores (Pearson’s residuals) across all cells
+and peaks using regularized quasibinomial logistic regression. Note that
+the function <code>regModel</code> can be parallelized by setting
+<code>nthreads</code> to a number greater than 1. Parallel
+implementations depend on the <code>doSNOW</code> library. In the
+example below, we set the number of threads to 4 to speed-up the
+analysis. In addition to regularized modeling, we provide additional
+functions to normalize chromatin accessibility profiles. Currently
+included in this release (supplement to <code>regModel</code>) are
+<code>tfidf</code>, <code>logisticModel</code>, and
+<code>regModel2</code>. In all cases, the output is saved in the
+‘residuals’ slot of the output object (<code>obj$residuals</code>). We
+will run multiple normalization schemes to compare their performance.
+Each scheme is saved to a different slot.</p>
+<h4 id="regularized-logistic-regression">Regularized logistic
+regression</h4>
+<p>The recommended normalization procedure.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># run regularized regression</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">regModel</span>(obj, <span class="at">verbose=</span>T, <span class="at">nthreads=</span><span class="dv">4</span>, <span class="at">slotName=</span><span class="st">&quot;NORM1&quot;</span>)</span></code></pre></div>
+<pre><code>##  - regularizing logistic model parameters ...
+
+##    * formula: ~zlog10nSites
+
+##    * estimating geometric mean ...
+
+##    * density sampling on peak space ...
+
+##    * fitting parameters to 5000 peaks ...
+
+##    * finding outliers ...
+
+##    * found 73 outliers ...
+
+##    * regularizing all coefficients ...
+
+##    * estimating residuals on the full data set ...
+
+  |======================================================================| 100%
+
+##    * residual range: -2.98779001451022 - 171.579569686042</code></pre>
+<h4 id="tf-idf">TF-IDF</h4>
+<p><code>tfidf</code> has the benefit of keeping the normalized data in
+a sparse format that allows users to conserve and reduce memory usage.
+We will compare TF-IDF normalization with quasibinomial later on in this
+tutorial. The TF-IDF function was adapted from Andrew Hill, the original
+implementation can be found <a
+href="http://andrewjohnhill.com/blog/2019/05/06/dimensionality-reduction-for-scatac-data/">here</a></p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># run TF-IDF normalization</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">tfidf</span>(obj, <span class="at">slotName=</span><span class="st">&quot;NORM2&quot;</span>)</span></code></pre></div>
+<h4 id="logistic-regression-without-regularization">Logistic regression
+without regularization</h4>
+<p><code>logisticModel</code> does not regularize parameters by
+explicitly learning a model each peak independently. To run logistic
+regression with 4 threads without any regularization, run the following
+line of code. See <code>?logisticModel</code> for more details.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># run logisticModel</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">logisticModel</span>(obj, <span class="at">verbose=</span>T, <span class="at">nthreads=</span><span class="dv">4</span>, <span class="at">slotName=</span><span class="st">&quot;NORM3&quot;</span>)</span></code></pre></div>
+<pre><code>##  - running logistic regression ...
+
+##    * formula: ~zlog10nSites</code></pre>
+<h4
+id="regularized-logistic-regression-with-cell-and-peak-sub-sampling.">Regularized
+logistic regression with cell and peak sub-sampling.</h4>
+<p>As the number of cells can quickly become prohibitive (we have tested
+up to 60K cells across 160K peaks, requiring upwards of 50G memory), we
+extended the peak sub-sampling procedure for sampling cells. The
+function <code>regModel2</code> samples subsets of cells uniforming for
+factors specified in a column from the meta data, such as sampling 1,000
+cells from different biological replicates or tissues. Sampling down to
+around 1,000 cells dramatically speeds up the computation with little
+effects on clustering. Here, we will sample 750 cells (half of the total
+1,500) for building the models. See <code>?regModel2</code> for more
+details.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># run regularized model with cell sampling</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>obj<span class="sc">$</span>meta<span class="sc">$</span>library <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="dv">1</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">regModel2</span>(obj, <span class="at">subcells=</span><span class="dv">750</span>, <span class="at">verbose=</span>T, <span class="at">slotName=</span><span class="st">&quot;NORM4&quot;</span>)</span></code></pre></div>
+<pre><code>##  - regularizing logistic model parameters ...
+
+##    * formula: ~zlog10nSites
+
+##    * sampling cells ...
+
+##    * sampled a total of 750 cells ...
+
+##    * estimating geometric mean ...
+
+##    * density sampling on peak space ...
+
+##    * fitting parameters to 5000 peaks ...
+
+##    * finding outliers ...
+
+##    * found 69 outliers ...
+
+##    * regularizing all coefficients ...
+
+##    * estimating residuals on the full data set ...
+
+##    * residual range: -2.91461115065793 - 141.815634021284</code></pre>
+<hr />
+<h2 id="reducing-dimensions">Reducing dimensions</h2>
+<h3 id="singular-value-decomposition-svd">Singular Value Decomposition
+(SVD)</h3>
+<p>After normalizing peak x cell chromatin accessibility profiles using
+one of the aforementioned methods, we can reduce the dimensionality of
+residual matrix to remove noise and better model cell-cell relationships
+in a reduced space. Dimensionality reduction is implemented via Singular
+Value Decomposition (SVD) from the <code>irlba</code> package. We will
+reduce the dimensions of all the normalization methods by specifically
+selecting the slots from each approach one-by-one.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># reduce dimensionality of the residual matrix</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">reduceDims</span>(obj, <span class="at">n.pcs=</span><span class="dv">50</span>, <span class="at">cor.max=</span><span class="fl">0.7</span>, <span class="at">verbose=</span>T, <span class="at">residuals_slotName=</span><span class="st">&quot;NORM1&quot;</span>, <span class="at">svd_slotName=</span><span class="st">&quot;SVD1&quot;</span>)</span></code></pre></div>
+<pre><code>##  - reduce dimensions with SVD ...
+
+##  - standardizing reduced dimensions per cell ...</code></pre>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">reduceDims</span>(obj, <span class="at">n.pcs=</span><span class="dv">50</span>, <span class="at">cor.max=</span><span class="fl">0.7</span>, <span class="at">verbose=</span>T, <span class="at">residuals_slotName=</span><span class="st">&quot;NORM2&quot;</span>, <span class="at">svd_slotName=</span><span class="st">&quot;SVD2&quot;</span>)</span></code></pre></div>
+<pre><code>##  - reduce dimensions with SVD ... 
+##  - standardizing reduced dimensions per cell ...</code></pre>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">reduceDims</span>(obj, <span class="at">n.pcs=</span><span class="dv">50</span>, <span class="at">cor.max=</span><span class="fl">0.7</span>, <span class="at">verbose=</span>T, <span class="at">residuals_slotName=</span><span class="st">&quot;NORM3&quot;</span>, <span class="at">svd_slotName=</span><span class="st">&quot;SVD3&quot;</span>)</span></code></pre></div>
+<pre><code>##  - reduce dimensions with SVD ... 
+##  - standardizing reduced dimensions per cell ...</code></pre>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">reduceDims</span>(obj, <span class="at">n.pcs=</span><span class="dv">50</span>, <span class="at">cor.max=</span><span class="fl">0.7</span>, <span class="at">verbose=</span>T, <span class="at">residuals_slotName=</span><span class="st">&quot;NORM4&quot;</span>, <span class="at">svd_slotName=</span><span class="st">&quot;SVD4&quot;</span>)</span></code></pre></div>
+<pre><code>##  - reduce dimensions with SVD ... 
+##  - standardizing reduced dimensions per cell ...</code></pre>
+<p>The above commands estimate the first 50 singular values, and removes
+singular values correlated with technical variation (read depth) above a
+Spearman Correlation Coefficient of 0.7.</p>
+<h3 id="projecting-into-a-reduced-dimensionality-with-umap">Projecting
+into a reduced dimensionality with UMAP</h3>
+<p>Similarity between cells is most easily visualized on two dimensions.
+Uniform Manifold Approximation Projection (UMAP) has gained popularity
+in single-cell approaches owing to its scalability and capacity for
+maintaining both global and local data structure, greatly aiding data
+interpretations. To generate UMAP embeddings, we can run the
+<code>projectUMAP</code> function which relies on
+<code>uwot::umap</code>:</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># run projectUMAP</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">projectUMAP</span>(obj, <span class="at">svd_slotName=</span><span class="st">&quot;SVD1&quot;</span>, <span class="at">umap_slotName=</span><span class="st">&quot;UMAP1&quot;</span>,<span class="at">verbose=</span>T)</span></code></pre></div>
+<pre><code>##  - non-linear dimensionality reduction with UMAP ...
+
+## 12:43:44 UMAP embedding parameters a = 1.577 b = 0.8951
+
+## 12:43:44 Read 1498 rows and found 50 numeric columns
+
+## 12:43:44 Using Annoy for neighbor search, n_neighbors = 15
+
+## 12:43:44 Building Annoy index with metric = cosine, n_trees = 50
+
+## 0%   10   20   30   40   50   60   70   80   90   100%
+
+## [----|----|----|----|----|----|----|----|----|----|
+
+## **************************************************|
+## 12:43:44 Writing NN index file to temp file /var/folders/_6/vtf34rcn6bd6xfg1_c3p34_m0000gp/T//RtmpJbEByC/filefe0f15a94d6d
+## 12:43:44 Searching Annoy index using 2 threads, search_k = 1500
+## 12:43:44 Annoy recall = 100%
+## 12:43:45 Commencing smooth kNN distance calibration using 2 threads
+## 12:43:45 Initializing from normalized Laplacian + noise
+## 12:43:45 Commencing optimization for 500 epochs, with 32716 positive edges
+## 12:43:47 Optimization finished</code></pre>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">projectUMAP</span>(obj, <span class="at">svd_slotName=</span><span class="st">&quot;SVD2&quot;</span>, <span class="at">umap_slotName=</span><span class="st">&quot;UMAP2&quot;</span>,<span class="at">verbose=</span>T)</span></code></pre></div>
+<pre><code>##  - non-linear dimensionality reduction with UMAP ...
+## 12:43:47 UMAP embedding parameters a = 1.577 b = 0.8951
+## 12:43:47 Read 1498 rows and found 49 numeric columns
+## 12:43:47 Using Annoy for neighbor search, n_neighbors = 15
+## 12:43:47 Building Annoy index with metric = cosine, n_trees = 50
+## 0%   10   20   30   40   50   60   70   80   90   100%
+## [----|----|----|----|----|----|----|----|----|----|
+## **************************************************|
+## 12:43:47 Writing NN index file to temp file /var/folders/_6/vtf34rcn6bd6xfg1_c3p34_m0000gp/T//RtmpJbEByC/filefe0f1e1a3a37
+## 12:43:47 Searching Annoy index using 2 threads, search_k = 1500
+## 12:43:47 Annoy recall = 100%
+## 12:43:48 Commencing smooth kNN distance calibration using 2 threads
+## 12:43:48 Initializing from normalized Laplacian + noise
+## 12:43:48 Commencing optimization for 500 epochs, with 33866 positive edges
+## 12:43:50 Optimization finished</code></pre>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">projectUMAP</span>(obj, <span class="at">svd_slotName=</span><span class="st">&quot;SVD3&quot;</span>, <span class="at">umap_slotName=</span><span class="st">&quot;UMAP3&quot;</span>,<span class="at">verbose=</span>T)</span></code></pre></div>
+<pre><code>##  - non-linear dimensionality reduction with UMAP ...
+## 12:43:50 UMAP embedding parameters a = 1.577 b = 0.8951
+## 12:43:50 Read 1498 rows and found 50 numeric columns
+## 12:43:50 Using Annoy for neighbor search, n_neighbors = 15
+## 12:43:50 Building Annoy index with metric = cosine, n_trees = 50
+## 0%   10   20   30   40   50   60   70   80   90   100%
+## [----|----|----|----|----|----|----|----|----|----|
+## **************************************************|
+## 12:43:50 Writing NN index file to temp file /var/folders/_6/vtf34rcn6bd6xfg1_c3p34_m0000gp/T//RtmpJbEByC/filefe0f4be40051
+## 12:43:50 Searching Annoy index using 2 threads, search_k = 1500
+## 12:43:50 Annoy recall = 100%
+## 12:43:51 Commencing smooth kNN distance calibration using 2 threads
+## 12:43:51 Initializing from normalized Laplacian + noise
+## 12:43:51 Commencing optimization for 500 epochs, with 32330 positive edges
+## 12:43:53 Optimization finished</code></pre>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">projectUMAP</span>(obj, <span class="at">svd_slotName=</span><span class="st">&quot;SVD4&quot;</span>, <span class="at">umap_slotName=</span><span class="st">&quot;UMAP4&quot;</span>,<span class="at">verbose=</span>T)</span></code></pre></div>
+<pre><code>##  - non-linear dimensionality reduction with UMAP ...
+## 12:43:53 UMAP embedding parameters a = 1.577 b = 0.8951
+## 12:43:53 Read 1498 rows and found 50 numeric columns
+## 12:43:53 Using Annoy for neighbor search, n_neighbors = 15
+## 12:43:53 Building Annoy index with metric = cosine, n_trees = 50
+## 0%   10   20   30   40   50   60   70   80   90   100%
+## [----|----|----|----|----|----|----|----|----|----|
+## **************************************************|
+## 12:43:53 Writing NN index file to temp file /var/folders/_6/vtf34rcn6bd6xfg1_c3p34_m0000gp/T//RtmpJbEByC/filefe0f65d0ecc3
+## 12:43:53 Searching Annoy index using 2 threads, search_k = 1500
+## 12:43:53 Annoy recall = 100%
+## 12:43:54 Commencing smooth kNN distance calibration using 2 threads
+## 12:43:54 Initializing from normalized Laplacian + noise
+## 12:43:54 Commencing optimization for 500 epochs, with 32848 positive edges
+## 12:43:56 Optimization finished</code></pre>
+<p>We can quickly visualize the reduced embedding. As you can see below,
+they are quite similar. In cases where speed and memory usage are
+central factors, it may be more advisable to use TF-IDF normalization in
+place of RRscca. One benefit of using model-based approaches is that the
+normalized values can be readily interpretted for down-stream
+analyses.</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plot UMAP results</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">layout</span>(<span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>), <span class="at">ncol=</span><span class="dv">2</span>, <span class="at">byrow=</span>T))</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar=</span><span class="fu">c</span>(<span class="dv">4</span>,<span class="dv">4</span>,<span class="dv">1</span>,<span class="dv">1</span>))</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(obj<span class="sc">$</span>UMAP1, <span class="at">pch=</span><span class="dv">16</span>, <span class="at">cex=</span><span class="fl">0.2</span>, <span class="at">main=</span><span class="st">&quot;regModel&quot;</span>)</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(obj<span class="sc">$</span>UMAP2, <span class="at">pch=</span><span class="dv">16</span>, <span class="at">cex=</span><span class="fl">0.2</span>, <span class="at">main=</span><span class="st">&quot;tfidf&quot;</span>)</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(obj<span class="sc">$</span>UMAP3, <span class="at">pch=</span><span class="dv">16</span>, <span class="at">cex=</span><span class="fl">0.2</span>, <span class="at">main=</span><span class="st">&quot;LogisticModel&quot;</span>)</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(obj<span class="sc">$</span>UMAP4, <span class="at">pch=</span><span class="dv">16</span>, <span class="at">cex=</span><span class="fl">0.2</span>, <span class="at">main=</span><span class="st">&quot;regModel2&quot;</span>)</span></code></pre></div>
+<p><img
+src="https://github.com/plantformatics/RRscca/blob/master/tutorial_figures/plotUMAPraw-2.png" /></p>
+<hr />
+<h2 id="graph-based-clustering">Graph-based clustering</h2>
+<p>Visualization of the UMAP embeddings suggests several groups of cells
+with distinct identities. We can cluster cells into groups using
+graph-based clustering by leaning on Louvain and Leiden clustering
+approaches provided by the popular <code>Seurat</code> package. Below is
+a wrapper for running graph-based clustering in the SVD space via
+Seurat. Cluster membership is appended to the meta data.frame under the
+column ‘LouvainClusters’ by default. For a list of tuneable parameters,
+run <code>?callClusters</code> in the R console.</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># run clustering</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">callClusters</span>(obj, <span class="at">svd_slotName=</span><span class="st">&quot;SVD1&quot;</span>, <span class="at">umap_slotName=</span><span class="st">&quot;UMAP1&quot;</span>, <span class="at">cluster_slotName=</span><span class="st">&quot;Clusters1&quot;</span>, <span class="at">verbose=</span>T)</span></code></pre></div>
+<pre><code>##  - filtering outliers in UMAP manifold (z-score e.thresh = 3) ...
+
+##  - creating seurat object for graph-based clustering ...
+
+## Warning: Feature names cannot have underscores (&#39;_&#39;), replacing with dashes
+## (&#39;-&#39;)
+
+## Computing nearest neighbor graph
+
+## Computing SNN
+
+## Warning: The following arguments are not used: reduction
+
+## Warning: The following arguments are not used: reduction
+
+## Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+## 
+## Number of nodes: 1476
+## Number of edges: 80057
+## 
+## Running Louvain algorithm...
+## Maximum modularity in 100 random starts: 0.9024
+## Number of communities: 9
+## Elapsed time: 0 seconds
+
+##    * removing low quality clusters ...
+
+##    * filtering per-cluster outliers (z-score filtDistClst2 = 5) ...
+
+##    * total number of cells surviving subcluster filtering = 1467</code></pre>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">callClusters</span>(obj, <span class="at">svd_slotName=</span><span class="st">&quot;SVD2&quot;</span>, <span class="at">umap_slotName=</span><span class="st">&quot;UMAP2&quot;</span>, <span class="at">cluster_slotName=</span><span class="st">&quot;Clusters2&quot;</span>, <span class="at">verbose=</span>T)</span></code></pre></div>
+<pre><code>##  - filtering outliers in UMAP manifold (z-score e.thresh = 3) ...
+
+##  - creating seurat object for graph-based clustering ...
+
+## Warning: Feature names cannot have underscores (&#39;_&#39;), replacing with dashes
+## (&#39;-&#39;)
+
+## Computing nearest neighbor graph
+
+## Computing SNN
+
+## Warning: The following arguments are not used: reduction
+
+## Warning: The following arguments are not used: reduction
+
+## Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+## 
+## Number of nodes: 1478
+## Number of edges: 98021
+## 
+## Running Louvain algorithm...
+## Maximum modularity in 100 random starts: 0.8824
+## Number of communities: 8
+## Elapsed time: 0 seconds
+
+##    * removing low quality clusters ...
+
+##    * filtering per-cluster outliers (z-score filtDistClst2 = 5) ...
+
+##    * total number of cells surviving subcluster filtering = 1460</code></pre>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">callClusters</span>(obj, <span class="at">svd_slotName=</span><span class="st">&quot;SVD3&quot;</span>, <span class="at">umap_slotName=</span><span class="st">&quot;UMAP3&quot;</span>, <span class="at">cluster_slotName=</span><span class="st">&quot;Clusters3&quot;</span>, <span class="at">verbose=</span>T)</span></code></pre></div>
+<pre><code>##  - filtering outliers in UMAP manifold (z-score e.thresh = 3) ...
+
+##  - creating seurat object for graph-based clustering ...
+
+## Warning: Feature names cannot have underscores (&#39;_&#39;), replacing with dashes
+## (&#39;-&#39;)
+
+## Computing nearest neighbor graph
+
+## Computing SNN
+
+## Warning: The following arguments are not used: reduction
+
+## Warning: The following arguments are not used: reduction
+
+## Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+## 
+## Number of nodes: 1486
+## Number of edges: 81146
+## 
+## Running Louvain algorithm...
+## Maximum modularity in 100 random starts: 0.8953
+## Number of communities: 8
+## Elapsed time: 0 seconds
+
+##    * removing low quality clusters ...
+
+##    * filtering per-cluster outliers (z-score filtDistClst2 = 5) ...
+
+##    * total number of cells surviving subcluster filtering = 1477</code></pre>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">callClusters</span>(obj, <span class="at">svd_slotName=</span><span class="st">&quot;SVD4&quot;</span>, <span class="at">umap_slotName=</span><span class="st">&quot;UMAP4&quot;</span>, <span class="at">cluster_slotName=</span><span class="st">&quot;Clusters4&quot;</span>, <span class="at">verbose=</span>T)</span></code></pre></div>
+<pre><code>##  - filtering outliers in UMAP manifold (z-score e.thresh = 3) ...
+
+##  - creating seurat object for graph-based clustering ...
+
+## Warning: Feature names cannot have underscores (&#39;_&#39;), replacing with dashes
+## (&#39;-&#39;)
+
+## Computing nearest neighbor graph
+
+## Computing SNN
+
+## Warning: The following arguments are not used: reduction
+
+## Warning: The following arguments are not used: reduction
+
+## Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+## 
+## Number of nodes: 1481
+## Number of edges: 82556
+## 
+## Running Louvain algorithm...
+## Maximum modularity in 100 random starts: 0.9005
+## Number of communities: 8
+## Elapsed time: 0 seconds
+
+##    * removing low quality clusters ...
+
+##    * filtering per-cluster outliers (z-score filtDistClst2 = 5) ...
+
+##    * total number of cells surviving subcluster filtering = 1475</code></pre>
+<h2 id="plotting-results">Plotting results</h2>
+<p>Having run the clustering algorithm, we can now visualize the
+different groupings on the UMAP embedding.</p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">layout</span>(<span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>), <span class="at">ncol=</span><span class="dv">2</span>, <span class="at">byrow=</span>T))</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar=</span><span class="fu">c</span>(<span class="dv">4</span>,<span class="dv">4</span>,<span class="dv">1</span>,<span class="dv">1</span>))</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plotUMAP</span>(obj, <span class="at">cluster_slotName=</span><span class="st">&quot;Clusters1&quot;</span>, <span class="at">main=</span><span class="st">&quot;regModel&quot;</span>)</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plotUMAP</span>(obj, <span class="at">cluster_slotName=</span><span class="st">&quot;Clusters2&quot;</span>, <span class="at">main=</span><span class="st">&quot;tfidf&quot;</span>)</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plotUMAP</span>(obj, <span class="at">cluster_slotName=</span><span class="st">&quot;Clusters3&quot;</span>, <span class="at">main=</span><span class="st">&quot;logisticModel&quot;</span>)</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plotUMAP</span>(obj, <span class="at">cluster_slotName=</span><span class="st">&quot;Clusters4&quot;</span>, <span class="at">main=</span><span class="st">&quot;regModel2&quot;</span>)</span></code></pre></div>
+<p><img
+src="https://github.com/plantformatics/RRscca/blob/master/tutorial_figures/plotClusters-2.png" /></p>
+<h2 id="saving-results">Saving results</h2>
+<p>The <code>RRscca</code> object is updated iteratively after each
+processing step. To save results for sharing or future exploration, you
+can use the following command to save a snapshot of current stage of
+analysis:</p>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(obj, <span class="at">file=</span><span class="st">&quot;RRscca_object.rds&quot;</span>)</span></code></pre></div>
+<h2 id="accessing-results">Accessing results</h2>
+<p>Results are appended to the <code>RRscca</code> object after each
+function, as described above. Below describes the location of different
+data sets up to this point.</p>
+<ul>
+<li>Raw counts
+<ul>
+<li><code>obj$counts</code></li>
+<li>generated by <code>loadSparseData</code></li>
+</ul></li>
+<li>Raw meta-data
+<ul>
+<li><code>obj$meta</code></li>
+<li>generated by <code>loadSparseData</code></li>
+</ul></li>
+<li>SVD/PCA
+<ul>
+<li><code>obj$PCA</code> (Default, can be customized)</li>
+<li>generated by <code>reduceDims</code></li>
+</ul></li>
+<li>Initial UMAP
+<ul>
+<li><code>obj$UMAP</code> (Default, can be customized)</li>
+<li>generated by <code>projectUMAP</code></li>
+</ul></li>
+<li>Cluster + meta-data (filtered cells)
+<ul>
+<li><code>obj$Clusters</code> (Default, can be customized)</li>
+<li>generated by <code>callClusters</code></li>
+</ul></li>
+</ul>
+<hr />
+<h3 id="session-information">Session Information</h3>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div>
+<pre><code>## R version 3.6.3 (2020-02-29)
+## Platform: x86_64-apple-darwin15.6.0 (64-bit)
+## Running under: macOS Catalina 10.15.6
+## 
+## Matrix products: default
+## BLAS:   /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRblas.0.dylib
+## LAPACK: /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRlapack.dylib
+## 
+## locale:
+## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+## [1] RRscca_0.0.0.9000
+## 
+## loaded via a namespace (and not attached):
+##   [1] Seurat_3.2.2          Rtsne_0.15            colorspace_1.4-1     
+##   [4] deldir_0.1-29         ellipsis_0.3.1        ggridges_0.5.2       
+##   [7] spatstat.data_1.4-3   leiden_0.3.3          listenv_0.8.0        
+##  [10] ggrepel_0.8.2         RSpectra_0.16-0       codetools_0.2-16     
+##  [13] splines_3.6.3         knitr_1.30            itertools_0.1-3      
+##  [16] polyclip_1.10-0       jsonlite_1.7.1        ica_1.0-2            
+##  [19] cluster_2.1.0         png_0.1-7             uwot_0.1.8           
+##  [22] shiny_1.5.0           sctransform_0.3.1     compiler_3.6.3       
+##  [25] httr_1.4.2            Matrix_1.2-18         fastmap_1.0.1        
+##  [28] lazyeval_0.2.2        later_1.1.0.1         htmltools_0.5.0      
+##  [31] tools_3.6.3           rsvd_1.0.3            igraph_1.2.6         
+##  [34] gtable_0.3.0          glue_1.4.2            RANN_2.6.1           
+##  [37] reshape2_1.4.4        dplyr_1.0.2           Rcpp_1.0.5           
+##  [40] spatstat_1.64-1       vctrs_0.3.4           nlme_3.1-150         
+##  [43] iterators_1.0.13      lmtest_0.9-38         xfun_0.18            
+##  [46] stringr_1.4.0         globals_0.13.1        mime_0.9             
+##  [49] miniUI_0.1.1.1        lifecycle_0.2.0       irlba_2.3.3          
+##  [52] goftest_1.2-2         future_1.19.1         MASS_7.3-53          
+##  [55] zoo_1.8-8             scales_1.1.1          doSNOW_1.0.19        
+##  [58] promises_1.1.1        spatstat.utils_1.17-0 parallel_3.6.3       
+##  [61] RColorBrewer_1.1-2    yaml_2.2.1            reticulate_1.18      
+##  [64] pbapply_1.4-3         gridExtra_2.3         ggplot2_3.3.2        
+##  [67] rpart_4.1-15          stringi_1.5.3         S4Vectors_0.24.4     
+##  [70] foreach_1.5.1         BiocGenerics_0.32.0   BiocParallel_1.20.1  
+##  [73] shape_1.4.5           rlang_0.4.8           pkgconfig_2.0.3      
+##  [76] matrixStats_0.57.0    evaluate_0.14         lattice_0.20-41      
+##  [79] ROCR_1.0-11           purrr_0.3.4           tensor_1.5           
+##  [82] patchwork_1.0.1       htmlwidgets_1.5.2     cowplot_1.1.0        
+##  [85] tidyselect_1.1.0      RcppAnnoy_0.0.16      plyr_1.8.6           
+##  [88] magrittr_1.5          R6_2.4.1              IRanges_2.20.2       
+##  [91] snow_0.4-3            generics_0.0.2        DelayedArray_0.12.3  
+##  [94] pillar_1.4.6          mgcv_1.8-33           fitdistrplus_1.1-1   
+##  [97] survival_3.2-7        abind_1.4-5           tibble_3.0.4         
+## [100] future.apply_1.6.0    crayon_1.3.4          KernSmooth_2.23-17   
+## [103] plotly_4.9.2.1        rmarkdown_2.5         viridis_0.5.1        
+## [106] grid_3.6.3            data.table_1.13.2     FNN_1.1.3            
+## [109] digest_0.6.27         xtable_1.8-4          tidyr_1.1.2          
+## [112] httpuv_1.5.4          glmnet_4.0-2          stats4_3.6.3         
+## [115] munsell_0.5.0         viridisLite_0.3.0</code></pre>
