@@ -28,14 +28,16 @@ gene.)<br />
 2. opt_gene_tn5.sparse<br />
 3. opt_genes_500bpTSS_sorted.bed<br />
 </p>
-<p><strong>Running</strong>:</p>
-<pre><code>python Socrates2/utils/prepare_tn5_gene_accessibiliy.py
--script_dir Socrates2/utils/input_other_required_scripts_dir
--o output_dir
--tn5_fl /Path/to/opt_tn5_mq10.bed
--Ggff_fl /Path/to/Gene.gff3
--Genome_fl /Path/to/Genome.fasta
--Gmfai_fl /Path/to/Genome.fasta.fai</code></pre>
+<p><strong>Running</strong>:<br />
+</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> Socrates2/utils/prepare_tn5_gene_accessibiliy.py</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">-script_dir</span> Socrates2/utils/input_other_required_scripts_dir</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">-o</span> output_dir</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">-tn5_fl</span> /Path/to/opt_tn5_mq10.bed</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">-Ggff_fl</span> /Path/to/Gene.gff3</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">-Genome_fl</span> /Path/to/Genome.fasta</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">-Gmfai_fl</span> /Path/to/Genome.fasta.fai</span></code></pre></div>
 <h3 id="calculate-gene-accessibility-1">Calculate gene
 accessibility</h3>
 <p>This step is to calculate the gene accessibility. The output file has
@@ -59,13 +61,15 @@ step)<br />
 <p><strong>Outputs</strong>:<br />
 1. opt_gene_body_accessibility_mtx.rds<br />
 </p>
-<p><strong>Running</strong>:</p>
-<pre><code>python Socrates2/utils/prepare_tn5_gene_accessibiliy.py
--script_dir Socrates2/utils/input_other_required_scripts_dir
--o output_dir
--meta_fl /Path/to/meta.txt
--gene_tn5_fl /Path/to/opt_gene_tn5.sparse
--gene_bed_fl /Path/to/opt_genes_500bpTSS_sorted</code></pre>
+<p><strong>Running</strong>:<br />
+</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> Socrates2/utils/prepare_tn5_gene_accessibiliy.py</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">-script_dir</span> Socrates2/utils/input_other_required_scripts_dir</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">-o</span> output_dir</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">-meta_fl</span> /Path/to/meta.txt</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">-gene_tn5_fl</span> /Path/to/opt_gene_tn5.sparse</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">-gene_bed_fl</span> /Path/to/opt_genes_500bpTSS_sorted</span></code></pre></div>
 <h3 id="smooth-gene-accessibility">Smooth gene accessibility</h3>
 <p>The smooth step will smooth gene accessibility using a published
 method ‘MAGIC’ referred from <a
@@ -99,11 +103,13 @@ LouvainClusters.)<br />
 <p><strong>Outputs</strong>:<br />
 1. opt_allgenes_impute.activity.rds<br />
 </p>
-<p><strong>Running</strong>:</p>
-<pre><code>python Socrates2/utils/prepare_tn5_gene_accessibiliy.py
--script_dir Socrates2/utils/input_other_required_scripts_dir
--o output_dir
--open_smoothGeneAcc yes
--meta_fl /Path/to/meta.txt
--svd_fl /Path/to/svd.txt
--gene_acc_fl /Path/to/opt_gene_body_accessibility_mtx.rds</code></pre>
+<p><strong>Running</strong>:<br />
+</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> Socrates2/utils/prepare_tn5_gene_accessibiliy.py</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">-script_dir</span> Socrates2/utils/input_other_required_scripts_dir</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">-o</span> output_dir</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ex">-open_smoothGeneAcc</span> yes</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">-meta_fl</span> /Path/to/meta.txt</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="ex">-svd_fl</span> /Path/to/svd.txt</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ex">-gene_acc_fl</span> /Path/to/opt_gene_body_accessibility_mtx.rds</span></code></pre></div>
