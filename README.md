@@ -72,7 +72,7 @@ Thank you to [YunChuan Wang](https://github.com/supermanwasd) for setting up the
 
 [4. Comparison of normalization methods](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_clustering_comparison_tutorial_html.html)
 
-[5. Prepare gene accessibility][http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html]
+[5. Prepare gene accessibility](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html)
 
 [6. Visulize marker genes]
 
