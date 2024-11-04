@@ -367,21 +367,25 @@ annotation based on ScAClass function.</p>
 <h3>Visualize marker genes</h3>
 <div id="case-1-umap-visualization" class="section level4">
 <h4>Case 1: UMAP visualization</h4>
-<p><strong>Inputs</strong> (Required): 1. -open_markerUMAP yes 2.
--script_dir (a script directory downloaded from GitHub:
-Socrates2/utils/input_other_required_scripts_dir) 3. -impute_gene_mtx
-(an imputed gene matrix obtained from Smooth gene accessibility within
-<a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html">5.
+<p><strong>Inputs</strong> (Required):<br />
+1. -open_markerUMAP yes<br />
+2. -script_dir (a script directory downloaded from GitHub:
+Socrates2/utils/input_other_required_scripts_dir)<br />
+3. -impute_gene_mtx (an imputed gene matrix obtained from Smooth gene
+accessibility within <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html">5.
 Prepare gene accessibility</a>:
-<strong>opt_allgenes_impute.activity.rds</strong>) 4. -meta_fl (A meta
-file obtained from <a href="https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_simple_clustering_tutorial.html">Loading
-pre-processed data, dimensionality reduction, and clustering</a>) 5.
--marker_fl (A marker gene file with a column name called ‘GeneID’) 6. -o
-output_dir (mkdir output_dir)</p>
+<strong>opt_allgenes_impute.activity.rds</strong>)<br />
+4. -meta_fl (A meta file obtained from <a href="https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_simple_clustering_tutorial.html">Loading
+pre-processed data, dimensionality reduction, and clustering</a>)<br />
+5. -marker_fl (A marker gene file with a column name called
+‘GeneID’)<br />
+6. -o output_dir (mkdir output_dir)<br />
+</p>
 <p><strong>Optional parameters:</strong><br />
 1. -lim_val 0.98 (A lim value of visualizing the markers in UMAP；
 Default: 0.98）</p>
-<p><strong>Outputs:</strong> 1. opt_UMAP_marker.png</p>
+<p><strong>Outputs:</strong><br />
+1. opt_UMAP_marker.png</p>
 <p><strong>Running</strong>:</p>
 <pre class="bash"><code>python Socrates2/utils/annotate_cell_identity_using_markers.py
 -script_dir Socrates2/utils/input_other_required_scripts_dir
@@ -393,31 +397,42 @@ Default: 0.98）</p>
 </div>
 <div id="case-2-dot-plot-visualization" class="section level4">
 <h4>Case 2: Dot plot visualization</h4>
-<p><strong>Inputs</strong> (Required): 1. -open_dotplot yes 2.
--script_dir (a script directory downloaded from GitHub:
-Socrates2/utils/input_other_required_scripts_dir) 3. -impute_gene_mtx
-(The <strong>opt_allgenes_impute.activity.rds</strong> obtained from
-from Smooth gene accessibility within <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html">5.
-Prepare gene accessibility</a>) 4. -meta_fl (A meta file obtained from
-<a href="https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_simple_clustering_tutorial.html">Loading
-pre-processed data, dimensionality reduction, and clustering</a>) 5.
--gene_tn5_fl (The <strong>opt_gene_tn5.sparse</strong> file obtained
+<p><strong>Inputs</strong> (Required):<br />
+1. -open_dotplot yes<br />
+2. -script_dir (a script directory downloaded from GitHub:
+Socrates2/utils/input_other_required_scripts_dir)<br />
+3. -impute_gene_mtx (The
+<strong>opt_allgenes_impute.activity.rds</strong> obtained from from
+Smooth gene accessibility within <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html">5.
+Prepare gene accessibility</a>)<br />
+4. -meta_fl (A meta file obtained from <a href="https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_simple_clustering_tutorial.html">Loading
+pre-processed data, dimensionality reduction, and clustering</a>)<br />
+5. -gene_tn5_fl (The <strong>opt_gene_tn5.sparse</strong> file obtained
 from Prepare genes with Tn5 insertions within <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html">5.
-Prepare gene accessibility</a> 6. -marker_fl (A marker gene file with a
-column name called ‘GeneID’) 7. -o output_dir (mkdir output_dir)</p>
+Prepare gene accessibility</a><br />
+6. -marker_fl (A marker gene file with a column name called
+‘GeneID’)<br />
+7. -o output_dir (mkdir output_dir)<br />
+</p>
 <p><strong>Optional parameters:</strong><br />
 1. -clustnm: Set the cell cluster name within meta file; Default:
-LouvainClusters. 2. -dotplotwidth: Define the width of output figure of
-the dotplot. Default: 10. 3. -dotplotheight: Define the height of output
-figure of the dotplot. Default: 10. 4. -open_only_plot: Only plot the
-marker genes. Once we open this step, we need to make sure we firstly
-ran the whole step completely to obtain the prepared gene file. Users
-initiate this argument only if they want to just plot other than build
-up the prepared file. Default: no. 5. -prepared_gene_fl: A prepared gene
-file (<strong>opt_gene_zscore_accprop.rds</strong>) obtained from the
-firstly running of the whole step.</p>
-<p><strong>Outputs:</strong> 1. opt_gene_zscore_accprop.rds 2.
-opt_dotplot_marker.pdf</p>
+LouvainClusters.<br />
+2. -dotplotwidth: Define the width of output figure of the dotplot.
+Default: 10.<br />
+3. -dotplotheight: Define the height of output figure of the dotplot.
+Default: 10.<br />
+4. -open_only_plot: Only plot the marker genes. Once we open this step,
+we need to make sure we firstly ran the whole step completely to obtain
+the prepared gene file. Users initiate this argument only if they want
+to just plot other than build up the prepared file. Default: no. 5.
+-prepared_gene_fl: A prepared gene file
+(<strong>opt_gene_zscore_accprop.rds</strong>) obtained from the firstly
+running of the whole step.<br />
+</p>
+<p><strong>Outputs:</strong><br />
+1. opt_gene_zscore_accprop.rds<br />
+2. opt_dotplot_marker.pdf<br />
+</p>
 <p><strong>Running</strong>:</p>
 <pre class="bash"><code>python Socrates2/utils/annotate_cell_identity_using_markers.py
 -script_dir Socrates2/utils/input_other_required_scripts_dir
