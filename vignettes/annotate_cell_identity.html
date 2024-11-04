@@ -415,19 +415,18 @@ Prepare gene accessibility</a><br />
 7. -o output_dir (mkdir output_dir)<br />
 </p>
 <p><strong>Optional parameters:</strong><br />
-1. -clustnm: Set the cell cluster name within meta file; Default:
-LouvainClusters.<br />
-2. -dotplotwidth: Define the width of output figure of the dotplot.
-Default: 10.<br />
-3. -dotplotheight: Define the height of output figure of the dotplot.
-Default: 10.<br />
-4. -open_only_plot: Only plot the marker genes. Once we open this step,
-we need to make sure we firstly ran the whole step completely to obtain
-the prepared gene file. Users initiate this argument only if they want
-to just plot other than build up the prepared file. Default: no. 5.
--prepared_gene_fl: A prepared gene file
-(<strong>opt_gene_zscore_accprop.rds</strong>) obtained from the firstly
-running of the whole step.<br />
+1. -clustnm LouvainClusters (Set the cell cluster name within meta file;
+Default: LouvainClusters.)<br />
+2. -dotplotwidth 10 (Define the width of output figure of the dotplot.
+Default: 10.)<br />
+3. -dotplotheight 10 (Define the height of output figure of the dotplot.
+Default: 10.)<br />
+4. -open_only_plot no (Only plot the marker genes. Once we open this
+step, we need to make sure we firstly ran the whole step completely to
+obtain the prepared gene file. Users initiate this argument only if they
+want to just plot other than build up the prepared file. Default: no. 5.
+-prepared_gene_fl: opt_gene_zscore_accprop.rds (A prepared gene file
+obtained from the firstly running of the whole step.)<br />
 </p>
 <p><strong>Outputs:</strong><br />
 1. opt_gene_zscore_accprop.rds<br />
@@ -453,6 +452,61 @@ following script other than build up this file again.</p>
 -prepared_gene_fl /Path/to/opt_gene_zscore_accprop.rds 
 -marker_fl /Path/to/marker.txt</code></pre>
 </div>
+</div>
+<div id="use-the-reference-based-annotation-scaclass" class="section level3">
+<h3>Use the reference-based annotation (ScAClass)</h3>
+<p>The reference-based method is to annotate cell identity using a
+pre-built gene by cell matrix with each cell identity has been
+annotated. Currently, this pipeline includes rice (nine organs: axillary
+bud, early seedling, Seedling, leaf, seminal root, crown root, early
+seed, late seed, panicle), maize etc. Users need to specify which
+species and organs they want to use to perform the annotation.</p>
+<p><strong>Inputs</strong> (Required):<br />
+1. <strong>-d working_dir</strong> (mkdir working_dir)<br />
+2. <strong>-o output_dir</strong> (mkdir output_dir)<br />
+3. <strong>-train_mtx</strong> (input_reference_mtx can be download from
+Socrates2)<br />
+4. <strong>-train_meta</strong> (input_reference_cell_meta_fl can be
+download from Socrates2)<br />
+5. <strong>-unknown_mtx</strong> (a matrix called
+opt_gene_body_accessibility_mtx.rds with cells need to be annotated,
+which was generated within <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html">5.
+Prepare gene accessibility</a>)<br />
+6. <strong>-species</strong> (A species name needs to be specified) 7.
+<strong>-organ</strong> (A organ name needs to be specified)</p>
+<p><strong>Optional parameters:</strong><br />
+1. <strong>-open_low_mem yes|no</strong> (Users could use the low mem to
+perform the classification by selecting the top variant features of the
+training dataset. Default: no)<br />
+2. <strong>-top_ft_num 5000</strong> (Once the low mem open, users could
+set a top variant ft number. Default: 5000)<br />
+3. <strong>-clustering_fl Path/to/clustering_fl</strong> (Provide a
+clustering file to build a clustering based annotation)<br />
+4. <strong>-PC_str 50</strong> (Provide a PC number string used for the
+embeddings. Default: 50)<br />
+5. <strong>-Rd_type SVD</strong> (Provide a reduction type. Default:
+SVD)<br />
+6. <strong>-ML_method SVM</strong> (Provide a machine learning method.
+ScAClass provides Random Forest/RF and Support Vector Machine/SVM.
+Default: SVM)<br />
+7. <strong>-SVM_kernel rbf</strong> (SVM method provides ‘linear’,
+‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’ in sklearn. Default: rbf)<br />
+8. <strong>-open_smote yes</strong> (Smote will impute data enabling
+data balance manner. Default: yes)<br />
+9. <strong>-running_steps All</strong> (Provide running steps to check
+whether we will run the specific steps. Default: All)<br />
+</p>
+<p><strong>Outputs:</strong><br />
+1. opt_final_cell_annotation.txt<br />
+</p>
+<pre class="bash"><code>python Socrates2/utils/ScAClass.py  
+-d working_dir  
+-o output_dir  
+-train_mtx input_reference_mtx  
+-train_meta input_reference_cell_meta_fl  
+-unknown_mtx input_unknown_mtx
+-species rice
+-organ seedling</code></pre>
 </div>
 </div>
 
