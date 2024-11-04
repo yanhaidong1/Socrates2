@@ -74,7 +74,7 @@ R environment: [4. Comparison of normalization methods](https://htmlpreview.gith
 
 Bash environment: [5. Prepare gene accessibility](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html)
 
-Bash environment: [6. Annotate cell identity]
+Bash environment: [6. Annotate cell identity](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/annotate_cell_identity.html)
 
 Bash environment: [7. Call peak per cell type]
 
