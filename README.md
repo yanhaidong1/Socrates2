@@ -76,7 +76,7 @@ Bash environment: [5. Prepare gene accessibility](http://htmlpreview.github.io/?
 
 Bash environment: [6. Annotate cell identity](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/annotate_cell_identity.html)
 
-Bash environment: [7. Call peak per cell type]
+Bash environment: [7. Call peak per cell type](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/peak_call_per_celltype.html)
 
 Bash environment: [8. Identify cell-type-specific peak]
 
