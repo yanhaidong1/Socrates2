@@ -363,18 +363,18 @@ display: none;
 <p>This pipeline helps annotate cell identity by visualizing marker
 genes using UMAP or DOT plot, and by performing reference-based
 annotation based on ScAClass function.</p>
-<div id="visualize-marker-genes" class="section level3">
-<h3>Visualize marker genes</h3>
+<div id="option-1-visualize-marker-genes" class="section level3">
+<h3>Option 1: visualize marker genes</h3>
 <div id="case-1-umap-visualization" class="section level4">
 <h4>Case 1: UMAP visualization</h4>
 <p><strong>Inputs</strong> (Required):<br />
 1. <strong>-open_markerUMAP yes</strong><br />
 2. <strong>-script_dir</strong> (a script directory downloaded from
 GitHub: Socrates2/utils/input_other_required_scripts_dir)<br />
-3. <strong>-impute_gene_mtx</strong> (an imputed gene matrix obtained
-from Smooth gene accessibility within <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html">5.
-Prepare gene accessibility</a>:
-<strong>opt_allgenes_impute.activity.rds</strong>)<br />
+3. <strong>-impute_gene_mtx</strong>
+(<strong>opt_allgenes_impute.activity.rds</strong> obtained from Smooth
+gene accessibility within <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html">5.
+Prepare gene accessibility</a>)<br />
 4. <strong>-meta_fl</strong> (A meta file obtained from <a href="https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_simple_clustering_tutorial.html">Loading
 pre-processed data, dimensionality reduction, and clustering</a>)<br />
 5. <strong>-marker_fl</strong> (A marker gene file with a column name
@@ -401,15 +401,14 @@ markers in UMAP； Default: 0.98）</p>
 1. <strong>-open_dotplot yes</strong><br />
 2. <strong>-script_dir</strong> (a script directory downloaded from
 GitHub: Socrates2/utils/input_other_required_scripts_dir)<br />
-3. <strong>-impute_gene_mtx</strong> (The
-<strong>opt_allgenes_impute.activity.rds</strong> obtained from from
+3. <strong>-impute_gene_mtx</strong>
+(<strong>opt_allgenes_impute.activity.rds</strong> obtained from from
 Smooth gene accessibility within <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html">5.
 Prepare gene accessibility</a>)<br />
 4. <strong>-meta_fl</strong> (A meta file obtained from <a href="https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_simple_clustering_tutorial.html">Loading
 pre-processed data, dimensionality reduction, and clustering</a>)<br />
-5. <strong>-gene_tn5_fl</strong> (The
-<strong>opt_gene_tn5.sparse</strong> file obtained from Prepare genes
-with Tn5 insertions within <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html">5.
+5. <strong>-gene_tn5_fl</strong> (<strong>opt_gene_tn5.sparse</strong>
+file obtained from Prepare genes with Tn5 insertions within <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html">5.
 Prepare gene accessibility</a><br />
 6. <strong>-marker_fl</strong> (A marker gene file with a column name
 called ‘GeneID’)<br />
@@ -455,8 +454,44 @@ following script other than build up this file again.</p>
 -marker_fl /Path/to/marker.txt</code></pre>
 </div>
 </div>
-<div id="use-the-reference-based-annotation-scaclass" class="section level3">
-<h3>Use the reference-based annotation (ScAClass)</h3>
+<div id="option-2-annotate-cell-identity-using-marker-genes" class="section level3">
+<h3>Option 2: annotate cell identity using marker genes</h3>
+<p>This step will automatically annotate cell identity based on
+chromatin accessibility of each marker gene. The outputs will return a
+single meta file recording predicted cell identity and also include
+several PNG image files that visualize the average performance of
+multiple marker genes within single UMAP file.</p>
+<p><strong>Inputs</strong> (Required):<br />
+1. <strong>-open_aggregateAnnot yes</strong><br />
+2. <strong>-script_dir</strong> (a script directory downloaded from
+GitHub: Socrates2/utils/input_other_required_scripts_dir)<br />
+3. <strong>-gene_acc_mtx</strong>
+(<strong>opt_gene_body_accessibility_mtx.rds</strong> obtained from
+Calculate gene accessibility within <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html">5.
+Prepare gene accessibility</a>)<br />
+4. <strong>-meta_fl</strong> (A meta file obtained from <a href="https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_simple_clustering_tutorial.html">Loading
+pre-processed data, dimensionality reduction, and clustering</a>)<br />
+5. <strong>-svd_fl</strong> (A svd file obtained from <a href="https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_simple_clustering_tutorial.html">Loading
+pre-processed data, dimensionality reduction, and clustering</a>)<br />
+6. <strong>-marker_fl</strong> (A marker gene file with a column name
+called ‘GeneID’)<br />
+</p>
+<p><strong>Outputs:</strong><br />
+1. opt_annot.meta.txt 2. opt_annot.cell_identities.predicted.png;
+opt_annot.cell_identities.smooth.png;
+opt_annot.cell_identities.wknn.png</p>
+<p><strong>Running</strong>:</p>
+<pre class="bash"><code>python Socrates2/utils/annotate_cell_identity_using_markers.py
+-script_dir Socrates2/utils/input_other_required_scripts_dir
+-o output_dir
+-open_aggregateAnnot yes 
+-gene_acc_mtx /Path/to/opt_gene_body_accessibility_mtx.rds
+-meta_fl /Path/to/meta.txt
+-svd_fl /Path/svd.txt
+-marker_fl /Path/to/marker.txt</code></pre>
+</div>
+<div id="option-3-use-the-reference-based-annotation-scaclass" class="section level3">
+<h3>Option 3: use the reference-based annotation (ScAClass)</h3>
 <p>The reference-based method is to annotate cell identity using a
 pre-built gene by cell matrix with each cell identity has been
 annotated. Currently, this pipeline includes rice (nine organs: axillary
@@ -466,45 +501,48 @@ species and organs they want to use to perform the annotation.</p>
 <p><strong>Inputs</strong> (Required):<br />
 1. <strong>-d working_dir</strong> (mkdir working_dir)<br />
 2. <strong>-o output_dir</strong> (mkdir output_dir)<br />
-3. <strong>-train_mtx</strong> (input_reference_mtx can be download from
+3. <strong>-script_dir</strong> (a script directory downloaded from
+GitHub: Socrates2/utils/input_other_required_scripts_dir)<br />
+4. <strong>-train_mtx</strong> (input_reference_mtx can be download from
 Socrates2)<br />
-4. <strong>-train_meta</strong> (input_reference_cell_meta_fl can be
+5. <strong>-train_meta</strong> (input_reference_cell_meta_fl can be
 download from Socrates2)<br />
-5. <strong>-unknown_mtx</strong> (a matrix called
+6. <strong>-unknown_mtx</strong> (a matrix called
 opt_gene_body_accessibility_mtx.rds with cells need to be annotated,
 which was generated within <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html">5.
 Prepare gene accessibility</a>)<br />
-6. <strong>-species</strong> (A species name needs to be
+7. <strong>-species</strong> (A species name needs to be
 specified)<br />
-7. <strong>-organ</strong> (A organ name needs to be specified)</p>
+8. <strong>-organ</strong> (A organ name needs to be specified)</p>
 <p><strong>Optional parameters:</strong><br />
-1. <strong>-open_low_mem yes|no</strong> (Users could use the low mem to
+9. <strong>-open_low_mem yes|no</strong> (Users could use the low mem to
 perform the classification by selecting the top variant features of the
 training dataset. Default: no)<br />
-2. <strong>-top_ft_num 5000</strong> (Once the low mem open, users could
-set a top variant ft number. Default: 5000)<br />
-3. <strong>-clustering_fl Path/to/clustering_fl</strong> (Provide a
+10. <strong>-top_ft_num 5000</strong> (Once the low mem open, users
+could set a top variant ft number. Default: 5000)<br />
+11. <strong>-clustering_fl Path/to/clustering_fl</strong> (Provide a
 clustering file to build a clustering based annotation)<br />
-4. <strong>-PC_str 50</strong> (Provide a PC number string used for the
+12. <strong>-PC_str 50</strong> (Provide a PC number string used for the
 embeddings. Default: 50)<br />
-5. <strong>-Rd_type SVD</strong> (Provide a reduction type. Default:
+13. <strong>-Rd_type SVD</strong> (Provide a reduction type. Default:
 SVD)<br />
-6. <strong>-ML_method SVM</strong> (Provide a machine learning method.
+14. <strong>-ML_method SVM</strong> (Provide a machine learning method.
 ScAClass provides Random Forest/RF and Support Vector Machine/SVM.
 Default: SVM)<br />
-7. <strong>-SVM_kernel rbf</strong> (SVM method provides ‘linear’,
+15. <strong>-SVM_kernel rbf</strong> (SVM method provides ‘linear’,
 ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’ in sklearn. Default: rbf)<br />
-8. <strong>-open_smote yes</strong> (Smote will impute data enabling
+16. <strong>-open_smote yes</strong> (Smote will impute data enabling
 data balance manner. Default: yes)<br />
-9. <strong>-running_steps All</strong> (Provide running steps to check
+17. <strong>-running_steps All</strong> (Provide running steps to check
 whether we will run the specific steps. Default: All)<br />
 </p>
 <p><strong>Outputs:</strong><br />
-1. opt_final_cell_annotation.txt<br />
+18. opt_final_cell_annotation.txt<br />
 </p>
 <pre class="bash"><code>python Socrates2/utils/ScAClass.py  
 -d working_dir  
 -o output_dir  
+-script_dir Socrates2/utils/input_other_required_scripts_dir
 -train_mtx input_reference_mtx  
 -train_meta input_reference_cell_meta_fl  
 -unknown_mtx opt_gene_body_accessibility_mtx.rds
