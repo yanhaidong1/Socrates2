@@ -421,8 +421,8 @@ estimating proportion of Tn5 integration sites near gene TSSs. Default:
 file obtained from the -open_build_obj.)<br />
 2. <strong>-min_cells 1000</strong> (Lower limit on the number of
 identified cells. Default: 1000)<br />
-3. <strong>-max_cells 15000</strong> (Upper limit on the number of
-identified cells. Default: 15000)<br />
+3. <strong>-max_cells 16000</strong> (Upper limit on the number of
+identified cells. Default: 16000)<br />
 4. <strong>-min_tn5 1000</strong> (Lower threshold for the minimum
 number of Tn5 integration sites for retaining obj barcode. Default:
 1000)<br />
@@ -464,6 +464,32 @@ set. Default: 100)<br />
 </p>
 <div id="option-1-run-all-the-steps-at-once" class="section level3">
 <h3>Option 1: Run all the steps at once</h3>
+<p>A particularly useful metric of data quality can be estimated by
+counting the proportion of Tn5 integration sites that are localized to
+significantly enriched regions of the genome. To estimate the fraction
+of reads in peaks (FRiP), <code>Socrates2</code> can run MACS2 on the
+bulk Tn5 integration sites and count the number of integration sites per
+barcode.</p>
+<p>The metadata slot contains essential information for filtering out
+low-quality barcodes. Cells are filtered by setting thresholds such as a
+minimum total read depth of <strong>-min_tn5 1000</strong> (requiring at
+least 1000 Tn5 integration sites per cell), a maximum number of cells
+with <strong>-max_cells 16000</strong>, a minimum proportion of reads
+mapping to TSSs with <strong>-tss_min_freq 0.2</strong> and
+<strong>-tss_z_thresh 2</strong> (default values of 0.2 and a z-score of
+2), and FRiP scores for barcodes with <strong>-frip_min_freq
+0.2</strong> and <strong>-frip_z_thresh 2</strong> (also with defaults
+of 0.2 and a z-score of 2).</p>
+<p>This pipeline offers enhanced cell filtration to identify cell
+barcodes that may represent ambient DNA or broken nuclei by comparing
+each barcode to background and cell bulk references. Parameters can be
+adjusted to refine the filtration, including <strong>-num_test</strong>
+(number of barcodes to query, ranked by the total number of unique Tn5
+insertions. Default: 20000), <strong>-num_REF</strong>(number of cells
+to use as the cell bulk reference, selecting the top cells based on
+unique Tn5 insertions. Default: 1000), and
+<strong>-background_cutoff</strong> (maximum unique Tn5 insertions for
+selecting barcodes for the background reference set. Default: 100).</p>
 <p><strong>Running</strong>:</p>
 <pre class="bash"><code>python Socrates2/utils/load_and_QC_data.py
 -script_dir Socrates2/utils/input_other_required_scripts_dir
@@ -480,8 +506,7 @@ set. Default: 100)<br />
 can set <strong>-open_build_obj no</strong> and provide a new input
 object using <strong>-ipt_raw_obj prefix.raw_obj.rds</strong> to save
 time. Additionally, users can modify the parameters listed above to
-filter cell barcodes.</p>
-<p><strong>Running</strong>:</p>
+filter cell barcodes. <strong>Running</strong>:</p>
 <pre class="bash"><code>python Socrates2/utils/load_and_QC_data.py
 -script_dir Socrates2/utils/input_other_required_scripts_dir
 -o output_dir
