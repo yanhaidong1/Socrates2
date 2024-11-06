@@ -66,7 +66,7 @@ Thank you to [YunChuan Wang](https://github.com/supermanwasd) for setting up the
 ## Tutorials
 Bash environment: [1. Processing bam](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/process_BAM.html)
 
-R environment: [2. Loading data, quality control, identifying cells, and creating a Socrates object](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Load_and_QC_data.html)
+Bash environment: [2. Loading data, quality control, identifying cells, and creating a Socrates object](https://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/load_data_and_QC.html)
 
 R environment: [3. Loading pre-processed data, dimensionality reduction, and clustering](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_simple_clustering_tutorial.html)
 
