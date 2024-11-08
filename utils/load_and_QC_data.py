@@ -5,6 +5,7 @@ import glob
 import sys
 import os
 import subprocess
+import re
 
 ##this pipeline is to load the data and perform the QC
 
@@ -399,7 +400,19 @@ def main(argv=None):
     ipt_chr_size_fl = args.chrom_size_file
     ipt_gene_gff_fl = args.gene_gff_file
     ipt_config_fl = output_dir + '/temp_defined_parameters.config'
-    ipt_path_to_preload_R = input_required_scripts_dir + '/preload_R'
+
+    ##obtain the previous folder
+    ipt_path_to_preload_R = ''
+
+    if re.match('(.+)/utils/input_other_required_scripts_dir/',input_required_scripts_dir):
+        mt = re.match('(.+)/utils/input_other_required_scripts_dir/',input_required_scripts_dir)
+        ipt_path_to_preload_R = mt.group(1) + '/R'
+
+    if re.match('(.+)/utils/input_other_required_scripts_dir',input_required_scripts_dir):
+        mt = re.match('(.+)/utils/input_other_required_scripts_dir',input_required_scripts_dir)
+        ipt_path_to_preload_R = mt.group(1) + '/R'
+
+    #ipt_path_to_preload_R = input_required_scripts_dir + '/preload_R'
 
     ##running
     cmd = 'Rscript ' + ipt_script + \
