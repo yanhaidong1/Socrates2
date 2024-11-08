@@ -178,7 +178,9 @@ countRemoveOrganelle <- function(obj,
 
             #Subsample bed so organelle reads do not interfere with ACR calls
             keep_bed_group <- c(obj$bed$V1 %notin% organelle)
-            final_bed <- subset(obj$bed, keep_bed_group)
+            final_bed <- obj$bed[!obj$bed$V1 %in% organelle,]
+	    dif <- nrow(final_bed) 
+	    message("... ", dif, " Tn5 insertions remaining after filtering...")
             obj$bed <- final_bed
             obj$PtMt <- zz
 
@@ -415,6 +417,7 @@ buildMetaData <- function(obj,
 #' @export
 #'
 findCells <- function(obj,
+                      output_dir,
                       set.tn5.cutoff=NULL,
                       min.cells=1000,
                       max.cells=15000,
@@ -622,7 +625,7 @@ findCells <- function(obj,
 
     # plot
     if(doplot){
-        if(!is.null(prefix)){pdf(paste0(prefix,".QC_FIGURES.pdf"), width=12, height=4)}
+        if(!is.null(prefix)){pdf(paste0(output_dir,'/',prefix,".QC_FIGURES.pdf"), width=12, height=4)}
         layout(matrix(c(1:plot_num), nrow=1))
         plot(rank[(cells+1):length(rank)], depth[(cells+1):length(rank)],
              type="l", lwd=2, col="grey75", main=prefix,
