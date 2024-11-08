@@ -45,7 +45,7 @@ if (open_build_object_final == 'yes'){
                   extsize= macs2_extsize_final,
                   fdr= macs2_fdr_final,
                   output=paste0(out,"_peaks"), 
-                  tempdir=paste0(out, '_macs2_temp'), 
+                  tempdir=paste0(output_dir,'/',out, '_macs2_temp'), 
                   verbose=T)
   ##build meta data
   obj <- buildMetaData(obj,
