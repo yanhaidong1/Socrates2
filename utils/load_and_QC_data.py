@@ -245,8 +245,8 @@ def main(argv=None):
         print('Please provide the mt chromosome name')
         return
 
-    store_final_parameter_line_list.append('Pt <- ' + args.Pt_chrom_name)
-    store_final_parameter_line_list.append('Mt <- ' + args.Mt_chrom_name)
+    store_final_parameter_line_list.append('Pt <- ' + '\'' + args.Pt_chrom_name + '\'')
+    store_final_parameter_line_list.append('Mt <- ' + '\'' + args.Mt_chrom_name + '\'')
 
     ##step01 parameters
     if args.prefix_name is not None:
@@ -254,7 +254,7 @@ def main(argv=None):
     else:
         prefix = 'output'
 
-    store_final_parameter_line_list.append('out <- ' + prefix)
+    store_final_parameter_line_list.append('out <- ' + '\'' + prefix + '\'')
 
 
     if args.macs2_shift is not None:
