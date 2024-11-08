@@ -294,50 +294,50 @@ def main(argv=None):
 
     store_final_parameter_line_list.append('min_cell_val_final <- ' + min_cell_val_final)
 
-    if args.max_cells is not None:
-        max_cell_val_final = args.max_cells
+    if args.max_cell_val is not None:
+        max_cell_val_final = args.max_cell_val
     else:
         max_cell_val_final = '16000'
 
     store_final_parameter_line_list.append('max_cell_val_final <- ' + max_cell_val_final)
 
-    if args.min_tn5 is not None:
-        min_tn5_val = args.min_tn5
+    if args.min_tn5_val is not None:
+        min_tn5_val_final = args.min_tn5_val
     else:
-        min_tn5_val = '1000'
+        min_tn5_val_final = '1000'
 
-    store_final_parameter_line_list.append('min_tn5_val <- ' + min_tn5_val)
+    store_final_parameter_line_list.append('min_tn5_val <- ' + min_tn5_val_final)
 
-    if args.org_flt_thresh is not None:
-        organelle_filter_cutoff_final = args.org_flt_thresh
+    if args.organelle_filter_cutoff is not None:
+        organelle_filter_cutoff_final = args.organelle_filter_cutoff
     else:
         organelle_filter_cutoff_final = '0.8'
 
     store_final_parameter_line_list.append('organelle_filter_cutoff_final <- ' + organelle_filter_cutoff_final)
 
-    if args.tss_min_freq is not None:
-        tss_min_freq_val_final = args.tss_min_freq
+    if args.tss_min_freq_val is not None:
+        tss_min_freq_val_final = args.tss_min_freq_val
     else:
         tss_min_freq_val_final = '0.2'
 
     store_final_parameter_line_list.append('tss_min_freq_val_final <- ' + tss_min_freq_val_final)
 
-    if args.tss_z_thresh is not None:
-        tss_z_thresh_final = args.tss_z_thresh
+    if args.tss_z_thresh_val is not None:
+        tss_z_thresh_final = args.tss_z_thresh_val
     else:
         tss_z_thresh_final = '2'
 
     store_final_parameter_line_list.append('tss_z_thresh_final <- ' + tss_z_thresh_final)
 
-    if args.frip_min_freq is not None:
-        frip_min_freq_final = args.frip_min_freq
+    if args.frip_min_freq_val is not None:
+        frip_min_freq_final = args.frip_min_freq_val
     else:
         frip_min_freq_final = '0.2'
 
     store_final_parameter_line_list.append('frip_min_freq_final <- ' + frip_min_freq_final)
 
-    if args.frip_z_thresh is not None:
-        frip_z_thresh_final = args.frip_z_thresh
+    if args.frip_z_thresh_val is not None:
+        frip_z_thresh_final = args.frip_z_thresh_val
     else:
         frip_z_thresh_final = '1'
 
