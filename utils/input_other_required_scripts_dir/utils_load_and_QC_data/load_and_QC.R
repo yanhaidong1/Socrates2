@@ -75,6 +75,12 @@ if (open_find_cells_step_final == 'yes'){
                      frip.min.freq=frip_min_freq_final,
                      frip.z.thresh=frip_z_thresh_final,
                      prefix=out)
+    
+    obj <- generateMatrix(obj,
+                          filtered=T, 
+                          windows=win_size, 
+                          peaks=F, 
+                          verbose=T)
   }else{
     
     message(" - finding cells ...")
@@ -101,6 +107,12 @@ if (open_find_cells_step_final == 'yes'){
                      frip.min.freq=frip_min_freq_final,
                      frip.z.thresh=frip_z_thresh_final,
                      prefix=out)
+    
+    obj <- generateMatrix(obj,
+                          filtered=T, 
+                          windows=win_size, 
+                          peaks=F, 
+                          verbose=T)
   }
   
   saveRDS(obj,paste0(output_dir,'/',out,'.findcell_obj.rds'))
@@ -141,11 +153,7 @@ if (open_is_cells_step_final == 'yes'){
   }
 }
 
-obj <- generateMatrix(obj,
-                      filtered=T, 
-                      windows=win_size, 
-                      peaks=F, 
-                      verbose=T)
+
 
 # save QC data
 saveRDS(obj, file=paste0(output_dir,'/',out, ".QC.rds"))
