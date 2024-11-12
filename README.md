@@ -64,27 +64,25 @@ Thank you to [YunChuan Wang](https://github.com/supermanwasd) for setting up the
 ---
 
 ## Tutorials
-Bash environment: [1. Processing bam](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/process_BAM.html)
+[1. Processing bam](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/process_BAM.html)
 
-Bash environment: [2. Loading data, quality control, identifying cells, and creating a Socrates object](https://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/load_data_and_QC.html)
+[2. Loading data, quality control, identifying cells, and creating a Socrates object](https://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/load_data_and_QC.html)
 
-R environment: [3. Loading pre-processed data, dimensionality reduction, and clustering](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_simple_clustering_tutorial.html)
+[3. Loading pre-processed data, dimensionality reduction, and clustering](https://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/clustering.html)
 
-R environment: [4. Comparison of normalization methods](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_clustering_comparison_tutorial_html.html)
+[5. Prepare gene accessibility](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html)
 
-Bash environment: [5. Prepare gene accessibility](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html)
+[6. Annotate cell identity](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/annotate_cell_identity.html)
 
-Bash environment: [6. Annotate cell identity](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/annotate_cell_identity.html)
+[7. Call peak per cell type](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/peak_call_per_celltype.html)
 
-Bash environment: [7. Call peak per cell type](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/peak_call_per_celltype.html)
+[8. Identify cell-type-specific peak]
 
-Bash environment: [8. Identify cell-type-specific peak]
+[9. Motif enrichment analysis]
 
-Bash environment: [9. Motif enrichment analysis]
+[10. Trjectory analysis analysis]
 
-Bash environment: [10. Trjectory analysis analysis]
-
-[8. Identify co-accessible ACRs](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_coACRs_tutorial.html)
+[11. Identify co-accessible ACRs](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_coACRs_tutorial.html)
 
 
 
