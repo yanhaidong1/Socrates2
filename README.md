@@ -70,19 +70,19 @@ Thank you to [YunChuan Wang](https://github.com/supermanwasd) for setting up the
 
 [3. Loading pre-processed data, dimensionality reduction, and clustering](https://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/clustering.html)
 
-[5. Prepare gene accessibility](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html)
+[4. Prepare gene accessibility](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html)
 
-[6. Annotate cell identity](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/annotate_cell_identity.html)
+[5. Annotate cell identity](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/annotate_cell_identity.html)
 
-[7. Call peak per cell type](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/peak_call_per_celltype.html)
+[6. Call peak per cell type](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/peak_call_per_celltype.html)
 
-[8. Identify cell-type-specific peak]
+[7. Identify cell-type-specific peak]
 
-[9. Motif enrichment analysis]
+[8. Motif enrichment analysis]
 
-[10. Trjectory analysis analysis]
+[9. Trjectory analysis analysis]
 
-[11. Identify co-accessible ACRs](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_coACRs_tutorial.html)
+[10. Identify co-accessible ACRs](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_coACRs_tutorial.html)
 
 
 
