@@ -109,8 +109,8 @@ def get_parsed_args():
     parser.add_argument("-num_REF", dest = 'num_ref_val',help = 'Number of cells to use as the cell bulk reference (top X cells based on # unique Tn5 insertions)'
                                                                 'Default: 1000')
 
-    parser.add_argument("-background_cutoff", dest = 'background_cutoff_val',help = 'Maximum unique Tn5 insertions to use for selecting barcodes for the background reference set)'
-                                                                'Default: 100')
+    #parser.add_argument("-background_cutoff", dest = 'background_cutoff_val',help = 'Maximum unique Tn5 insertions to use for selecting barcodes for the background reference set)'
+    #                                                            'Default: 100')
 
 
     #######################
@@ -366,12 +366,12 @@ def main(argv=None):
 
     store_final_parameter_line_list.append('num_ref_val_final <- ' + num_ref_val_final)
 
-    if args.background_cutoff_val is not None:
-        background_cutoff_val_final = args.background_cutoff_val
-    else:
-        background_cutoff_val_final = '100'
+    #if args.background_cutoff_val is not None:
+    #    background_cutoff_val_final = args.background_cutoff_val
+    #else:
+    #    background_cutoff_val_final = '100'
 
-    store_final_parameter_line_list.append('background_cutoff_val_final <- ' + background_cutoff_val_final)
+    #store_final_parameter_line_list.append('background_cutoff_val_final <- ' + background_cutoff_val_final)
 
     if args.window_size is not None:
         window_size_bp = args.window_size
