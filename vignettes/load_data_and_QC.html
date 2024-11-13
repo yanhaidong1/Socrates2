@@ -507,35 +507,30 @@ selecting barcodes for the background reference set. Default: 100).</p>
 <div id="option-2-start-from-prefix.raw_obj.rds" class="section level3">
 <h3>Option 2: Start from “prefix.raw_obj.rds”</h3>
 <p>If users wish to adjust parameters during the filtration step, they
-can set <strong>-open_build_obj no</strong> and provide a new input
-object using <strong>-ipt_raw_obj prefix.raw_obj.rds</strong> to save
-time. Additionally, users can modify the parameters listed above to
-filter cell barcodes. <strong>Running</strong>:</p>
+can set <strong>-open_build_obj no</strong> to save time. Additionally,
+users can modify the parameters listed above to filter cell barcodes.
+<strong>Running</strong>:</p>
 <pre class="bash"><code>python Socrates2/utils/load_and_QC_data.py
 -script_dir Socrates2/utils/input_other_required_scripts_dir
 -o output_dir
 -open_build_obj no
 -open_find_cells yes
--open_is_cells yes
--ipt_raw_obj prefix.raw_obj.rds</code></pre>
+-open_is_cells yes</code></pre>
 </div>
 <div id="option-3-start-from-prefix.findcell_obj.rds" class="section level3">
 <h3>Option 3: Start from “prefix.findcell_obj.rds”</h3>
 <p>If users wish to adjust parameters in the final filtration step,
 which compares to the background for filtration, they can set
 <strong>-open_build_obj no</strong> and <strong>-open_find_cells
-no</strong>, and provide a new input object with
-<strong>prefix.findcell_obj.rds</strong> to save time. Additionally,
-users can modify the parameters listed above to filter cell
-barcodes.</p>
+no</strong> to save time. Additionally, users can modify the parameters
+listed above to filter cell barcodes.</p>
 <p><strong>Running</strong>:</p>
 <pre class="bash"><code>python Socrates2/utils/load_and_QC_data.py
 -script_dir Socrates2/utils/input_other_required_scripts_dir
 -o output_dir
 -open_build_obj no
 -open_find_cells no
--open_is_cells yes
--ipt_findcell_obj prefix.findcell_obj.rds</code></pre>
+-open_is_cells yes</code></pre>
 </div>
 </div>
 
