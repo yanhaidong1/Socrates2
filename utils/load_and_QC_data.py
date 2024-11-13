@@ -64,7 +64,7 @@ def get_parsed_args():
     parser.add_argument("-open_find_cells", dest = 'open_find_cells_step', help = 'Perform intital QC to find an overall data quality.'
                                                                                   'Default: yes')
 
-    parser.add_argument("-ipt_raw_obj", dest = 'input_raw_object', help = 'Provide an object file obtained from the -open_build_obj.')
+    #parser.add_argument("-ipt_raw_obj", dest = 'input_raw_object', help = 'Provide an object file obtained from the -open_build_obj.')
 
 
     parser.add_argument("-min_cells", dest = 'min_cell_val', help = 'Lower limit on the number of identified cells.'
@@ -96,7 +96,7 @@ def get_parsed_args():
     parser.add_argument("-open_is_cells", dest = 'open_is_cells_step', help = 'This function compares each barcode to obj background and cell bulk reference to identify barcodes representing ambient DNA or broken nuclei.'
                                                                               'Default: yes')
 
-    parser.add_argument("-ipt_findcell_obj", dest = 'input_findcell_object', help = 'Provide an object obtained from the -open_find_cells.')
+    #parser.add_argument("-ipt_findcell_obj", dest = 'input_findcell_object', help = 'Provide an object obtained from the -open_find_cells.')
 
     parser.add_argument("-num_test", dest='num_test_val',
                         help='Number of barcodes to query (ranked by total # of unique Tn5 insertions).'
@@ -204,33 +204,33 @@ def main(argv=None):
 
 
     ##only if the build object do not open and find cells open we will provide the input object
-    if open_build_object_final == 'no':
+    #if open_build_object_final == 'no':
 
-        if open_find_cells_step_final == 'yes':
+    #    if open_find_cells_step_final == 'yes':
 
-            if args.input_raw_object is None:
-                print('Cannot find a raw built object file, please provide it')
-                return
-            else:
-                try:
-                    file = open(args.input_raw_object, 'r')  ##check if the file is not the right file
-                except IOError:
-                    print('There was an error opening the raw built object file!')
-                    return
+    #        if args.input_raw_object is None:
+    #            print('Cannot find a raw built object file, please provide it')
+    #            return
+    #        else:
+    #            try:
+    #                file = open(args.input_raw_object, 'r')  ##check if the file is not the right file
+    #            except IOError:
+    #                print('There was an error opening the raw built object file!')
+    #                return
 
-        else:
+    #    else:
 
-            if open_is_cells_step_final == 'yes':
+    #        if open_is_cells_step_final == 'yes':
 
-                if args.input_findcell_object is None:
-                    print('Cannot find a find cell object file, please provide it')
-                    return
-                else:
-                    try:
-                        file = open(args.input_findcell_object, 'r')  ##check if the file is not the right file
-                    except IOError:
-                        print('There was an error opening the find cell object file!')
-                        return
+    #            if args.input_findcell_object is None:
+    #                print('Cannot find a find cell object file, please provide it')
+    #                return
+    #            else:
+    #                try:
+    #                    file = open(args.input_findcell_object, 'r')  ##check if the file is not the right file
+    #                except IOError:
+    #                    print('There was an error opening the find cell object file!')
+    #                    return
 
 
     ##required parameters
