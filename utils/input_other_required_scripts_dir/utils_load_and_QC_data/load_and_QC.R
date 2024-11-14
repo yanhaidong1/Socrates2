@@ -151,6 +151,12 @@ if (open_is_cells_step_final == 'yes'){
                   min.FRiP.z= -2,
                   verbose=F)
   }
+}else{
+  
+  message(" - close the isCell")
+  obj <- readRDS(paste0(output_dir,'/',out,'.findcell_obj.rds'))
+  
+  
 }
 
 
