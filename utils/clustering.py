@@ -202,7 +202,7 @@ def main(argv=None):
         ipt_path_to_preload_R = mt.group(1) + '/R'
 
 
-    ipt_script = input_required_scripts_dir + '/utils_load_and_QC_data/clustering.R'
+    ipt_script = input_required_scripts_dir + '/utils_clustering/clustering.R'
     ipt_obj_dir = args.input_object_dir
     ipt_config_fl = output_dir + '/temp_defined_parameters.config'
 
