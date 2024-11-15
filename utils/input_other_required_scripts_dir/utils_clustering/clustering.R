@@ -62,9 +62,9 @@ input_output_dir <- as.character(args[4])
 #num_var <- as.numeric(args[2])
 
 if (num_var_final == 0){
-  num_var_final = NULL
+  num_var = NULL
 }else{
-  num_var_final = num_var_final
+  num_var = num_var_final
 }
 
 ##set the rdType
