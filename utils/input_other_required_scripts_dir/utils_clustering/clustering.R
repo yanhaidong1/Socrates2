@@ -90,7 +90,7 @@ if (num_var_final == 0){
 
 
 ##load all the required R script under Socrates2
-load_all(path_to_pleload_R_script)
+load_all(path_to_preload_R_script)
 
 ##load the configure file
 source(config)
