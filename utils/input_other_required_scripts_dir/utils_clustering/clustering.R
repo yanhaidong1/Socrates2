@@ -244,9 +244,10 @@ if (only_cluster == 'no'){
         }else{
           message ('- merged object is not existed, and we will create it')
           
-          dat <- list.files(pattern=paste0(input_obj_dir,'/','*.filtered.soc.rds'))
+          dat <- list.files(path= input_obj_dir,pattern = '.filtered.soc.rds')
+          #dat <- list.files(pattern=paste0(input_obj_dir,'/','*.filtered.soc.rds'))
           dat <- lapply(dat, function(x){
-            obj <- readRDS(x)
+            obj <- readRDS(paste0(input_obj_dir,'/',x))
             obj$counts <- obj$counts[Matrix::rowMeans(obj$counts > 0)>0.01,]
             obj$counts <- obj$counts[,Matrix::colSums(obj$counts)>0]
             obj$meta <- obj$meta[colnames(obj$counts),]
