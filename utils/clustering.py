@@ -183,7 +183,7 @@ def main(argv=None):
     else:
         only_cluster = 'no'
 
-    store_final_parameter_line_list.append('only_cluster <- ' + only_cluster)
+    store_final_parameter_line_list.append('only_cluster <- ' + '\'' + only_cluster + '\'')
 
     ##we will firstly build up the parameter setting file
     with open(output_dir + '/temp_defined_parameters.config', 'w+') as opt:
