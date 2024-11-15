@@ -56,6 +56,7 @@ config <- as.character(args[3])
 
 input_output_dir <- as.character(args[4])
 
+source(config)
 
 ##set parameters
 ##set the number of var of the selected windows
