@@ -21,19 +21,8 @@ Coming updates to `Socrates` will provides tool for several processing and analy
 
 and much more!
 
-All users need to begin is a counts matrix (binarized) in triplet format, or a BED file (Columns 1-3: locations of Tn5 insertions, Column 4: barcode, and Column 5 strand) with genome annotation data (gff3/gtf and fai/chromosome.sizes). 
 
----
 
-If you use `Socates` in your own study, please consider citing the following article:
-
-> *Alexandre P. Marand, Zongliang Chen, Andrea Gallavotti, Robert J. Schmitz*. (2021). 
-> [**A cis-regulatory atlas in maize at single-cell resolution**](https://doi.org/10.1016/j.cell.2021.04.014). 
-> [**Cell**](https://doi.org/10.1016/j.cell.2021.04.014),  doi:10.1016/j.cell.2021.04.014
-
----
-
-Current release: 03/16/21 BETA v0.0.9
 
 ## Installation
 
