@@ -2,10 +2,10 @@ Package: Socrates2
 Title: Analysis of scATAC-seq data
 Version: 0.0.1
 Authors@R: 
-    person(given = "Alexandre",
-           family = "Marand",
+    person(given = "Haidong",
+           family = "Yan",
            role = c("aut", "cre"),
-           email = "alexandre.p.marand@gmail.com",
+           email = "hy17471@uga.edu",
            comment = c(ORCID = "YOUR-ORCID-ID"))
 Description: What the package does (one paragraph).
 License: `use_mit_license()`, `use_gpl3_license()` or friends to
@@ -16,7 +16,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
 biocViews:
 Depends: 
-    R (>= 4.0.0),
+    R (>= 4.2.0),
     cicero (>= 1.4.4),
     FNN (>= 1.1.3),
     Seurat (>= 4.0.1),
