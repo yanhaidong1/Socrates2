@@ -7,7 +7,7 @@
 
 # load arguments
 args <- commandArgs(T)
-if(length(args)!=5){stop("Rscript calculate_normGBA.R <gene.sparse> <meta> <TAIR10_genes_500bpTSS.bed> <output_dir>")}
+if(length(args)!=4){stop("Rscript calculate_normGBA.R <gene.sparse> <meta> <TAIR10_genes_500bpTSS.bed> <output_dir>")}
 input <- as.character(args[1])
 meta <- as.character(args[2])
 gene <- as.character(args[3])
