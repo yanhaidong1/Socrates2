@@ -3,6 +3,7 @@
 ##updating 120824 use symbol other than the common and remove the name in the UMAP showing
 library(Matrix)
 library(ggplot2)
+library(RColorBrewer)
 
 args <- commandArgs(T)
 
