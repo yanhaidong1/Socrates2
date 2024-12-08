@@ -372,7 +372,7 @@ count.<br />
 1. -open_geneTn5 yes<br />
 2. -script_dir (a script directory downloaded from GitHub:
 Socrates2/utils/input_other_required_scripts_dir)<br />
-3. -tn5_fl (A file obtained from <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/process_BAM.html">Processing
+3. -tn5_fl (A file obtained merged replicates obtained from <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/process_BAM.html">Processing
 bam</a> step which records the coordinates of each Tn5 insertions per
 cell)<br />
 4. -Ggff_fl (A gene gff annotation file)<br />
@@ -391,13 +391,18 @@ gene.)<br />
 </p>
 <p><strong>Running</strong>:<br />
 </p>
-<pre class="bash"><code>python Socrates2/utils/prepare_tn5_gene_accessibiliy.py
+<pre class="bash"><code>##Merge Tn5 insertions per cell file
+cat /Path/to/opt_tn5_mq10_rep1.bed /Path/to/opt_tn5_mq10_rep2.bed &gt; /Path/to/opt_tn5_mq10.bed
+
+##run the pipeline
+python Socrates2/utils/prepare_tn5_gene_accessibiliy.py
 -script_dir Socrates2/utils/input_other_required_scripts_dir
 -o output_dir
 -tn5_fl /Path/to/opt_tn5_mq10.bed
 -Ggff_fl /Path/to/Gene.gff3
 -Genome_fl /Path/to/Genome.fasta
--Gmfai_fl /Path/to/Genome.fasta.fai</code></pre>
+-Gmfai_fl /Path/to/Genome.fasta.fai
+-open_geneTn5 yes</code></pre>
 </div>
 <div id="calculate-gene-accessibility-1" class="section level3">
 <h3>Calculate gene accessibility</h3>
@@ -428,7 +433,8 @@ step)<br />
 -o output_dir
 -meta_fl /Path/to/meta.txt
 -gene_tn5_fl /Path/to/opt_gene_tn5.sparse
--gene_bed_fl /Path/to/opt_genes_500bpTSS_sorted</code></pre>
+-gene_bed_fl /Path/to/opt_genes_500bpTSS_sorted
+-open_geneAcc yes</code></pre>
 </div>
 <div id="smooth-gene-accessibility" class="section level3">
 <h3>Smooth gene accessibility</h3>
@@ -469,7 +475,8 @@ LouvainClusters.)<br />
 -open_smoothGeneAcc yes
 -meta_fl /Path/to/meta.txt
 -svd_fl /Path/to/svd.txt
--gene_acc_fl /Path/to/opt_gene_body_accessibility_mtx.rds</code></pre>
+-gene_acc_fl /Path/to/opt_gene_body_accessibility_mtx.rds
+-open_smoothGeneAcc yes</code></pre>
 </div>
 </div>
 
