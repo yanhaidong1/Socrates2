@@ -94,12 +94,12 @@ def main(argv=None):
         input_required_scripts_dir = args.required_script_dir
 
 
-    if args.open_markerUMAP is None:
+    if args.open_vis_marker_UMAP is None:
 
         open_markerUMAP_final = 'no'
 
     else:
-        if args.open_markerUMAP == 'yes':
+        if args.open_vis_marker_UMAP == 'yes':
 
             open_markerUMAP_final = 'yes'
 
