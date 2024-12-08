@@ -1,5 +1,6 @@
 #Visualizing marker genes using UMAP
 ##load a function
+##updating 120824 use symbol other than the common and remove the name in the UMAP showing
 library(Matrix)
 library(ggplot2)
 
@@ -103,7 +104,7 @@ plot.act.scores    <- function(df,output_dir,
     
     # plot
     plot(df2$umap1, df2$umap2, col=colvec,
-         main=paste(info$name[i],info$type[i],info$common[i],sep="-"),
+         main=paste(info$symbol[i],info$type[i],sep="-"),
          #main=info$name[i],
          xlab="", ylab="", bty="n",
          xaxt="n", yaxt="n", pch=16, cex=0.2) ##previous cex is 0.25 we set smaller
