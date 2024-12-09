@@ -4,6 +4,7 @@
 library(Matrix)
 library(ggplot2)
 library(RColorBrewer)
+library(scales)
 
 args <- commandArgs(T)
 
@@ -29,6 +30,10 @@ plot.act.scores    <- function(df,output_dir,
   # prep data
   df <- df[rownames(df) %in% colnames(acts),]
   acts <- acts[,which(rownames(df) %in% colnames(acts))]
+  
+  
+  acts <- acts[,rownames(df)]
+  
   
   # reorder rows
   ##updating 102221 do not use the geneID to be the rownames
