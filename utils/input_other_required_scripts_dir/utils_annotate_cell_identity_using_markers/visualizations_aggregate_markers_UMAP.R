@@ -66,6 +66,7 @@ loadData <- function(gene_access,
     #y <- read.delim(metadata,row.names = 1)
     yy <- y
     z <- read.table(markers, header=T)
+    rownames(z) <- z$geneID
     pcs <- read.table(pcs)
     
     # make sure columns 1-2 are factors and 3 is numeric
