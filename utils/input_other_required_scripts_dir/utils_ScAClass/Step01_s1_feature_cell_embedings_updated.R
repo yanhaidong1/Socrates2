@@ -74,6 +74,7 @@ reference_obj <- CreateSeuratObject(counts = training_dt, project = "training", 
 #Active assay: RNA (41935 features, 0 variable features)
 
 ##scale matrix
+reference_obj <- NormalizeData(reference_obj)
 reference_obj <- ScaleData(reference_obj, features = rownames(reference_obj))
 
 
