@@ -430,7 +430,7 @@ def main(argv=None):
     if step04_ID in final_running_steps_list:
 
         print ('Step 4 use the clustering file to update the cell identities')
-        ipt_script = utils_dir + '/Step04_update_cell_identity_by_clusters.py'
+        ipt_script = utils_dir + '/Step04_update_cell_identity_by_cluster.py'
         cmd = 'python ' + ipt_script + \
               ' ' + args.clustering_fl_path + \
               ' ' + output_dir + '/opt_final_cell_annotation.txt' + \
