@@ -10,7 +10,7 @@
 
 library(Matrix)
 library(ggplot2)
-
+library(gtools)
 
 args <- commandArgs(T)
 
@@ -145,7 +145,7 @@ prepare_geneImputAcc_prop     <- function(input_imputed_mtx_rds,input_sparse_fl,
 
 
 ##prepare the object 
-input_imputed_mtx_rds <- input_gene_body_acc_impute_mtx_rds_fl
+input_imputed_mtx_rds <- input_gene_body_acc_mtx_rds_fl
 input_sparse_fl <- input_gene_body_sparse_fl
 
 opt_prepare_plot_obj <- prepare_geneImputAcc_prop(input_imputed_mtx_rds,input_sparse_fl,

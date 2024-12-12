@@ -129,7 +129,8 @@ plot_markers <- function(prefix,input_marker_gene_fl,opt_prepare_plot_obj,
 ##plotting
 prefix <- 'marker'
 
-plot_markers(prefix,input_marker_gene_fl,opt_prepare_plot_obj_fl,
+opt_prepare_plot_obj <- readRDS(opt_prepare_plot_obj_fl)
+plot_markers(prefix,input_marker_gene_fl,opt_prepare_plot_obj,
              plot_width,plot_height,OpenaddCTtoName='no')
 
 
