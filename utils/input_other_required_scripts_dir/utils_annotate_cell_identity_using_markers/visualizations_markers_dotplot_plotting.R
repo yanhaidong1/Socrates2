@@ -13,6 +13,7 @@ library(ggplot2)
 library(gtools)
 library(dplyr)
 
+
 args <- commandArgs(T)
 
 opt_prepare_plot_obj_fl <- as.character(args[1])
@@ -33,6 +34,8 @@ plot_markers <- function(prefix,input_marker_gene_fl,opt_prepare_plot_obj,
 
   combine_dt_addzscore <- opt_prepare_plot_obj$dt
   
+  
+  #markers <- read.delim(input_marker_gene_fl,row.names = 1)
   markers <- read.delim(input_marker_gene_fl)
   row.names(markers) <- markers$geneID
   
@@ -68,10 +71,10 @@ plot_markers <- function(prefix,input_marker_gene_fl,opt_prepare_plot_obj,
   combine_dt_addzscore_addcomm$Gene <- factor(combine_dt_addzscore_addcomm$Gene, levels = as.character(rownames(z.means)))
   combine_dt_addzscore_addcomm <- combine_dt_addzscore_addcomm[order(combine_dt_addzscore_addcomm$Gene),]
   combine_dt_addzscore_addcomm$CellType <- factor(combine_dt_addzscore_addcomm$CellType, levels = as.character(colnames(z.means)))
-  combine_dt_addzscore_addcomm$name <- factor(combine_dt_addzscore_addcomm$name, levels = as.character(unique(combine_dt_addzscore_addcomm$name)))
+  combine_dt_addzscore_addcomm$symbol <- factor(combine_dt_addzscore_addcomm$symbol, levels = as.character(unique(combine_dt_addzscore_addcomm$symbol)))
   
   ##do the plotting
-  p <- ggplot(combine_dt_addzscore_addcomm, aes(y=CellType, x = name, 
+  p <- ggplot(combine_dt_addzscore_addcomm, aes(y=CellType, x = symbol, 
                                                 color = zscore, size = AccProp)) + 
     geom_point() + 
     theme(axis.text.x = element_text(angle = 90)) + 
@@ -96,7 +99,7 @@ plot_markers <- function(prefix,input_marker_gene_fl,opt_prepare_plot_obj,
   ##updating 090722 we will set an option to check whether we will pot name and ct at the same time
   if (OpenaddCTtoName == 'yes'){
     
-    combine_dt_addzscore_addcomm$CTnm <- paste0(combine_dt_addzscore_addcomm$name,'.',combine_dt_addzscore_addcomm$AAtype)
+    combine_dt_addzscore_addcomm$CTnm <- paste0(combine_dt_addzscore_addcomm$symbol,'.',combine_dt_addzscore_addcomm$type)
     combine_dt_addzscore_addcomm$CTnm <- factor(combine_dt_addzscore_addcomm$CTnm, levels = as.character(unique(combine_dt_addzscore_addcomm$CTnm)))
     
     
