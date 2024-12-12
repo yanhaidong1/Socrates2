@@ -32,7 +32,7 @@ plot_markers <- function(prefix,input_marker_gene_fl,opt_prepare_plot_obj,
 
   combine_dt_addzscore <- opt_prepare_plot_obj$dt
   
-  markers <- read.delim(input_marker_gene_fl,row.names = 1)
+  markers <- read.delim(input_marker_gene_fl)
   
   ##merge the markers
   combine_dt_addzscore_addcomm <- merge(combine_dt_addzscore,markers,by.x = 'Gene',by.y = 'geneID')
