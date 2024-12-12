@@ -10,6 +10,7 @@
 
 library(Matrix)
 library(ggplot2)
+library(gtools)
 
 
 args <- commandArgs(T)
