@@ -198,11 +198,11 @@ def build_bigwig_fl_parallele (input_output_dir,input_final_output_dir,input_req
     store_alltargetOrgan_bed_fl_list = store_all_bed_fl_path_list
 
     ##do the parallele
-    store_store_final_bw_dir = step04_build_bigwig_fl_dir + '/store_store_final_bw_dir'
+    store_store_final_bw_dir = step04_build_bigwig_fl_dir + '/store_final_bw_dir'
     if not os.path.exists(store_store_final_bw_dir):
         os.makedirs(store_store_final_bw_dir)
 
-    store_store_final_bdg_dir = step04_build_bigwig_fl_dir + '/store_store_final_bdg_dir'
+    store_store_final_bdg_dir = step04_build_bigwig_fl_dir + '/store_final_bdg_dir'
     if not os.path.exists(store_store_final_bdg_dir):
         os.makedirs(store_store_final_bdg_dir)
 
