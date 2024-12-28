@@ -201,3 +201,36 @@ def FDR_filteration (input_step02_output_dir,utils_cell_type_peak_calling_dir,
               s3_open_filter_peak_final_dir + '/opt_' + 'final' + '.' + pval_or_qval + organ_pqval_num + '.FDR' + eachFDRnum + '.unique500bpPeaks.bed'
         print(cmd)
         subprocess.call(cmd, shell=True)
+
+
+        ##updating  122824
+        ##change the last col to be ACR number
+        store_final_line_list = []
+        count = 0
+        with open (s3_open_filter_peak_final_dir + '/opt_' + 'final' + '.' + pval_or_qval + organ_pqval_num + '.FDR' + eachFDRnum + '.unique500bpPeaks.bed','r') as ipt:
+            for eachline in ipt:
+                eachline = eachline.strip('\n')
+                col = eachline.strip().split()
+                count += 1
+                ACRnm = 'ACR_' + str(count)
+                final_line = col[0] + '\t' + col[1] + '\t' + col[2] + '\t' + ACRnm
+                store_final_line_list.append(final_line)
+
+        with open (s3_open_filter_peak_final_dir + '/opt_' + 'final' + '.' + pval_or_qval + organ_pqval_num + '.FDR' + eachFDRnum + '.unique500bpPeaks_new.bed','w+') as opt:
+            for eachline in store_final_line_list:
+                opt.write(eachline + '\n')
+
+        cmd = 'rm ' + s3_open_filter_peak_final_dir + '/opt_' + 'final' + '.' + pval_or_qval + organ_pqval_num + '.FDR' + eachFDRnum + '.unique500bpPeaks.bed'
+        print(cmd)
+        subprocess.call(cmd,shell=True)
+
+        cmd = 'mv ' + s3_open_filter_peak_final_dir + '/opt_' + 'final' + '.' + pval_or_qval + organ_pqval_num + '.FDR' + eachFDRnum + '.unique500bpPeaks_new.bed ' + s3_open_filter_peak_final_dir + '/opt_' + 'final' + '.' + pval_or_qval + organ_pqval_num + '.FDR' + eachFDRnum + '.unique500bpPeaks.bed'
+        print(cmd)
+        subprocess.call(cmd,shell=True)
+
+
+
+
+
+
+
