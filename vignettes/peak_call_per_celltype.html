@@ -400,16 +400,16 @@ samtools faidx)<br />
 tn5 file per cell type. Default: yes)<br />
 2. <strong>-s2_open_peak yes|no</strong> (Run the step 02 to call peaks
 per cell type. Default: yes)<br />
-3. <strong>-s3_open_filter</strong> (Run the step 03 to filter peaks
-from all the peak calling. Default: yes)<br />
-4. <strong>s4_open_bigwig</strong> (Run the step 04 to obtain the bigwig
-file per cell type. Default: yes)<br />
+3. <strong>-s3_open_filter yes|no</strong> (Run the step 03 to filter
+peaks from all the peak calling. Default: yes)<br />
+4. <strong>-s4_open_bigwig yes|no</strong> (Run the step 04 to obtain
+the bigwig file per cell type. Default: yes)<br />
 5. <strong>-core</strong> (Set cores we will use for the parallele
 analysis. Default: 1)<br />
 6. <strong>-umapp_fl</strong> (Provide the unmappable file that will
-help build the imputated region. Default: None) 7.
-<strong>-p_or_q</strong> (Provide to use p value or q value using MACS2.
-Default: pval)<br />
+help build the imputated region. Default: None)<br />
+7. <strong>-p_or_q</strong> (Provide to use p value or q value using
+MACS2. Default: pval)<br />
 8. <strong>-cutoff</strong> (Provide an exact cutoff for either pvalue
 or qvalue. Default: 0.05)<br />
 9. <strong>-SLOCAL</strong> (Provide a parameter setting of SLOCAL
@@ -427,9 +427,9 @@ files with all defined FDR values with performing peak filtration.
 Default: 0.05,0.01,0,005,0.001)<br />
 </p>
 <p><strong>Outputs</strong><br />
-1. output_dir/s3_open_filter_peak_final_diropt_final<em>Peaks.bed<br />
+1. output_dir/s3_open_filter_peak_final_dir/opt_final.Peaks.bed<br />
 2.
-output_dir/s4_open_bigwig_build_final_dir/store_store_final_bw_dir/cluster</em>raw.bw<br />
+output_dir/s4_open_bigwig_build_final_dir/store_store_final_bw_dir/cluster.raw.bw<br />
 </p>
 <p><strong>Running</strong>:<br />
 </p>
