@@ -55,7 +55,6 @@ devtools::install_github("yanhaidong1/Socrates2", ref="main")
 
 [9. Trjectory analysis analysis]
 
-[10. Identify co-accessible ACRs](https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_coACRs_tutorial.html)
 
 
 
