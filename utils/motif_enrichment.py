@@ -40,15 +40,15 @@ def get_parsed_args():
                         help='Define the cluster column name of the meta file.')
 
     ##step 01 predict motif by fimo
-    parser.add_argument("-open_predict_motif", dest='open_predict_motif_within_ACR', help='Perform motif prediction using fimo tool.'
+    parser.add_argument("-s1_open_predict_motif", dest='open_predict_motif_within_ACR', help='Perform motif prediction using fimo tool.'
                              'Default: yes')
 
     ##step 02 prepare the data for the enrichment
-    parser.add_argument("-open_prepare_data", dest = 'open_prepare_data_enrichment', help = 'Prepare data before performing the enrichment test.'
+    parser.add_argument("-s2_open_prepare_data", dest = 'open_prepare_data_enrichment', help = 'Prepare data before performing the enrichment test.'
                                                                                             'Default: yes')
 
     ##step 03 perform the enrichment test
-    parser.add_argument("-open_enrichment", dest = 'open_enrichment_test', help = 'Perform the motif enrichment test.'
+    parser.add_argument("-s3_open_enrichment", dest = 'open_enrichment_test', help = 'Perform the motif enrichment test.'
                                                                                   'Default: yes')
 
     ##optional parameters
@@ -56,7 +56,8 @@ def get_parsed_args():
     parser.add_argument("-core", dest='core_number', help='Specify how many cores we will use.'
                                                           'Default: 1')
 
-    parser.add_argument("-qval", dest='q_value_cutoff_fimo', help = 'q value cutoff for the fimo')
+    parser.add_argument("-qval", dest='q_value_cutoff_fimo', help = 'q value cutoff for the fimo.'
+                                                                    'Default: 0.00005')
 
     parser.add_argument("-ext_size", dest = 'acr_extended_size',help = '"Extended the flanking regions of ACRs to facilitate'
                                                                    ' the prediction of motifs within the ACRs and their surrounding sequences.'
