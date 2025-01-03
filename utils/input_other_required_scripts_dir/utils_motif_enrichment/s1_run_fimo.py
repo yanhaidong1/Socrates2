@@ -60,8 +60,25 @@ def analyze_acr_motif(ipt_acr_fl,ipt_genome_fasta_fl,ipt_motif_fl,opt_dir,extend
     print(cmd)
     subprocess.call(cmd,shell=True)
 
+    ##updating 010324
+    ##we will update the fasta file to remove the location of the title
+    store_final_line_list = []
+    with open (opt_dir + '/temp_final_acr_extended.fasta','r') as ipt:
+        for eachline in ipt:
+            eachline = eachline.strip('\n')
+            if eachline.startswith('>'):
+                mt = re.match('(.+)::.+',eachline)
+                final_line = mt.group(1)
+                store_final_line_list.append(final_line)
+            else:
+                store_final_line_list.append(eachline)
+
+    with open (opt_dir + '/temp_final_acr_extended_modi.fasta','w+') as opt:
+        for eachline in store_final_line_list:
+            opt.write(eachline + '\n')
+
     ##run the fimo
-    cmd = 'fimo -max-stored-scores 10000000 --oc ' + opt_dir + ' ' + ipt_motif_fl + ' ' + opt_dir + '/temp_final_acr_extended.fasta'
+    cmd = 'fimo -max-stored-scores 10000000 --oc ' + opt_dir + ' ' + ipt_motif_fl + ' ' + opt_dir + '/temp_final_acr_extended_modi.fasta'
     print(cmd)
     subprocess.call(cmd, shell=True)
 
