@@ -106,25 +106,34 @@ def build_peak_cell_in_meta (input_meta_fl,input_peak_cell_sparse_fl,input_outpu
         for eachline in store_final_line_list:
             opt.write(eachline + '\n')
 
-
-def downsampling (cutoff_cellnm,input_output_dir,prefix_meta):
+##upating 010225
+def downsampling (cutoff_cellnm,input_output_dir,prefix_meta,target_colnm):
 
     new_meta_fl = input_output_dir + '/opt_' + prefix_meta + '.txt'
 
     store_celltype_celllist_dic = {}
+    count = 0
     with open (new_meta_fl,'r') as ipt:
         for eachline in ipt:
             eachline = eachline.strip('\n')
             col = eachline.strip().split()
 
-            cellnm = col[0]
-            celltype = col[24]
-
-            if celltype in store_celltype_celllist_dic:
-                store_celltype_celllist_dic[celltype].append(cellnm)
+            count += 1
+            target_index = 0
+            if count == 1:
+                target_index = col.index(target_colnm)
             else:
-                store_celltype_celllist_dic[celltype] = []
-                store_celltype_celllist_dic[celltype].append(cellnm)
+
+                celltype = col[int(target_index)]
+
+                cellnm = col[0]
+                #celltype = col[24]
+
+                if celltype in store_celltype_celllist_dic:
+                    store_celltype_celllist_dic[celltype].append(cellnm)
+                else:
+                    store_celltype_celllist_dic[celltype] = []
+                    store_celltype_celllist_dic[celltype].append(cellnm)
 
     store_target_cell_list = []
     for eachcelltype in store_celltype_celllist_dic:
