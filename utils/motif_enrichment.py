@@ -35,7 +35,7 @@ def get_parsed_args():
 
     parser.add_argument("-Gmfai_fl", dest='genome_fai_file', help='Provide a fai index file of reference genome.')
 
-    ##step 03
+    ##step 02 and 03
     parser.add_argument("-ct_colnm", dest='celltype_cluster_col_name',
                         help='Define the cluster column name of the meta file.')
 
@@ -292,8 +292,9 @@ def main(argv=None):
         if down_sample_cell_final == 'yes':
 
             cutoff_cellnm = cell_number_cutoff_final
+            target_colnm = args.celltype_cluster_col_name
 
-            s2_prepare_data.downsampling (cutoff_cellnm,open_prepare_data_enrichment_final_dir,prefix_meta)
+            s2_prepare_data.downsampling (cutoff_cellnm,open_prepare_data_enrichment_final_dir,prefix_meta,target_colnm)
 
             ##final output is opt_downsample_meta.txt
 
