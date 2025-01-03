@@ -51,7 +51,7 @@ devtools::install_github("yanhaidong1/Socrates2", ref="main")
 
 [7. Identify cell-type-specific peak]
 
-[8. Motif enrichment analysis]
+[8. Motif enrichment analysis](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/motif_enrichment.html)
 
 [9. Trjectory analysis analysis]
 
