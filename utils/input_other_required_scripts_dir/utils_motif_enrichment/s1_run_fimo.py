@@ -166,8 +166,11 @@ def wrap_all_results (output_dir,pval_cutoff):
 
                 if 'Name' in store_annot_dic:
                     motifID = store_annot_dic['Name']
+                    mt = re.match('(.+)_.+_.+_.+',motifID)
+                    final_motifID = mt.group(1)
+
                 else:
-                    motifID = 'unknown'
+                    final_motifID = 'unknown'
                 if 'pvalue' in store_annot_dic:
                     pval = store_annot_dic['pvalue']
                 else:
@@ -177,7 +180,7 @@ def wrap_all_results (output_dir,pval_cutoff):
                 else:
                     seq = 'unknown'
 
-                final_line = acr_loc + '\t' + st + '\t' + ed + '\t' + motifID + '\t' + pval + '\t' + col[6] + '\t' + seq
+                final_line = acr_loc + '\t' + st + '\t' + ed + '\t' + final_motifID + '\t' + pval + '\t' + col[6] + '\t' + seq
                 bed_fl_w.write(final_line + '\n')
 
         gff_fl_o.close()
