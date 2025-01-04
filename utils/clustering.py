@@ -65,7 +65,8 @@ def get_parsed_args():
     parser.add_argument('-only_cluster', dest = 'open_only_cluster' , help = 'Only open the clustering step. Users could adjust the resolution to obtain different clustering performance.'
                                                                              'Default: no')
 
-
+    parser.add_argument('-prefix', dest = 'prefix_name', help = 'Specify a prefix name for the final output file.'
+                                                                'Default: output')
 
     ##parse of parameters
     args = parser.parse_args()
@@ -184,6 +185,14 @@ def main(argv=None):
         only_cluster = 'no'
 
     store_final_parameter_line_list.append('only_cluster <- ' + '\'' + only_cluster + '\'')
+
+    if args.prefix_name is not None:
+        prefix_name_final = args.prefix_name
+    else:
+        prefix_name_final = 'output'
+
+    store_final_parameter_line_list.append('input_prefix <- ' + '\'' + prefix_name_final + '\'')
+
 
     ##we will firstly build up the parameter setting file
     with open(output_dir + '/temp_defined_parameters.config', 'w+') as opt:
