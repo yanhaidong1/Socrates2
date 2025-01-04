@@ -372,12 +372,13 @@ count.<br />
 1. -open_geneTn5 yes<br />
 2. -script_dir (a script directory downloaded from GitHub:
 Socrates2/utils/input_other_required_scripts_dir)<br />
-3. -tn5_fl (A file obtained merged replicates obtained from <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/process_BAM.html">Processing
+3. -soc_obj (The <strong>*.atac.soc.rds</strong> object obtained from
+the <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/clustering.html">Clustering</a>
+step) 4. -tn5_fl (A file obtained merged replicates obtained from <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/process_BAM.html">Processing
 bam</a> step which records the coordinates of each Tn5 insertions per
 cell)<br />
-4. -Ggff_fl (A gene gff annotation file)<br />
-5. -Genome_fl (A genome fasta file)<br />
-6. -Gmfai_fl (A genome index file, prepared by ‘samtools faidx’)<br />
+5. -Ggff_fl (A gene gff annotation file)<br />
+6. -Genome_fl (A genome fasta file)<br />
 7. -o output_dir (mkdir output_dir)<br />
 </p>
 <p><strong>Optional parameters</strong><br />
@@ -385,9 +386,9 @@ cell)<br />
 gene.)<br />
 </p>
 <p><strong>Outputs</strong>:<br />
-1. opt_genome_size.txt<br />
-2. opt_gene_tn5.sparse<br />
-3. opt_genes_500bpTSS_sorted.bed<br />
+1. *.atac.soc.rds<br />
+2. opt_genes_500bpTSS_sorted.bed (temporary file)<br />
+3. opt_gene_tn5.sparse (temporary file)<br />
 </p>
 <p><strong>Running</strong>:<br />
 </p>
@@ -398,11 +399,11 @@ cat /Path/to/opt_tn5_mq10_rep1.bed /Path/to/opt_tn5_mq10_rep2.bed &gt; /Path/to/
 python Socrates2/utils/prepare_tn5_gene_accessibiliy.py
 -script_dir Socrates2/utils/input_other_required_scripts_dir
 -o output_dir
+-open_geneTn5 yes
+-soc_obj /Path/to/*.atac.soc.rds
 -tn5_fl /Path/to/opt_tn5_mq10.bed
 -Ggff_fl /Path/to/Gene.gff3
--Genome_fl /Path/to/Genome.fasta
--Gmfai_fl /Path/to/Genome.fasta.fai
--open_geneTn5 yes</code></pre>
+-Genome_fl /Path/to/Genome.fasta</code></pre>
 </div>
 <div id="calculate-gene-accessibility-1" class="section level3">
 <h3>Calculate gene accessibility</h3>
@@ -413,28 +414,20 @@ three columns: 1) gene ID 2) cell barcode 3) Accessibility score.<br />
 1. -open_geneAcc yes<br />
 2. -script_dir (a script directory downloaded from GitHub:
 Socrates2/utils/input_other_required_scripts_dir)<br />
-3. -meta_fl (A meta file obtained from <a href="https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_simple_clustering_tutorial.html"><strong>Loading
-pre-processed data, dimensionality reduction, and
-clustering</strong></a>)<br />
-4. -gene_tn5_fl (An <strong>opt_gene_tn5.sparse</strong> file obtained
-from <strong>Prepare genes with Tn5 insertions</strong> step)<br />
-5. -gene_bed_fl (An <strong>opt_genes_500bpTSS_sorted</strong> file
-obtained from <strong>Prepare genes with Tn5 insertions</strong>
-step)<br />
-6. -o output_dir (mkdir output_dir)<br />
+3. -soc_obj (The <strong>*.atac.soc.rds</strong> object generated from
+the <strong>Prepare genes with Tn5 insertions</strong> step)<br />
+4. -o output_dir (mkdir output_dir)<br />
 </p>
 <p><strong>Outputs</strong>:<br />
-1. opt_gene_body_accessibility_mtx.rds<br />
+1. *.atac.soc.rds<br />
 </p>
 <p><strong>Running</strong>:<br />
 </p>
 <pre class="bash"><code>python Socrates2/utils/prepare_tn5_gene_accessibiliy.py
 -script_dir Socrates2/utils/input_other_required_scripts_dir
 -o output_dir
--meta_fl /Path/to/meta.txt
--gene_tn5_fl /Path/to/opt_gene_tn5.sparse
--gene_bed_fl /Path/to/opt_genes_500bpTSS_sorted
--open_geneAcc yes</code></pre>
+-open_geneAcc yes
+-soc_obj /Path/to/*.atac.soc.rds</code></pre>
 </div>
 <div id="smooth-gene-accessibility" class="section level3">
 <h3>Smooth gene accessibility</h3>
@@ -447,16 +440,9 @@ Data Using Data Diffusion</strong>. 2018. <em>Cell</em></a>.<br />
 1. -open_smoothGeneAcc yes<br />
 2. -script_dir (a script directory downloaded from GitHub:
 Socrates2/utils/input_other_required_scripts_dir)<br />
-3. -meta_fl (A meta file obtained from <a href="https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_simple_clustering_tutorial.html"><strong>Loading
-pre-processed data, dimensionality reduction, and
-clustering</strong></a>)<br />
-4. -svd_fl (A svd file obtained from <a href="https://htmlpreview.github.io/?https://github.com/plantformatics/Socrates/blob/main/vignettes/Socrates_simple_clustering_tutorial.html"><strong>Loading
-pre-processed data, dimensionality reduction, and
-clustering</strong></a>)<br />
-5. -gene_acc_fl (An <strong>opt_gene_body_accessibility_mtx.rds</strong>
-file obtained from <strong>Calculate gene accessibility</strong>
-step)<br />
-6. -o output_dir (mkdir output_dir)<br />
+3. -soc_obj (The <strong>*.atac.soc.rds</strong> object generated from
+the <strong>Calculate gene accessibility</strong> step)<br />
+4. -o output_dir (mkdir output_dir)<br />
 </p>
 <p><strong>Optional parameters</strong>:<br />
 1. -core (Set cores we will use for the parallele analysis. Default:
@@ -465,7 +451,8 @@ step)<br />
 LouvainClusters.)<br />
 </p>
 <p><strong>Outputs</strong>:<br />
-1. opt_allgenes_impute.activity.rds<br />
+1. *.atac.soc.rds<br />
+2. GAobj.rds (temporary file)<br />
 </p>
 <p><strong>Running</strong>:<br />
 </p>
@@ -473,10 +460,7 @@ LouvainClusters.)<br />
 -script_dir Socrates2/utils/input_other_required_scripts_dir
 -o output_dir
 -open_smoothGeneAcc yes
--meta_fl /Path/to/meta.txt
--svd_fl /Path/to/svd.txt
--gene_acc_fl /Path/to/opt_gene_body_accessibility_mtx.rds
--open_smoothGeneAcc yes</code></pre>
+-soc_obj /Path/to/*.atac.soc.rds</code></pre>
 </div>
 </div>
 
