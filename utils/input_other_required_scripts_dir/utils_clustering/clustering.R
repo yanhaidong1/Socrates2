@@ -1,5 +1,6 @@
 # run Socrates on merged socrates object #
 
+##updating 010525 we will return a prefix.atac.soc.rds file
 ##updating 011124 we will set an option to remove the temp file
 ##updating 041722 we need to modify npc number detect doublet
 ##updating 121221 we set an argument to add a harmony function
@@ -8,7 +9,7 @@
 ##updating 111621 we will set the normalized way
 ##updating 111121 we will check whether the rds file is existing
 ##updating 110921 we will set the parameters as arguments
-##udpating 102221 we will save a win matrix since later we will use this to do the subclustering
+##udpating 102221 we will save a win matrix since later we will use this to do the subclustereing
 ##updating 101821 we will filter windows first \
 ##updating 101521 no harmony information here
 ##updating 101421 add the detect doublet function
@@ -52,7 +53,6 @@ path_to_preload_R_script <- as.character(args[2])
 
 ##updating 111124
 config <- as.character(args[3])
-
 
 input_output_dir <- as.character(args[4])
 
@@ -421,18 +421,24 @@ if (do_harmony == 'yes'){
   ##since we did not specify the slot name so we need to use the PCA
   nmf.rd <- soc.obj$HM_EMBS
   
-  write.table(nmf.meta, file=paste0(input_output_dir,'/',aft_clust_out,'_rHM_metadata.txt'), quote=F, row.names=T, col.names=T, sep="\t")
-  write.table(nmf.rd, file=paste0(input_output_dir,'/',aft_clust_out,'_rHM_reduced_dimensions.txt'), quote=F, row.names=T, col.names=T, sep="\t")
+  ##updating 010425 only store the meta and svd
+  final_obj <- list(
+    meta = nmf.meta,
+    svd = nmf.rd
+  )
+  saveRDS(final_obj,file=paste0(input_output_dir,'/',input_prefix,'.atac.soc.rds'))
+  
+  #write.table(nmf.meta, file=paste0(input_output_dir,'/',aft_clust_out,'_rHM_metadata.txt'), quote=F, row.names=T, col.names=T, sep="\t")
+  #write.table(nmf.rd, file=paste0(input_output_dir,'/',aft_clust_out,'_rHM_reduced_dimensions.txt'), quote=F, row.names=T, col.names=T, sep="\t")
   # # save data --------------------------------------------------------------
-  saveRDS(soc.obj, file=paste0(input_output_dir,'/',aft_clust_out,".rHM.processed_final.rds"))
+  #saveRDS(soc.obj, file=paste0(input_output_dir,'/',aft_clust_out,".rHM.processed_final.rds"))
   
   ##return a win matrix
-  mtx_m <- soc.obj$counts
-  ia <- as.data.frame(summary(mtx_m))
-  ia$i <- rownames(mtx_m)[as.numeric(ia$i)]
-  ia$j <- colnames(mtx_m)[as.numeric(ia$j)]
-  write.table(ia, file=paste0(input_output_dir,'/',aft_clust_out,'.rHM.win.sparse'), quote=F, row.names=F, col.names=F, sep="\t")
-  
+  #mtx_m <- soc.obj$counts
+  #ia <- as.data.frame(summary(mtx_m))
+  #ia$i <- rownames(mtx_m)[as.numeric(ia$i)]
+  #ia$j <- colnames(mtx_m)[as.numeric(ia$j)]
+  #write.table(ia, file=paste0(input_output_dir,'/',aft_clust_out,'.rHM.win.sparse'), quote=F, row.names=F, col.names=F, sep="\t")
   
   
 }else{
@@ -490,17 +496,25 @@ if (do_harmony == 'yes'){
   #  nmf.rd <- soc.obj$SVD
   #}
   
-  write.table(nmf.meta, file=paste0(input_output_dir,'/',aft_clust_out,'.metadata.txt'), quote=F, row.names=T, col.names=T, sep="\t")
-  write.table(nmf.rd, file=paste0(input_output_dir,'/',aft_clust_out,'.reduced_dimensions.txt'), quote=F, row.names=T, col.names=T, sep="\t")
+  ##updating 010425 only store meta and rd
+  final_obj <- list(
+    meta = nmf.meta,
+    svd = nmf.rd
+  )
+  saveRDS(final_obj,file=paste0(input_output_dir,'/',input_prefix,'.atac.soc.rds'))
+  
+
+  #write.table(nmf.meta, file=paste0(input_output_dir,'/',aft_clust_out,'.metadata.txt'), quote=F, row.names=T, col.names=T, sep="\t")
+  #write.table(nmf.rd, file=paste0(input_output_dir,'/',aft_clust_out,'.reduced_dimensions.txt'), quote=F, row.names=T, col.names=T, sep="\t")
   # # save data --------------------------------------------------------------
-  saveRDS(soc.obj, file=paste0(input_output_dir,'/',aft_clust_out,".processed_final.rds"))
+  #saveRDS(soc.obj, file=paste0(input_output_dir,'/',aft_clust_out,".processed_final.rds"))
   
   ##return a win matrix
-  mtx_m <- soc.obj$counts
-  ia <- as.data.frame(summary(mtx_m))
-  ia$i <- rownames(mtx_m)[as.numeric(ia$i)]
-  ia$j <- colnames(mtx_m)[as.numeric(ia$j)]
-  write.table(ia, file=paste0(input_output_dir,'/',aft_clust_out,'.win.sparse'), quote=F, row.names=F, col.names=F, sep="\t")
+  #mtx_m <- soc.obj$counts
+  #ia <- as.data.frame(summary(mtx_m))
+  #ia$i <- rownames(mtx_m)[as.numeric(ia$i)]
+  #ia$j <- colnames(mtx_m)[as.numeric(ia$j)]
+  #write.table(ia, file=paste0(input_output_dir,'/',aft_clust_out,'.win.sparse'), quote=F, row.names=F, col.names=F, sep="\t")
 
 }
 
