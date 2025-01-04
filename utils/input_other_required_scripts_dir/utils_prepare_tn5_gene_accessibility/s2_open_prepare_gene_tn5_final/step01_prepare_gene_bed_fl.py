@@ -77,71 +77,76 @@ def prepare_gene_bed_fl (input_gene_gff_fl,input_genome_fai_fl,input_output_dir,
                             final_line = gene_feat + '\t' + str(length)
                             store_gene_length_line_list.append(final_line)
 
-    with open (input_output_dir + '/opt_gene_length.txt','w+') as opt:
-        for eachline in store_gene_length_line_list:
-            opt.write(eachline + '\n')
+    #with open (input_output_dir + '/opt_gene_length.txt','w+') as opt:
+    #    for eachline in store_gene_length_line_list:
+    #        opt.write(eachline + '\n')
 
-    with open (input_output_dir + '/opt_geneAnnotation.bed','w+') as opt:
-        for eachline in store_gene_annotation_bed_list:
-            opt.write(eachline + '\n')
+    #with open (input_output_dir + '/opt_geneAnnotation.bed','w+') as opt:
+    #    for eachline in store_gene_annotation_bed_list:
+    #        opt.write(eachline + '\n')
 
     with open (input_output_dir + '/opt_genes_500bpTSS.bed','w+') as opt:
         for eachline in store_500TSS_bed_line_list:
             opt.write(eachline + '\n')
 
     ##we need to sort the bed information
-    cmd = 'sort -k1,1V -k2,2n ' + input_output_dir + '/opt_geneAnnotation.bed' + ' > ' +  input_output_dir + '/opt_geneAnnotation_sorted.bed'
-    subprocess.call(cmd,shell=True)
+    #cmd = 'sort -k1,1V -k2,2n ' + input_output_dir + '/opt_geneAnnotation.bed' + ' > ' +  input_output_dir + '/opt_geneAnnotation_sorted.bed'
+    #subprocess.call(cmd,shell=True)
 
     cmd = 'sort -k1,1V -k2,2n ' + input_output_dir + '/opt_genes_500bpTSS.bed > ' + input_output_dir + '/opt_genes_500bpTSS_sorted.bed'
+    print(cmd)
+    subprocess.call(cmd,shell=True)
+
+    cmd = 'rm ' + input_output_dir + '/opt_genes_500bpTSS.bed'
+    print(cmd)
     subprocess.call(cmd,shell=True)
 
     ##updation 120920
-    store_2000up500down_bed_line_list = []
-    with open (input_gene_gff_fl,'r') as ipt:
-        for eachline in ipt:
-            if not eachline.startswith('#'):
-                eachline = eachline.strip('\n')
-                col = eachline.strip().split()
-                if col[2] == 'gene':
+    #store_2000up500down_bed_line_list = []
+    #with open (input_gene_gff_fl,'r') as ipt:
+    #    for eachline in ipt:
+    #        if not eachline.startswith('#'):
+    #            eachline = eachline.strip('\n')
+    #            col = eachline.strip().split()
+    #            if col[2] == 'gene':
 
-                    if col[0] in store_genome_name_dic:
+    #                if col[0] in store_genome_name_dic:
 
-                        start = col[3]
-                        end = col[4]
-                        dir = col[6]
+    #                    start = col[3]
+    #                    end = col[4]
+    #                    dir = col[6]
 
-                        if dir == '+':
-                            real_end = str(int(end) + 500)
-                            if (int(start) - 2000) < 0:
-                                real_start = '0'
-                            else:
-                                real_start = str(int(start) - 2000)
-                        else:
-                            if int(start) - 500 < 0:
-                                real_start = '0'
-                            else:
-                                real_start = str(int(start) - 500)
-                            real_end = str(int(end) + 2000)
+    #                    if dir == '+':
+    #                        real_end = str(int(end) + 500)
+    #                        if (int(start) - 2000) < 0:
+    #                            real_start = '0'
+    #                        else:
+    #                            real_start = str(int(start) - 2000)
+    #                    else:
+    #                        if int(start) - 500 < 0:
+    #                            real_start = '0'
+    #                        else:
+    #                            real_start = str(int(start) - 500)
+    #                        real_end = str(int(end) + 2000)
                         
                         ##updating 070821 do not consider the  Pt and Mt
-                        if col[0] != 'ChrPt' and col[0] != 'ChrMt':
+    #                    if col[0] != 'ChrPt' and col[0] != 'ChrMt':
 
-                            annot_col = col[8].split(';')
-                            mt = re.match('ID=(.+)',annot_col[0])
-                            gene_id = mt.group(1)
-                            mt = re.match('Name=(.+)',annot_col[1])
-                            gene_feat = mt.group(1)
+    #                        annot_col = col[8].split(';')
+    #                        mt = re.match('ID=(.+)',annot_col[0])
+    #                        gene_id = mt.group(1)
+    #                        mt = re.match('Name=(.+)',annot_col[1])
+    #                        gene_feat = mt.group(1)
 
-                            final_line = 'chr' + col[0] + '\t' + real_start + '\t' + real_end + '\t' + \
-                                         gene_feat + '\t' + col[6]
-                            store_2000up500down_bed_line_list.append(final_line)
+    #                        final_line = 'chr' + col[0] + '\t' + real_start + '\t' + real_end + '\t' + \
+    #                                     gene_feat + '\t' + col[6]
+    #                        store_2000up500down_bed_line_list.append(final_line)
 
-    with open (input_output_dir + '/opt_genes_2000up500down.bed','w+') as opt:
-        for eachline in store_2000up500down_bed_line_list:
-            opt.write(eachline + '\n')
+    #with open (input_output_dir + '/opt_genes_2000up500down.bed','w+') as opt:
+    #    for eachline in store_2000up500down_bed_line_list:
+    #        opt.write(eachline + '\n')
 
-    cmd = 'sort -k1,1V -k2,2n ' + input_output_dir + '/opt_genes_2000up500down.bed > ' + input_output_dir + '/opt_genes_2000up500down_sorted.bed'
-    subprocess.call(cmd,shell=True)
+    #cmd = 'sort -k1,1V -k2,2n ' + input_output_dir + '/opt_genes_2000up500down.bed > ' + input_output_dir + '/opt_genes_2000up500down_sorted.bed'
+    #subprocess.call(cmd,shell=True)
 
 prepare_gene_bed_fl (input_gene_gff_fl,input_genome_fai_fl,input_output_dir,target_nm)

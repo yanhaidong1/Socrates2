@@ -129,10 +129,27 @@ def step03_prepare_gene_sparse (input_other_required_scripts_dir,input_tn5_bed_f
     #subprocess.call(cmd,shell=True)
 
 
+##updating 010425 save it to the object
+def step04_save_to_soc_obj (input_other_required_scripts_dir,input_soc_obj_fl,input_gene_tn5_sparse_fl,input_gene_500bp_sorted_fl,input_prefix,input_output_dir):
+
+
+    input_store_obj_R_script = input_other_required_scripts_dir + '/utils_prepare_tn5_gene_accessibility/s2_open_prepare_gene_tn5_final/store_files_to_object.R'
+
+    cmd = 'Rscript ' + input_store_obj_R_script + \
+          ' ' + input_soc_obj_fl + \
+          ' ' + input_gene_tn5_sparse_fl + \
+          ' ' + input_gene_500bp_sorted_fl + \
+          ' ' + input_prefix + \
+          ' ' + input_output_dir
+    print(cmd)
+    subprocess.call(cmd,shell=True)
+
+
+
 
 def prepare_gene_tn5 (input_other_required_scripts_dir,input_tn5_bed_fl,input_output_dir,
                       input_gene_gff_fl,input_genome_fai_fl,
-                      input_genome_fl,
+                      input_soc_obj_fl,input_prefix,
                       category = 'gene'):
 
 
@@ -141,10 +158,18 @@ def prepare_gene_tn5 (input_other_required_scripts_dir,input_tn5_bed_fl,input_ou
     step01_prepare_gene_bed (input_final_scripts_dir,input_output_dir,
                                  input_gene_gff_fl,input_genome_fai_fl,category)
 
-    step02_prepare_genome_size (input_final_scripts_dir,input_genome_fl,input_output_dir)
+    #step02_prepare_genome_size (input_final_scripts_dir,input_genome_fl,input_output_dir)
 
     step03_prepare_gene_sparse (input_final_scripts_dir,input_tn5_bed_fl,input_genome_fai_fl,
                                 input_output_dir)
+
+
+
+    ##updating 010425
+    input_gene_tn5_sparse_fl = input_output_dir + '/opt_gene_tn5.sparse'
+    input_gene_500bp_sorted_fl = input_output_dir + '/opt_genes_500bpTSS_sorted.bed'
+    step04_save_to_soc_obj (input_other_required_scripts_dir,input_soc_obj_fl,input_gene_tn5_sparse_fl,input_gene_500bp_sorted_fl,input_prefix,input_output_dir)
+
 
 #prepare_gene_tn5 (input_other_required_scripts_dir,input_gene_gff_fl,input_genome_fai_fl,
 #              target_nm,prefix,input_genome_fl,input_unique_tn5_bed_fl,input_output_dir)
