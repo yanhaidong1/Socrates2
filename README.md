@@ -39,7 +39,7 @@ devtools::install_github("yanhaidong1/Socrates2", ref="main")
 ## Tutorials
 [1. Processing bam](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/process_BAM.html)
 
-[2. Quality control](https://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/load_data_and_QC.html)
+[2. Load and QC](https://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/load_data_and_QC.html)
 
 [3. Clustering](https://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/clustering.html)
 
