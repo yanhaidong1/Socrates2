@@ -1,18 +1,18 @@
-##updating 070921 set message to check the error
-##mute the gene_attr
-##updating 061621 use the raw tn5 to be input and open the CTnorm
-##this script is to generate accessibility from gene body based on tn5 mapping to the body regions
-
-#the main idea of the g is to check the length of genes and conduct a filtration
+##updating 010425 only load the object other than many different files
 
 # load arguments
 args <- commandArgs(T)
-if(length(args)!=4){stop("Rscript calculate_normGBA.R <gene.sparse> <meta> <TAIR10_genes_500bpTSS.bed> <output_dir>")}
-input <- as.character(args[1])
-meta <- as.character(args[2])
-gene <- as.character(args[3])
+#if(length(args)!=4){stop("Rscript calculate_normGBA.R <gene.sparse> <meta> <TAIR10_genes_500bpTSS.bed> <output_dir>")}
+
+input_soc_obj_fl <- as.character(args[1])
+
+input_prefix <- as.character(args[2])
+
+#input <- as.character(args[1])
+#meta <- as.character(args[2])
+#gene <- as.character(args[3])
 #prefix <- as.character(args[4])
-output_dir <- as.character(args[4])
+input_output_dir <- as.character(args[3])
 
 ##create sub output to store the files generated from this script
 #genebody_accessibility_dir <- paste0(output_dir,'/genebody_accessibility_dir')
@@ -36,26 +36,32 @@ message(" - loading data ...")
   
 #}else{
   
-  a <- read.table(input,stringsAsFactors = T)
-  b <- read.table(meta)
-  g <- read.table(gene)
+soc_obj <- readRDS(input_soc_obj_fl)
+
+a <- soc_obj$gene_Tn5
+b <- soc_obj$meta
+g <- soc_obj$gene_bed
+
+#a <- read.table(input,stringsAsFactors = T)
+#b <- read.table(meta)
+#g <- read.table(gene)
+
+##process
+##filter out genes without meeting the requirements of length
+a <- sparseMatrix(i=as.numeric(a$V1),
+                  j=as.numeric(a$V2),
+                  x=as.numeric(a$V3),
+                  dimnames=list(levels(a$V1),levels(a$V2)))
+a <- a[,colnames(a) %in% rownames(b)]
+b <- b[colnames(a),]
+rownames(g) <- g$V4
+g <- g[rownames(a),]
+g$gene.len <- g$V3 - g$V2
+g <- subset(g, g$gene.len > 100)
+a <- a[rownames(g),]
   
-  ##process
-  ##filter out genes without meeting the requirements of length
-  a <- sparseMatrix(i=as.numeric(a$V1),
-                    j=as.numeric(a$V2),
-                    x=as.numeric(a$V3),
-                    dimnames=list(levels(a$V1),levels(a$V2)))
-  a <- a[,colnames(a) %in% rownames(b)]
-  b <- b[colnames(a),]
-  rownames(g) <- g$V4
-  g <- g[rownames(a),]
-  g$gene.len <- g$V3 - g$V2
-  g <- subset(g, g$gene.len > 100)
-  a <- a[rownames(g),]
-  
-  ##save the sparseMatrix
-  #saveRDS(a,paste0(output_dir,'/temp_mtx.rds'))
+##save the sparseMatrix
+#saveRDS(a,paste0(output_dir,'/temp_mtx.rds'))
 
 #}
   
@@ -124,7 +130,16 @@ ids <- colnames(norm)
 norm <- norm %*% Diagonal(x=1/Matrix::colSums(norm))
 colnames(norm) <- ids
 
-saveRDS(norm, file = paste0(output_dir,'/opt_gene_body_accessibility_mtx.rds'))
+#saveRDS(norm, file = paste0(output_dir,'/opt_gene_body_accessibility_mtx.rds'))
+
+##updating 010425 save the data to the obj
+final_obj <- append(soc_obj, list(
+  gene_acc = norm
+))
+
+saveRDS(final_obj,file=paste0(input_output_dir,'/',input_prefix,'.atac.soc.rds'))
+
+
 
 # write output
 #message(' - write out sparse file')

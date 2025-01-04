@@ -34,19 +34,17 @@ import os
 
 ##define a function for the gene body sparse
 def calculate_gene_body_acc(input_other_required_scripts_dir,
-                            input_gene_sparse_fl,
-                            input_gene_bed_fl,
-                            input_output_dir,
-                            input_meta_fl):
+                            input_soc_obj_fl,input_prefix,
+                            input_output_dir):
 
     input_target_required_pipeline_scripts_dir = input_other_required_scripts_dir + '/utils_prepare_tn5_gene_accessibility/s3_open_gene_accessibility_final'
 
     call_normGBA_script = input_target_required_pipeline_scripts_dir + '/call_accessiblity_normGBA.R'
 
+
     cmd = 'Rscript ' + call_normGBA_script + \
-          ' ' + input_gene_sparse_fl + \
-          ' ' + input_meta_fl + \
-          ' ' + input_gene_bed_fl + \
+          ' ' + input_soc_obj_fl + \
+          ' ' + input_prefix + \
           ' ' + input_output_dir
     print(cmd)
     subprocess.call(cmd,shell=True)
