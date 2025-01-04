@@ -38,16 +38,16 @@ library(png)
 ###################################################################################################
 
 # load data
-loadData           <- function(meta, 
-                               pcs, 
-                               geneact, 
+loadData           <- function(input_soc_obj,
                                target_cluster){
 
     # verbose
     message(" - loading data ...")
 
     # load
-    b <- read.table(meta)
+    b <- input_soc_obj$meta  
+  
+    #b <- read.table(meta)
     #b <- read.delim(meta,row.names = 1)
     
     ##check if it has the cellID
@@ -61,10 +61,13 @@ loadData           <- function(meta,
     ##updating 102021
     #rownames(marker.info) <- paste0(marker.info$geneID,'_',marker.info$type,'_',marker.info$tissue)
     
-    h.pcs <- read.table(pcs)
+    h.pcs <- input_soc_obj$svd
+    #h.pcs <- read.table(pcs)
     #activity <- read.table(gzfile(geneact))
     #activity <- read.table(geneact,stringsAsFactors = T)
-    activity <- readRDS(geneact)
+    #activity <- readRDS(geneact)
+    
+    activity <- input_soc_obj$gene_acc
     
     b <- b[rownames(b) %in% rownames(h.pcs),]
     h.pcs <- h.pcs[rownames(h.pcs) %in% rownames(b),]
@@ -79,10 +82,7 @@ loadData           <- function(meta,
     #activity <- activity[,Matrix::colSums(activity>0) > 0]
     #activity <- activity[Matrix::rowSums(activity>0) > 0,]
     #activity <- activity[,Matrix::colSums(activity>0) > 0]
-    
-
-    
-    
+  
     b <- b[colnames(activity),]
     h.pcs <- h.pcs[colnames(activity),]
   
@@ -1220,7 +1220,7 @@ runMajorPriori     <- function(all.b,
 
 ##updating 112723
 # only run the smooth function
-run_smooth     <- function(all.b, 
+run_smooth     <- function(input_soc_obj,input_prefix,all.b, 
                                all.activity,
                                all.hpcs,
                                output_dir,
@@ -1286,7 +1286,15 @@ run_smooth     <- function(all.b,
                                  output=output)
   
 
-  saveRDS(impute.activity,paste0(output_dir,'/opt_allgenes_impute.activity.rds'))
+  #saveRDS(impute.activity,paste0(output_dir,'/opt_allgenes_impute.activity.rds'))
+  ##updating 010425
+  final_obj <- append(input_soc_obj, list(
+    gene_acc_smooth = impute.activity
+  ))
+  
+  saveRDS(final_obj,file=paste0(output_dir,'/',input_prefix,'.atac.soc.rds'))
+  
+  
   
 }
 

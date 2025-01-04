@@ -1,6 +1,7 @@
 ###################################################################################################
 ## plot marker accessibility scores
 ###################################################################################################
+##updating 010425 we will load the object to perform the analysis
 ##updating 062221 add the target cluster argument
 ##updating 062221 create a fold to store each type of markers in a seperate pdf that is suitable for the many markers within one cell type
 
@@ -8,18 +9,21 @@
 args <- commandArgs(trailingOnly=T)
 #if(length(args) != 5){stop("Rscript plot_marker_accessibility.R [meta] [gene_activity] [pcs.txt] [markers.bed] [threads]")}
 
-#args    
-meta <- as.character(args[1])
-geneact <- as.character(args[2])
-pcs <- as.character(args[3])
+#args
+input_soc_obj_fl <- as.character(args[1])
+#meta <- as.character(args[1])
+#geneact <- as.character(args[2])
+#pcs <- as.character(args[3])
 #mark <- as.character(args[4])
-threads <- as.numeric(args[4])
+threads <- as.numeric(args[2])
 
 ##updating 062221
-target_cluster <- as.character(args[5])
+target_cluster <- as.character(args[3])
 #plot_each_CT <- as.character(args[7]) ##use yes to initiate this argument
-output_dir <- as.character(args[6])
-function_script <- as.character(args[7])
+output_dir <- as.character(args[4])
+function_script <- as.character(args[5])
+
+input_prefix <- as.character(args[6])
 
 ##updating 071521
 ##if we update the markers, we need to re-run this script to obtain the new set of smooth marker file
@@ -32,10 +36,12 @@ source(function_script)
 
 
 # load data
+input_soc_obj <- readRDS(input_soc_obj_fl)
+
 if(file.exists(paste0(output_dir,"/GAobj.rds"))){
     dat <- readRDS(paste0(output_dir,"/GAobj.rds"))
 }else{
-    dat <- loadData(meta, pcs, geneact,target_cluster)
+    dat <- loadData(input_soc_obj,target_cluster)
     ##updating 062221 save to the GAobj
     saveRDS(dat,paste0(output_dir,"/GAobj.rds"))
 }
@@ -45,13 +51,14 @@ activity.all <- dat$activity
 h.pcs1 <- dat$h.pcs
 #marker.info.dat <- dat$marker.info
 
-
-run_smooth(b.meta, 
+run_smooth(input_soc_obj,input_prefix,b.meta, 
            activity.all,
            h.pcs1,
            output_dir,
            threads=threads,
            output="all")
+
+
 
 
 
