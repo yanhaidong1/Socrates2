@@ -5,6 +5,7 @@ import glob
 import sys
 import os
 import subprocess
+import re
 
 ##this pipeline is to annotate cell identity including several methods:
 ##these methods are mainly based on the marker genes
@@ -30,9 +31,12 @@ def get_parsed_args():
     ##step 01
     parser.add_argument("-open_markerUMAP", dest='open_vis_marker_UMAP',help = "Run visualization of marker genes using UMAP.")
 
-    parser.add_argument("-impute_gene_mtx", dest= 'impute_gene_acc_matrix', help = 'Provide the impute gene accessibility file.')
+    ##updating 010425
+    parser.add_argument("-soc_obj", dest='soc_object_fl', help='Provide an object obtained from the Calculate gene accessibility step.')
 
-    parser.add_argument("-meta_fl", dest='meta_file', help='Provide a meta file aftering the clustering.')
+    #parser.add_argument("-impute_gene_mtx", dest= 'impute_gene_acc_matrix', help = 'Provide the impute gene accessibility file.')
+
+    #arser.add_argument("-meta_fl", dest='meta_file', help='Provide a meta file aftering the clustering.')
 
     parser.add_argument("-marker_fl", dest='marker_file',help = 'Provide a marker gene file.')
 
@@ -51,7 +55,10 @@ def get_parsed_args():
     parser.add_argument("-open_only_plot", dest = 'open_only_dotplot', help = 'If open only plot, users need to provide a rds file with data already prepared.'
                                                                               'Default: no')
 
-    parser.add_argument("-prepared_gene_fl", dest = 'prepared_gene_file', help = 'Once we open only plot, we need to specify a prepared gene file used for the dotplot.')
+
+
+    parser.add_argument("-updated_soc_obj", dest = 'updated_soc_object_fl', help = 'Once we open only plot, we need to specify a prepared gene file used for the dotplot.')
+
 
     parser.add_argument("-dotplotwidth", dest='dotplotwidth_val',
                         help='Specify the dot plot width value.'
@@ -94,6 +101,7 @@ def main(argv=None):
         input_required_scripts_dir = args.required_script_dir
 
 
+
     if args.open_vis_marker_UMAP is None:
 
         open_markerUMAP_final = 'no'
@@ -101,29 +109,17 @@ def main(argv=None):
     else:
         if args.open_vis_marker_UMAP == 'yes':
 
+            if args.soc_object_fl is None:
+                print('Cannot find the soc object file, please provide it')
+                return
+            else:
+                try:
+                    file = open(args.soc_object_fl, 'r')  ##check if the file is not the right file
+                except IOError:
+                    print('There was an error opening the soc object file!')
+                    return
+
             open_markerUMAP_final = 'yes'
-
-            ##input meta file
-            if args.meta_file is None:
-                print('Cannot find meta file, please provide it')
-                return
-            else:
-                try:
-                    file = open(args.meta_file, 'r')  ##check if the file is not the right file
-                except IOError:
-                    print('There was an error opening the meta file!')
-                    return
-
-            ##check the gff file
-            if args.impute_gene_acc_matrix is None:
-                print('Cannot find imputed gene accessibility file, please provide it')
-                return
-            else:
-                try:
-                    file = open(args.impute_gene_acc_matrix, 'r')  ##check if the file is not the right file
-                except IOError:
-                    print('There was an error opening the imputed gene accessibility file!')
-                    return
 
             if args.marker_file is None:
                 print('Cannot find marker gene file, please provide it')
@@ -151,7 +147,6 @@ def main(argv=None):
 
             open_vis_marker_dotplot_final = 'yes'
 
-
             if args.open_only_dotplot is None:
                 open_only_dotplot_final = 'no'
             else:
@@ -164,24 +159,14 @@ def main(argv=None):
 
             if open_only_dotplot_final == 'no':
 
-                if args.gene_tn5_sparse_file is None:
-                    print('Cannot find gene tn5 sparse file, please provide it')
+                if args.soc_object_fl is None:
+                    print('Cannot find the soc object file, please provide it')
                     return
                 else:
                     try:
-                        file = open(args.gene_tn5_sparse_file, 'r')  ##check if the file is not the right file
+                        file = open(args.soc_object_fl, 'r')  ##check if the file is not the right file
                     except IOError:
-                        print('There was an error opening the gene tn5 sparse file!')
-                        return
-
-                if args.impute_gene_acc_matrix is None:
-                    print('Cannot find imputed gene accessibility file, please provide it')
-                    return
-                else:
-                    try:
-                        file = open(args.impute_gene_acc_matrix, 'r')  ##check if the file is not the right file
-                    except IOError:
-                        print('There was an error opening the imputed gene accessibility file!')
+                        print('There was an error opening the soc object file!')
                         return
 
                 if args.marker_file is None:
@@ -192,21 +177,20 @@ def main(argv=None):
                         file = open(args.marker_file, 'r')  ##check if the file is not the right file
                     except IOError:
                         print('There was an error opening the marker gene file!')
-                        return
-
-                ##input meta file
-                if args.meta_file is None:
-                    print('Cannot find meta file, please provide it')
-                    return
-                else:
-                    try:
-                        file = open(args.meta_file, 'r')  ##check if the file is not the right file
-                    except IOError:
-                        print('There was an error opening the meta file!')
                         return
 
             else:
 
+                if args.updated_soc_object_fl is None:
+                    print('Cannot find updated soc object file, please provide it')
+                    return
+                else:
+                    try:
+                        file = open(args.updated_soc_object_fl, 'r')  ##check if the file is not the right file
+                    except IOError:
+                        print('There was an error opening updated soc object file!')
+                        return
+
                 if args.marker_file is None:
                     print('Cannot find marker gene file, please provide it')
                     return
@@ -215,16 +199,6 @@ def main(argv=None):
                         file = open(args.marker_file, 'r')  ##check if the file is not the right file
                     except IOError:
                         print('There was an error opening the marker gene file!')
-                        return
-
-                if args.prepared_gene_file is None:
-                    print('Cannot find prepared gene file, please provide it')
-                    return
-                else:
-                    try:
-                        file = open(args.prepared_gene_file, 'r')  ##check if the file is not the right file
-                    except IOError:
-                        print('There was an error opening the prepared gene file!')
                         return
 
 
@@ -242,37 +216,14 @@ def main(argv=None):
 
             open_aggregate_annotation_final = 'yes'
 
-            if args.gene_accessibility_mtx is None:
-                print('Cannot find gene accessibility file, please provide it')
+            if args.soc_object_fl is None:
+                print('Cannot find the soc object file, please provide it')
                 return
             else:
                 try:
-                    file = open(args.gene_accessibility_mtx, 'r')  ##check if the file is not the right file
+                    file = open(args.soc_object_fl, 'r')  ##check if the file is not the right file
                 except IOError:
-                    print('There was an error opening the gene accessibility file!')
-                    return
-
-
-            ##input meta file
-            if args.meta_file is None:
-                print('Cannot find meta file, please provide it')
-                return
-            else:
-                try:
-                    file = open(args.meta_file, 'r')  ##check if the file is not the right file
-                except IOError:
-                    print('There was an error opening the meta file!')
-                    return
-
-            ##input svd file
-            if args.svd_file is None:
-                print('Cannot find svd file, please provide it')
-                return
-            else:
-                try:
-                    file = open(args.svd_file, 'r')  ##check if the file is not the right file
-                except IOError:
-                    print('There was an error opening the svd file!')
+                    print('There was an error opening the soc object file!')
                     return
 
             if args.marker_file is None:
@@ -284,7 +235,6 @@ def main(argv=None):
                 except IOError:
                     print('There was an error opening the marker gene file!')
                     return
-
 
         else:
             open_aggregate_annotation_final = 'no'
@@ -319,19 +269,33 @@ def main(argv=None):
 
         print('Users choose to visualize marker gene accessibility based on UMAP')
 
+        ##updating 010425 we will get the input prefix of the soc obj fl
+        input_soc_obj_fl = args.soc_object_fl
+        if re.match('.+/(.+)\.atac\.soc\.rds', input_soc_obj_fl):
+            mt = re.match('.+/(.+)\.atac\.soc\.rds', input_soc_obj_fl)
+            input_prefix = mt.group(1)
+        else:
+            if re.match('(.+)\.atac\.soc\.rds', input_soc_obj_fl):
+                mt = re.match('(.+)\.atac\.soc\.rds', input_soc_obj_fl)
+                input_prefix = mt.group(1)
+            else:
+                print('Please use *.atac.soc.rds file without changing the file name')
+                return
+
         open_markerUMAP_final_dir = output_dir + '/open_markerUMAP_final_dir'
         if not os.path.exists(open_markerUMAP_final_dir):
             os.makedirs(open_markerUMAP_final_dir)
 
 
         vis_R_script = input_required_scripts_dir + '/utils_annotate_cell_identity_using_markers/visualizations_markers_UMAP.R'
-        ipt_meta_fl = args.meta_file
-        ipt_impute_fl = args.impute_gene_acc_matrix
+
+        ##updating 010524
+        #ipt_meta_fl = args.meta_file
+        #ipt_impute_fl = args.impute_gene_acc_matrix
         ipt_marker_fl = args.marker_file
 
         cmd = 'Rscript ' + vis_R_script + \
-              ' ' + ipt_meta_fl + \
-              ' ' + ipt_impute_fl + \
+              ' ' + input_soc_obj_fl + \
               ' ' + ipt_marker_fl + \
               ' ' + vis_lim_value_final + \
               ' ' + open_markerUMAP_final_dir
@@ -352,26 +316,40 @@ def main(argv=None):
 
             vis_R_script = input_required_scripts_dir + '/utils_annotate_cell_identity_using_markers/visualizations_markers_dotplot_prepare.R'
 
-            ipt_impute_fl = args.impute_gene_acc_matrix
-            ipt_sparse_fl = args.gene_tn5_sparse_file
-            ipt_meta_fl = args.meta_file
+            ##updating 010425 we will get the input prefix of the soc obj fl
+            input_soc_obj_fl = args.soc_object_fl
+            if re.match('.+/(.+)\.atac\.soc\.rds', input_soc_obj_fl):
+                mt = re.match('.+/(.+)\.atac\.soc\.rds', input_soc_obj_fl)
+                input_prefix = mt.group(1)
+            else:
+                if re.match('(.+)\.atac\.soc\.rds', input_soc_obj_fl):
+                    mt = re.match('(.+)\.atac\.soc\.rds', input_soc_obj_fl)
+                    input_prefix = mt.group(1)
+                else:
+                    print('Please use *.atac.soc.rds file without changing the file name')
+                    return
+
+            #ipt_impute_fl = args.impute_gene_acc_matrix
+            #ipt_sparse_fl = args.gene_tn5_sparse_file
+            #ipt_meta_fl = args.meta_file
 
             cmd = 'Rscript ' + vis_R_script + \
-                  ' ' + ipt_impute_fl + \
-                  ' ' + ipt_sparse_fl + \
-                  ' ' + ipt_meta_fl + \
+                  ' ' + input_soc_obj_fl + \
                   ' ' + target_cluster_nm_final + \
-                  ' ' + open_vis_marker_dotplot_final_dir
+                  ' ' + open_vis_marker_dotplot_final_dir + \
+                  ' ' + input_prefix
             print(cmd)
             subprocess.call(cmd,shell=True)
 
             vis_R_script = input_required_scripts_dir + '/utils_annotate_cell_identity_using_markers/visualizations_markers_dotplot_plotting.R'
 
-            ipt_prepared_gene_fl = output_dir + '/open_vis_marker_dotplot_final_dir/opt_gene_zscore_accprop.rds'
+            #ipt_prepared_gene_fl = output_dir + '/open_vis_marker_dotplot_final_dir/opt_gene_zscore_accprop.rds'
             ipt_marker_fl = args.marker_file
 
+            input_soc_obj_fl = open_vis_marker_dotplot_final_dir + '/' + input_prefix + '.atac.soc.rds'
+
             cmd = 'Rscript ' + vis_R_script + \
-                  ' ' + ipt_prepared_gene_fl + \
+                  ' ' + input_soc_obj_fl + \
                   ' ' + ipt_marker_fl + \
                   ' ' + open_vis_marker_dotplot_final_dir + \
                   ' ' + dotplotwidth_val_final + \
@@ -383,11 +361,25 @@ def main(argv=None):
 
             vis_R_script = input_required_scripts_dir + '/utils_annotate_cell_identity_using_markers/visualizations_markers_dotplot_plotting.R'
 
-            ipt_prepared_gene_fl = output_dir + '/open_vis_marker_dotplot_final_dir/opt_gene_zscore_accprop.rds'
+            #ipt_prepared_gene_fl = output_dir + '/open_vis_marker_dotplot_final_dir/opt_gene_zscore_accprop.rds'
             ipt_marker_fl = args.marker_file
 
+            ##updating 010425 we will get the input prefix of the soc obj fl
+            input_soc_obj_fl = args.updated_soc_object_fl
+            if re.match('.+/(.+)\.atac\.soc\.rds', input_soc_obj_fl):
+                mt = re.match('.+/(.+)\.atac\.soc\.rds', input_soc_obj_fl)
+                input_prefix = mt.group(1)
+            else:
+                if re.match('(.+)\.atac\.soc\.rds', input_soc_obj_fl):
+                    mt = re.match('(.+)\.atac\.soc\.rds', input_soc_obj_fl)
+                    input_prefix = mt.group(1)
+                else:
+                    print('Please use *.atac.soc.rds file without changing the file name')
+                    return
+
+
             cmd = 'Rscript ' + vis_R_script + \
-                  ' ' + ipt_prepared_gene_fl + \
+                  ' ' + input_soc_obj_fl + \
                   ' ' + ipt_marker_fl + \
                   ' ' + open_vis_marker_dotplot_final_dir + \
                   ' ' + dotplotwidth_val_final + \
@@ -399,27 +391,38 @@ def main(argv=None):
 
         print('Users choose to open the aggregating marker accessibility to visualize the markers')
 
+        input_soc_obj_fl = args.soc_object_fl
+        if re.match('.+/(.+)\.atac\.soc\.rds', input_soc_obj_fl):
+            mt = re.match('.+/(.+)\.atac\.soc\.rds', input_soc_obj_fl)
+            input_prefix = mt.group(1)
+        else:
+            if re.match('(.+)\.atac\.soc\.rds', input_soc_obj_fl):
+                mt = re.match('(.+)\.atac\.soc\.rds', input_soc_obj_fl)
+                input_prefix = mt.group(1)
+            else:
+                print('Please use *.atac.soc.rds file without changing the file name')
+                return
+
         open_aggregate_annotation_final_dir = output_dir + '/open_aggregate_annotation_final_dir'
         if not os.path.exists(open_aggregate_annotation_final_dir):
             os.makedirs(open_aggregate_annotation_final_dir)
 
         vis_R_script = input_required_scripts_dir + '/utils_annotate_cell_identity_using_markers/visualizations_aggregate_markers_UMAP.R'
 
-        ipt_gene_acc_mtx_rds_fl = args.gene_accessibility_mtx
-        ipt_meta_fl = args.meta_file
-        ipt_svd_fl = args.svd_file
+        #ipt_gene_acc_mtx_rds_fl = args.gene_accessibility_mtx
+        #ipt_meta_fl = args.meta_file
+        #ipt_svd_fl = args.svd_file
         prefix = 'opt_annot'
         openAnnot = 'yes'
         ipt_marker_fl = args.marker_file
 
         cmd = 'Rscript ' + vis_R_script + \
-              ' ' + ipt_gene_acc_mtx_rds_fl + \
-              ' ' + ipt_meta_fl + \
+              ' ' + input_soc_obj_fl + \
               ' ' + ipt_marker_fl + \
-              ' ' + ipt_svd_fl + \
               ' ' + prefix + \
               ' ' + openAnnot + \
-              ' ' + open_aggregate_annotation_final_dir
+              ' ' + open_aggregate_annotation_final_dir + \
+              ' ' + input_prefix
         print(cmd)
         subprocess.call(cmd,shell=True)
 
