@@ -1,5 +1,6 @@
 #Visualizing marker genes using UMAP
 ##load a function
+##updating 010524 we will use the object to run the marker visulization
 ##updating 120824 use symbol other than the common and remove the name in the UMAP showing
 library(Matrix)
 library(ggplot2)
@@ -8,15 +9,18 @@ library(scales)
 
 args <- commandArgs(T)
 
-ipt_meta_fl <- as.character(args[1])
+ipt_object_fl <- as.character(args[1])
 
-ipt_impute_mtx_fl <- as.character(args[2])
+#ipt_meta_fl <- as.character(args[1])
 
-ipt_marker_fl <- as.character(args[3])
+#ipt_impute_mtx_fl <- as.character(args[2])
 
-ipt_lim_val <- as.numeric(args[4])
+ipt_marker_fl <- as.character(args[2])
 
-input_output_dir <- as.character(args[5])
+ipt_lim_val <- as.numeric(args[3])
+
+input_output_dir <- as.character(args[4])
+
 
 plot.act.scores    <- function(df,output_dir, 
                                acts=acts, 
@@ -31,9 +35,7 @@ plot.act.scores    <- function(df,output_dir,
   df <- df[rownames(df) %in% colnames(acts),]
   acts <- acts[,which(rownames(df) %in% colnames(acts))]
   
-  
   acts <- acts[,rownames(df)]
-  
   
   # reorder rows
   ##updating 102221 do not use the geneID to be the rownames
@@ -124,16 +126,21 @@ plot.act.scores    <- function(df,output_dir,
 
 
 
-UMAP_plot <- function(ipt_meta_fl,
-                      ipt_impute_mtx_fl,
+UMAP_plot <- function(ipt_object_fl,
                       ipt_marker_fl,
                       input_output_dir,
                       lim = 0.98,
                       opt_name = 'output'){
     
-  meta_dt <- read.table(ipt_meta_fl)
+  ipt_object <- readRDS(ipt_object_fl)
+  
+  meta_dt <- ipt_object$meta
+  #meta_dt <- read.table(ipt_meta_fl)
   #meta_dt <- obj_impute$meta
-  impute.activity <- readRDS(ipt_impute_mtx_fl)
+  
+  #impute.activity <- readRDS(ipt_impute_mtx_fl)
+  impute.activity <- ipt_object$gene_acc_smooth
+  
   #marker.info <- obj_impute$marker_infor
   marker.info <- read.delim(ipt_marker_fl,header=T)
 

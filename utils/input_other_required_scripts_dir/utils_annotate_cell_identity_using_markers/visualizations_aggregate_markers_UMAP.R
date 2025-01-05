@@ -2,6 +2,7 @@
 ## per cell annotation ##
 #########################
 
+##updating 010525 make the umap and store the meta into obejct and also store the meta directly in the output
 ##updating 110424 
 ##updating 110221 add the output dir
 ##updating 081821 replace the knn and log using the smooth data
@@ -18,14 +19,16 @@ args <- commandArgs(T)
 #if(length(args) != 7){stop("Rscript annotate_cells.R <gene_accessibility> <meta> <markers> <svd> <prefix> <output_dir>")}
 
 # arguments
-ga <- as.character(args[1])
-meta <- as.character(args[2])
-markers <- as.character(args[3])
-svd <- as.character(args[4])
-prefix <- as.character(args[5])
-openAnnot <- as.character(args[6])
-output_dir <- as.character(args[7])
+input_soc_object_fl <- as.character(args[1])
 
+#ga <- as.character(args[1])
+#meta <- as.character(args[2])
+markers <- as.character(args[2])
+#svd <- as.character(args[4])
+prefix <- as.character(args[3])
+openAnnot <- as.character(args[4])
+output_dir <- as.character(args[5])
+input_prefix <- as.character(args[6])
 
 
 # load libraries ----------------------------------------------------------------------------------
@@ -46,28 +49,31 @@ library(scales)
 # load functions ----------------------------------------------------------------------------------
 
 # loading data into obj
-loadData <- function(gene_access, 
-                     metadata, 
-                     markers, 
-                     pcs){
+loadData <- function(input_soc_object,
+                     markers){
     
-    message(gene_access)
-    message(metadata)
+    #input_soc_object <- readRDS(input_soc_object_fl)
+  
+    #message(gene_access)
+    #message(metadata)
     message(markers)
-    message(pcs)
+    #message(pcs)
     
     # files
     message(" - loading data ...")
     
     #x <- read.table(gene_access)
-    y <- read.table(metadata)
+    #y <- read.table(metadata)
+    y <- input_soc_object$meta
     
     ##updating 061923
     #y <- read.delim(metadata,row.names = 1)
     yy <- y
     z <- read.table(markers, header=T)
     rownames(z) <- z$geneID
-    pcs <- read.table(pcs)
+    
+    #pcs <- read.table(pcs)
+    pcs <- input_soc_object$svd
     
     # make sure columns 1-2 are factors and 3 is numeric
     #message(" - reformating input data ...")
@@ -81,7 +87,8 @@ loadData <- function(gene_access,
     #                   dimnames=list(levels(x[,1]), levels(x[,2])))
     #sm <- sm %*% Diagonal(x=10000/Matrix::colSums(sm))
     
-    sm <- readRDS(gene_access)
+    #sm <- readRDS(gene_access)
+    sm <- input_soc_object$gene_acc
     
     ids <- colnames(sm)
     
@@ -794,7 +801,6 @@ aveScores <- function(scores.list,
 
 # return results 
 updateMeta <- function(obj, 
-                       enrich.idents, 
                        smooth.idents, 
                        knn.idents,
                        pred.idents, 
@@ -825,17 +831,18 @@ updateMeta <- function(obj,
     obj$original.meta$cell_annotation_knn <- calls[rownames(obj$original.meta)]
     obj$original.meta$cell_annotation_knn[is.na(obj$original.meta$cell_annotation_knn)] <- "unknown"
     
+    ##updating 010525 do not assign the enrich identity
     # assign identities (enrich)
-    calls <- apply(enrich.idents,1, function(x){
-        val <- max(x)
-        if(val > cutoff[4]){
-            return(names(x)[which.max(x)])
-        }else{
-            return("unknown")
-        }
-    })
-    obj$original.meta$cell_annotation_enrich <- calls[rownames(obj$original.meta)]
-    obj$original.meta$cell_annotation_enrich[is.na(obj$original.meta$cell_annotation_enrich)] <- "unknown"
+    #calls <- apply(enrich.idents,1, function(x){
+    #    val <- max(x)
+    #    if(val > cutoff[4]){
+    #        return(names(x)[which.max(x)])
+    #    }else{
+    #        return("unknown")
+    #    }
+    #})
+    #obj$original.meta$cell_annotation_enrich <- calls[rownames(obj$original.meta)]
+    #obj$original.meta$cell_annotation_enrich[is.na(obj$original.meta$cell_annotation_enrich)] <- "unknown"
     
     # assign identities (smooth)
     calls <- apply(smooth.idents,1, function(x){
@@ -887,9 +894,13 @@ updateMeta <- function(obj,
 # ANALYSIS ----------------------------------------------------------------------------------------
 
 # load data #####################################
-ga.obj <- loadData(ga, meta, markers, svd)
+#ga.obj <- loadData(ga, meta, markers, svd)
 
-saveRDS(ga.obj,paste0(output_dir,'/temp_store_obj.rds'))
+input_soc_object <- readRDS(input_soc_object_fl)
+ga.obj <- loadData(input_soc_object,markers)
+
+
+#saveRDS(ga.obj,paste0(output_dir,'/temp_store_obj.rds'))
 
 # filter markers ################################
 #ga.obj.filt <- filterMarkers(ga.obj, enrich.threshold=1, threads=30)
@@ -899,63 +910,95 @@ if (openAnnot == 'yes'){
   ##open when necessary
   # estimate cell identity enrichment #############
   ga.identities <- cellIdentityEnrichment(ga.obj, permutations=1000, threads=30, weight=F)
-  write.table(ga.identities, file=paste0(output_dir,'/',prefix,".enriched_celltypes.txt"), quote=F, row.names=T, col.names=T, sep="\t")
-  plotIdentities(ga.identities, ga.obj, prefix=paste0(prefix,".cell_identities.enriched.png"), u.lim=0.99)
+  #write.table(ga.identities, file=paste0(output_dir,'/',prefix,".enriched_celltypes.txt"), quote=F, row.names=T, col.names=T, sep="\t")
+  ##do not plot the enriched cell types
+  #plotIdentities(ga.identities, ga.obj, prefix=paste0(prefix,".cell_identities.enriched.png"), u.lim=0.99)
   
   # smooth cell identity by neighborhood ##########
   ga.smooth.identities <- smoothIdentity(ga.obj, ga.identities, k=15, step=3, npcs=30)
-  write.table(ga.smooth.identities, file=paste0(output_dir,'/',prefix,".smoothed_celltypes.txt"), quote=F, row.names=T, col.names=T, sep="\t")
+  #write.table(ga.smooth.identities, file=paste0(output_dir,'/',prefix,".smoothed_celltypes.txt"), quote=F, row.names=T, col.names=T, sep="\t")
   plotIdentities(ga.smooth.identities, ga.obj, prefix=paste0(prefix,".cell_identities.smooth.png"), u.lim=0.999)
   
   ##updating 080321 add a version to allow the value/max
-  smooth_dt <- read.table(paste0(output_dir,'/',prefix,".smoothed_celltypes.txt"))
-  ga.smooth.identities.norm = smooth_dt/apply(smooth_dt,1,max)
-  message('plot norm smooth data of ori')
-  plotIdentities(ga.smooth.identities.norm, ga.obj, prefix=paste0(prefix,".cell_identities_norm.smooth.png"), u.lim=0.9999)
+  #smooth_dt <- read.table(paste0(output_dir,'/',prefix,".smoothed_celltypes.txt"))
+  #ga.smooth.identities.norm = smooth_dt/apply(smooth_dt,1,max)
+  #message('plot norm smooth data of ori')
+  #plotIdentities(ga.smooth.identities.norm, ga.obj, prefix=paste0(prefix,".cell_identities_norm.smooth.png"), u.lim=0.9999)
   
   # knn identities ################################
   ga.knn.identities <- knnCellTypes(ga.obj, ga.identities, train.top=0.1, k=30)
   ga.knn.smooth <- smoothIdentity(ga.obj, ga.knn.identities, k=15, step=3, npcs=30)
-  write.table(ga.knn.smooth, file=paste0(output_dir,'/',prefix,".knn_celltypes.smooth.txt"), quote=F, row.names=T, col.names=T, sep="\t")
+  #write.table(ga.knn.smooth, file=paste0(output_dir,'/',prefix,".knn_celltypes.smooth.txt"), quote=F, row.names=T, col.names=T, sep="\t")
   plotIdentities(ga.knn.smooth, ga.obj, prefix=paste0(prefix,".cell_identities.wknn.png"), u.lim=0.999)
   
   ##updating 080321 add a version to do the normalization
-  smooth_dt <- read.table(paste0(output_dir,'/',prefix,".knn_celltypes.smooth.txt"))
-  ga.knn.smooth.norm = smooth_dt/apply(smooth_dt,1,max)
-  message('plot norm smooth data of knn method')
-  plotIdentities(ga.knn.smooth.norm, ga.obj, prefix=paste0(prefix,".cell_identities_norm.wknn.png"), u.lim=0.9999)
+  #smooth_dt <- read.table(paste0(output_dir,'/',prefix,".knn_celltypes.smooth.txt"))
+  #ga.knn.smooth.norm = smooth_dt/apply(smooth_dt,1,max)
+  #message('plot norm smooth data of knn method')
+  #plotIdentities(ga.knn.smooth.norm, ga.obj, prefix=paste0(prefix,".cell_identities_norm.wknn.png"), u.lim=0.9999)
   
   # train multinomial logistic regression cell type classifier on genome-wide accessibility
   ga.pred.identities <- trainIdentity(ga.obj, ga.identities, perc=0.1, threads=10, smoothdata=F)
   ga.pred.smooth <- smoothIdentity(ga.obj, ga.pred.identities, k=15, step=3, npcs=30)
-  write.table(ga.pred.smooth, file=paste0(output_dir,'/',prefix,".predicted_celltypes.smooth.txt"), quote=F, row.names=T, col.names=T, sep="\t")
+  #write.table(ga.pred.smooth, file=paste0(output_dir,'/',prefix,".predicted_celltypes.smooth.txt"), quote=F, row.names=T, col.names=T, sep="\t")
   plotIdentities(ga.pred.smooth, ga.obj, prefix=paste0(prefix,".cell_identities.predicted.png"), u.lim=0.999)
   
   ##updating 080321 add a version to doe the normalization
-  smooth_dt <- read.table(paste0(output_dir,'/',prefix,".predicted_celltypes.smooth.txt"))
-  ga.pred.smooth.norm = smooth_dt/apply(smooth_dt,1,max)
-  message('plot norm smooth data of pred method')
-  plotIdentities(ga.pred.smooth.norm, ga.obj, prefix=paste0(prefix,".cell_identities_norm.predicted.png"), u.lim=0.9999)
-
+  #smooth_dt <- read.table(paste0(output_dir,'/',prefix,".predicted_celltypes.smooth.txt"))
+  #ga.pred.smooth.norm = smooth_dt/apply(smooth_dt,1,max)
+  #message('plot norm smooth data of pred method')
+  #plotIdentities(ga.pred.smooth.norm, ga.obj, prefix=paste0(prefix,".cell_identities_norm.predicted.png"), u.lim=0.9999)
+  
+  ##directly perform the annot other than make the temp files
+  cell.data <- updateMeta(ga.obj, 
+                          ga.smooth.identities,
+                          ga.knn.smooth, 
+                          ga.pred.smooth, 
+                          cutoff=c(0,0,0,0))
+  
 }
 
 ##we need to assign identities
-ga.identities <- read.table(paste0(output_dir,'/',prefix,".enriched_celltypes.txt"))
-ga.smooth.identities <- read.table(paste0(output_dir,'/',prefix,'.smoothed_celltypes.txt'))
-ga.knn.smooth <- read.table(paste0(output_dir,'/',prefix,'.knn_celltypes.smooth.txt'))
-ga.pred.smooth <- read.table(paste0(output_dir,'/',prefix,'.predicted_celltypes.smooth.txt'))
+##do not need the enrich ones
+#ga.identities <- read.table(paste0(output_dir,'/',prefix,".enriched_celltypes.txt"))
+
+#ga.smooth.identities <- read.table(paste0(output_dir,'/',prefix,'.smoothed_celltypes.txt'))
+#ga.knn.smooth <- read.table(paste0(output_dir,'/',prefix,'.knn_celltypes.smooth.txt'))
+#ga.pred.smooth <- read.table(paste0(output_dir,'/',prefix,'.predicted_celltypes.smooth.txt'))
 
 
 # assign identities #############################
-cell.data <- updateMeta(ga.obj, 
-                        ga.identities,
-                        ga.smooth.identities,
-                        ga.knn.smooth, 
-                        ga.pred.smooth, 
-                        cutoff=c(0,0,0,0))
+#cell.data <- updateMeta(ga.obj, 
+#                        ga.smooth.identities,
+#                        ga.knn.smooth, 
+#                        ga.pred.smooth, 
+#                        cutoff=c(0,0,0,0))
 
 
 # return results ----------------------------------------------------------------------------------
 write.table(cell.data, file=paste0(output_dir,'/',prefix,".meta.txt"), quote=F, row.names=T, col.names=T, sep="\t")
+
+
+
+##save the annotate to the meta of the final object
+final_obj <- append(input_soc_object, list(
+  meta_annot = cell.data
+))
+
+
+saveRDS(final_obj,file=paste0(output_dir,'/',input_prefix,'.atac.soc.rds'))
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

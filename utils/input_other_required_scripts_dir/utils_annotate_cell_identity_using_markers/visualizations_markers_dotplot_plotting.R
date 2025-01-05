@@ -16,7 +16,9 @@ library(dplyr)
 
 args <- commandArgs(T)
 
-opt_prepare_plot_obj_fl <- as.character(args[1])
+input_soc_object_fl <- as.character(args[1])
+
+#opt_prepare_plot_obj_fl <- as.character(args[1])
 
 input_marker_gene_fl <- as.character(args[2])
 
@@ -27,12 +29,12 @@ plot_width <- as.numeric(args[4])
 plot_height <- as.numeric(args[5])
 
 
-plot_markers <- function(prefix,input_marker_gene_fl,opt_prepare_plot_obj,
+plot_markers <- function(prefix,input_marker_gene_fl,input_soc_object,
                          plot_width,plot_height,OpenaddCTtoName='no'){
 
-  input_z_score_dt <- opt_prepare_plot_obj$zscore
+  input_z_score_dt <- input_soc_object$dotplot$zscore
 
-  combine_dt_addzscore <- opt_prepare_plot_obj$dt
+  combine_dt_addzscore <- input_soc_object$dotplot$dt
   
   
   #markers <- read.delim(input_marker_gene_fl,row.names = 1)
@@ -134,8 +136,9 @@ plot_markers <- function(prefix,input_marker_gene_fl,opt_prepare_plot_obj,
 ##plotting
 prefix <- 'marker'
 
-opt_prepare_plot_obj <- readRDS(opt_prepare_plot_obj_fl)
-plot_markers(prefix,input_marker_gene_fl,opt_prepare_plot_obj,
+input_soc_object <- readRDS(input_soc_object_fl)
+#opt_prepare_plot_obj <- readRDS(opt_prepare_plot_obj_fl)
+plot_markers(prefix,input_marker_gene_fl,input_soc_object,
              plot_width,plot_height,OpenaddCTtoName='no')
 
 

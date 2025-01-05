@@ -1,7 +1,6 @@
 ###################################################################################################
-###################################################################################################
-###################################################################################################
 
+##updating 010525 we will use the object
 #' Visualizing marker genes using dot plot
 
 #' Function to plot dot plot
@@ -14,26 +13,32 @@ library(gtools)
 
 args <- commandArgs(T)
 
-input_gene_body_acc_mtx_rds_fl <- as.character(args[1])
+input_object_fl <- as.character(args[1])
 
-input_gene_body_sparse_fl <- as.character(args[2])
+#input_gene_body_acc_mtx_rds_fl <- as.character(args[1])
 
-input_meta_fl <- as.character(args[3])
+#input_gene_body_sparse_fl <- as.character(args[2])
 
-input_target_clust <- as.character(args[4])
+#input_meta_fl <- as.character(args[3])
 
-input_output_dir <- as.character(args[5])
+input_target_clust <- as.character(args[2])
+
+input_output_dir <- as.character(args[3])
+
+input_prefix <- as.character(args[4])
 
 
-prepare_geneImputAcc_prop     <- function(input_imputed_mtx_rds,input_sparse_fl,
-                                          input_meta_fl,
+prepare_geneImputAcc_prop     <- function(input_object,
                                           input_output_dir,target_col){
   
   ####
   ##s1 load the files
   message(" -s1 load files ...")
-  acts <- readRDS(input_imputed_mtx_rds)
-  meta_dt <- read.delim(input_meta_fl,row.names = 1)
+  #acts <- readRDS(input_imputed_mtx_rds)
+  acts <- input_object$gene_acc_smooth
+  
+  #meta_dt <- read.delim(input_meta_fl,row.names = 1)
+  meta_dt <- input_object$meta
   
   ####
   ##s2 calculat the avg mean values
@@ -69,7 +74,9 @@ prepare_geneImputAcc_prop     <- function(input_imputed_mtx_rds,input_sparse_fl,
   ####
   ##s3 calculate the prop per gene
   message(" -s3 cal prop per gene ...")
-  ipt_sparse_dt <- read.table(input_sparse_fl,stringsAsFactors = T)
+  #ipt_sparse_dt <- read.table(input_sparse_fl,stringsAsFactors = T)
+  ipt_sparse_dt <- input_object$gene_Tn5
+  
   ##correspond the gene name
   ipt_sparse_dt_t <- ipt_sparse_dt[ipt_sparse_dt$V1 %in% rownames(z),]
   ##correspond the cell name
@@ -145,14 +152,24 @@ prepare_geneImputAcc_prop     <- function(input_imputed_mtx_rds,input_sparse_fl,
 
 
 ##prepare the object 
-input_imputed_mtx_rds <- input_gene_body_acc_mtx_rds_fl
-input_sparse_fl <- input_gene_body_sparse_fl
+#input_imputed_mtx_rds <- input_gene_body_acc_mtx_rds_fl
+#input_sparse_fl <- input_gene_body_sparse_fl
 
-opt_prepare_plot_obj <- prepare_geneImputAcc_prop(input_imputed_mtx_rds,input_sparse_fl,
-                         input_meta_fl,
+input_object <- readRDS(input_object_fl)
+
+opt_prepare_plot_obj <- prepare_geneImputAcc_prop(input_object,
                          input_output_dir,input_target_clust)
 
-saveRDS(opt_prepare_plot_obj,paste0(input_output_dir,'/opt_gene_zscore_accprop.rds'))
+
+##udpating 010525 we will add the output to the oject
+final_obj <- append(input_object, list(
+  dotplot = opt_prepare_plot_obj
+))
+
+saveRDS(final_obj,file=paste0(input_output_dir,'/',input_prefix,'.atac.soc.rds'))
+
+
+#saveRDS(opt_prepare_plot_obj,paste0(input_output_dir,'/opt_gene_zscore_accprop.rds'))
 
 
 
