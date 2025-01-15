@@ -52,14 +52,30 @@ def get_parsed_args():
     parser.add_argument("-ct_colnm", dest='celltype_cluster_col_name',
                         help='Define the cluster column name of the meta file.')
 
-    parser.add_argument("-upsample_method", dest= 'upsampling_method',help = 'Users need to define the method used for the upsampling. Sample read or sample cell'
-                                                   'Default: read')
+    parser.add_argument("-stat_test", dest='stat_test_method', help='Users need to provide the method used for the stat test. pnorm or perm.'
+                                                                    'Default: perm. ')
 
-    parser.add_argument("-FDR", dest = 'FDR_cutoff', help = 'Provide a FDR cutoff to filter the differentially accessible peaks'
-                                                            'Default: 0.1')
+    parser.add_argument("-threshold", dest='threshold_val', help = 'The threshold value for statistical testing.'
+                                                                   'Default: 0.001')
 
-    parser.add_argument("-log2fc", dest= 'log2fc_cutoff', help = 'Provde a log2fc cutoff to filter the differentially accessible peaks.'
-                                                                 'Default: 1')
+    parser.add_argument("-null_permutations", dest='null_permutations_val', help = 'The number of null permutations to generate.'
+                                                                   'Default: 1000')
+
+    parser.add_argument("-entropy_bootstraps", dest = 'entropy_bootstraps_val', help = 'The number of bootstraps for the entropy metric to generate.'
+                                                                                       'Default: 1000')
+
+    parser.add_argument("-prefix", dest = 'prefix_str', help = 'Prefix for output.'
+                                                               'Default:opt')
+
+
+    #parser.add_argument("-upsample_method", dest= 'upsampling_method',help = 'Users need to define the method used for the upsampling. Sample read or sample cell'
+    #                                               'Default: read')
+
+    #parser.add_argument("-FDR", dest = 'FDR_cutoff', help = 'Provide a FDR cutoff to filter the differentially accessible peaks'
+    #                                                        'Default: 0.1')
+
+    #parser.add_argument("-log2fc", dest= 'log2fc_cutoff', help = 'Provde a log2fc cutoff to filter the differentially accessible peaks.'
+    #                                                             'Default: 1')
 
     ##parse of parameters
     args = parser.parse_args()
@@ -88,7 +104,7 @@ def main(argv=None):
 
     if args.s1_open_prepare_peak_tn5 is None:
 
-        s1_open_prepare_peak_tn5_final = 'no'
+        s1_open_prepare_peak_tn5_final = 'yes'
 
     else:
 
@@ -124,7 +140,7 @@ def main(argv=None):
 
     if args.s2_open_diff_peak_call is None:
 
-        s2_open_diff_peak_call_final = 'no'
+        s2_open_diff_peak_call_final = 'yes'
 
     else:
 
@@ -170,31 +186,46 @@ def main(argv=None):
             print ('Please use \'-ct_colnm\' to specify the column name showing cell identity.')
             return
 
-
-    if args.upsampling_method is not None:
-        upsampling_method_final = args.upsampling_method
-        if upsampling_method_final != 'read' and upsampling_method_final != 'cell':
-            print ('Please make sure \'-upsample_method\' should be \'read\' or \'cell\'')
-            return
+    if args.stat_test_method is not None:
+        stat_test_method_final = args.stat_test_method
     else:
-        upsampling_method_final = 'read'
+        stat_test_method_final = 'perm'
 
-    store_final_parameter_line_list.append('select_method <- ' + '\'' + upsampling_method_final + '\'')
+    store_final_parameter_line_list.append('stat_test <- ' + '\'' + stat_test_method_final + '\'')
 
 
-    if args.FDR_cutoff is not None:
-        FDR_cutoff_final = args.FDR_cutoff
+    if args.threshold_val is not None:
+        threshold_val_final = args.threshold_val
     else:
-        FDR_cutoff_final = '0.1'
+        threshold_val_final = '0.0001'
 
-    store_final_parameter_line_list.append('FDR_cutoff <- ' + FDR_cutoff_final)
+    store_final_parameter_line_list.append('threshold <- ' + threshold_val_final)
 
-    if args.log2fc_cutoff is not None:
-        log2fc_cutoff_final = args.log2fc_cutoff
+
+    if args.null_permutations_val is not None:
+        null_permutations_val_final = args.null_permutations_val
     else:
-        log2fc_cutoff_final = '1'
+        null_permutations_val_final = '1000'
 
-    store_final_parameter_line_list.append('log2fc_cutoff <- ' + log2fc_cutoff_final)
+    store_final_parameter_line_list.append('null_permutations <- ' + null_permutations_val_final)
+
+
+    if args.entropy_bootstraps_val is not None:
+        entropy_bootstraps_val_final = args.entropy_bootstraps_val
+    else:
+        entropy_bootstraps_val_final = '1000'
+
+    store_final_parameter_line_list.append('entropy_bootstraps <- ' + entropy_bootstraps_val_final)
+
+
+    if args.prefix_str is not None:
+        prefix_str_final = args.prefix_str
+    else:
+        prefix_str_final = 'opt'
+
+    store_final_parameter_line_list.append('prefix <- ' + '\'' + prefix_str_final + '\'')
+
+
 
     with open(output_dir + '/temp_defined_parameters.config', 'w+') as opt:
         for eachline in store_final_parameter_line_list:
@@ -219,6 +250,13 @@ def main(argv=None):
 
         s1_prepare.sort_sparse(s1_open_prepare_peak_tn5_final_dir)
 
+        input_peak_tn5_fl = s1_open_prepare_peak_tn5_final_dir + '/opt_peak_sparse_sorted_dir/opt_peak_sorted.sparse'
+
+        s1_prepare.prepare_peak_acc (input_peak_tn5_fl,input_peak_fl,s1_open_prepare_peak_tn5_final_dir)
+
+        ##final output for the next step is storing
+        ##opt_prepare_peak_acc_dir/
+
     if s2_open_diff_peak_call_final == 'yes':
 
         print ('Users will call the differential accessible peaks across cell types.')
@@ -227,9 +265,12 @@ def main(argv=None):
         if not os.path.exists(s2_open_diff_peak_call_final_dir):
             os.makedirs(s2_open_diff_peak_call_final_dir)
 
-        R_script = input_required_scripts_dir + '/utils_diff_peak_calling/s2_pseudobulk_DAR_analysis.R'
-        ipt_peak_sparse_fl = output_dir + '/s1_open_prepare_peak_tn5_final/opt_peak_sparse_sorted_dir/opt_peak_sorted.sparse'
+        R_script = input_required_scripts_dir + '/utils_diff_peak_calling/s2_call_ctACR.Bootstrap.R'
+
+
+        ipt_peak_sparse_fl = output_dir + '/s1_open_prepare_peak_tn5_final/opt_prepare_peak_acc_dir/opt_accessibility.txt'
         ipt_meta_fl = args.meta_file
+        ipt_peak_fl = output_dir + '/s1_open_prepare_peak_tn5_final/opt_prepare_peak_acc_dir/opt_peak.bed'
 
         if os.path.isfile(ipt_peak_sparse_fl) == True:
 
@@ -237,13 +278,17 @@ def main(argv=None):
             cmd = 'Rscript ' + R_script + \
                   ' ' + ipt_peak_sparse_fl + \
                   ' ' + ipt_meta_fl + \
-                  ' ' + s2_open_diff_peak_call_final_dir + \
-                  ' ' + output_dir + '/temp_defined_parameters.config'
+                  ' ' + ipt_peak_fl + \
+                  ' ' + output_dir + '/temp_defined_parameters.config' + \
+                  ' ' + s2_open_diff_peak_call_final_dir
             print(cmd)
             subprocess.call(cmd,shell=True)
 
         else:
-            print('Please check the step01 and make sure opt_peak_sorted.sparse file exists in the s1_open_prepare_peak_tn5_final_dir/opt_peak_sparse_sorted_dir')
+            print('Please check the step01 and make sure opt_accessibility.txt and opt_peak.bed file existing in the s1_open_prepare_peak_tn5_final_dir/opt_prepare_peak_acc_dir')
+
+
+
 
 
 
