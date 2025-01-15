@@ -113,13 +113,14 @@ def downsampling (cutoff_cellnm,input_output_dir,prefix_meta,target_colnm):
 
     store_celltype_celllist_dic = {}
     count = 0
+    target_index = 0
     with open (new_meta_fl,'r') as ipt:
         for eachline in ipt:
             eachline = eachline.strip('\n')
             col = eachline.strip().split()
 
             count += 1
-            target_index = 0
+
             if count == 1:
                 target_index = col.index(target_colnm)
             else:
