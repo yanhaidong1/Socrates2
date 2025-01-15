@@ -37,6 +37,9 @@ def get_parsed_args():
 
     parser.add_argument("-script_dir", dest = 'required_script_dir', help = 'Users must provide the required script dir provided by GitHub.')
 
+    parser.add_argument("-ct_colnm", dest='celltype_cluster_col_name',
+                        help='Define the cluster column name of the meta file.')
+
     ##optional parameters
     parser.add_argument("-s1_open_tn5", dest = 's1_open_prepare_tn5_file', help = 'Run the step 01 to prepare the tn5 file per cell type.'
                                                                                  'Default: yes')
@@ -153,6 +156,14 @@ def main(argv=None):
             s1_open_prepare_tn5_file_final = 'no'
             print('Users close the step01, please use \'-s1_open_tn5\' yes to open this step')
 
+    ##check if we provide the target cluster name
+    if s1_open_prepare_tn5_file_final == 'yes':
+
+        if args.celltype_cluster_col_name is None:
+            print('Please provide the name of column specifying the cell type identity in the meta file.')
+            return
+
+
 
     if args.s2_open_call_peak is None:
         s2_open_call_peak_final = 'yes'
@@ -250,8 +261,9 @@ def main(argv=None):
         input_tn5_fl = args.tn5_bed_file
         input_meta_fl = args.meta_file
         input_core_num = core_number_run
+        target_colnm = args.celltype_cluster_col_name
 
-        s1_tn5.prepare_bed_files_parallele(input_tn5_fl, input_meta_fl,
+        s1_tn5.prepare_bed_files_parallele(input_tn5_fl, input_meta_fl,target_colnm,
                                     input_core_num,
                                     s1_open_prepare_tn5_file_final_dir)
 
