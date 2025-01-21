@@ -153,13 +153,20 @@ UMAP_plot <- function(ipt_object_fl,
 
 }
 
-
-UMAP_plot(ipt_meta_fl,
-          ipt_impute_mtx_fl,
+UMAP_plot(ipt_object_fl,
           ipt_marker_fl,
           input_output_dir,
           lim = ipt_lim_val,
-          opt_name = 'opt_UMAP_marker.png')
+          opt_name = 'opt_UMAP_marker.png'
+          )
+
+
+#UMAP_plot(ipt_meta_fl,
+#          ipt_impute_mtx_fl,
+#          ipt_marker_fl,
+#          input_output_dir,
+#          lim = ipt_lim_val,
+#          opt_name = 'opt_UMAP_marker.png')
 
 
 
