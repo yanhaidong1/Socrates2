@@ -8,6 +8,8 @@ import re
 import subprocess
 
 
+##updating 012325 add removing the black list step
+
 ##this script is to process data bam file from cellranger
 ##calculate tn5 data and gene accessibility
 from input_other_required_scripts_dir.utils_prepare_tn5_gene_accessibility.s1_open_process_BAM_final import pipeline_process_bam as s1_procbam
@@ -26,6 +28,8 @@ def get_parsed_args():
 
     ##step 01
     parser.add_argument("-BAM_fl", dest='bam_file', help="Provide bam file obtained from cell ranger")
+
+    parser.add_argument("-black_fl", dest='black_list_file', help = 'Provide a black list file')
 
     ##step 02
     ##updating 010425
@@ -72,6 +76,7 @@ def get_parsed_args():
     parser.add_argument("-open_procBAM", dest='s1_open_process_BAM',
                         help='Run the step 01 to process the BAM file to obtain the tn5.'
                              'Default: no')
+
 
     parser.add_argument("-open_geneTn5", dest='s2_open_prepare_gene_tn5', help='Run the step 02 to prepare the gene tn5 file.'
                                                                         'Default: no')
@@ -144,7 +149,15 @@ def main(argv=None):
             s1_open_process_BAM_final = 'no'
             print('Users choose to close the BAM processing, please use \'-open_procBAM yes\' to open this step')
 
-
+    ##updaitng 012325
+    if args.black_list_file is None:
+        print('Cannot find gene gff file, if users want to remove the reads under the black region, please provide it')
+    else:
+        try:
+            file = open(args.black_list_file, 'r')  ##check if the file is not the right file
+        except IOError:
+            print('There was an error opening the black list file!')
+            return
 
 
     ##step02
@@ -267,6 +280,20 @@ def main(argv=None):
 
         s1_procbam.process_bam (input_required_scripts_dir,input_bam_fl,s1_open_process_BAM_final_dir,
                                 core_number_run,mapping_quality_val,remove_step_s1_temp_final)
+
+        ##updating 012325 update the black list file
+        if args.black_list_file is not None:
+
+            print ('Users choose to use black list file to filter out Tn5 reads within black region in genome')
+
+            ipt_black_list_file = args.black_list_file
+            input_qual_val = mapping_quality_val
+
+            ipt_tn5_fl = s1_open_process_BAM_final_dir + '/opt_tn5_mq' + input_qual_val + '.bed'
+
+            s1_procbam.remove_black (ipt_tn5_fl,ipt_black_list_file,s1_open_process_BAM_final_dir)
+
+
 
     ##updating 010425 we will get the input prefix of the soc obj fl
     input_soc_obj_fl = args.soc_object_fl
