@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 
+
+##updating 012325 add a new function to remove the black
 ##this script is to process bam files from the cell ranger output
 
 import subprocess
+import re
 
 
 def process_bam (input_other_required_scripts_dir,input_bam_fl,input_output_dir,
@@ -80,6 +83,66 @@ def process_bam (input_other_required_scripts_dir,input_bam_fl,input_output_dir,
         cmd = 'rm ' + input_output_dir + '/dups.txt'
         print(cmd)
         subprocess.call(cmd,shell=True)
+
+
+def remove_black (ipt_tn5_fl,input_black_list_fl,opt_dir):
+
+    if re.match('.+/.+',ipt_tn5_fl):
+        mt = re.match('.+/(.+)\.bed',ipt_tn5_fl)
+        flnm = mt.group(1)
+    else:
+        mt = re.match('(.+)\.bed',ipt_tn5_fl)
+        flnm = mt.group(1)
+
+    ##remove the black list
+    cmd = 'sort -k1,1V -k2,2n ' + input_black_list_fl + ' > ' + opt_dir + '/temp_black_list_sorted.bed'
+    print(cmd)
+    subprocess.call(cmd,shell=True)
+
+    ##uniq
+    cmd = 'uniq ' + ipt_tn5_fl + ' > ' + opt_dir + '/temp_uniq_tn5.bed'
+    print(cmd)
+    subprocess.call(cmd, shell=True)
+
+    ##sort
+    cmd = 'sort -k1,1V -k2,2n ' + opt_dir + '/temp_uniq_tn5.bed' + ' > ' + opt_dir + '/temp_uniq_tn5_sorted.bed'
+    print(cmd)
+    subprocess.call(cmd, shell=True)
+
+
+    ##intersect with the bed
+    cmd = 'bedtools intersect -a ' + opt_dir + '/temp_uniq_tn5_sorted.bed' + ' -b ' + opt_dir + '/temp_black_list_sorted.bed' + \
+          ' -wa -wb ' + ' > ' + opt_dir + '/temp_intersect.txt'
+    subprocess.call(cmd, shell=True)
+
+    store_black_region_dic = {}
+    with open(opt_dir + '/temp_intersect.txt', 'r') as ipt:
+        for eachline in ipt:
+            eachline = eachline.strip('\n')
+            col = eachline.strip().split()
+            black_loc = col[0] + '_' + col[1] + '_' + col[2] + '_' + col[3] + '_' + col[4]
+            store_black_region_dic[black_loc] = 1
+
+    bed_file = open(opt_dir + '/temp_uniq_tn5_sorted.bed', 'r')
+    bed_file_noblack_fl = open(opt_dir + '/' + flnm + '_rmblack.bed', 'w')
+
+    for eachline in bed_file:
+        eachline = eachline.strip('\n')
+        col = eachline.strip().split()
+        loc = col[0] + '_' + col[1] + '_' + col[2] + '_' + col[3] + '_' + col[4]
+        if loc not in store_black_region_dic:
+            bed_file_noblack_fl.write(eachline + '\n')
+
+    bed_file.close()
+    bed_file_noblack_fl.close()
+
+    cmd = 'rm ' + opt_dir + '/temp*'
+    print(cmd)
+    subprocess.call(cmd,shell=True)
+
+
+
+
 
 
 
