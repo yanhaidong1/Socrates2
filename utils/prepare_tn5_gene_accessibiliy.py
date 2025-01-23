@@ -145,23 +145,26 @@ def main(argv=None):
             print('Users choose to close the BAM processing, please use \'-open_procBAM yes\' to open this step')
 
 
-    ###########################################################
-    ##this object should be provided in all the following steps
-    if args.soc_object_fl is None:
-        print('Cannot find the soc object file, please provide it')
-        return
-    else:
-        try:
-            file = open(args.soc_object_fl, 'r')  ##check if the file is not the right file
-        except IOError:
-            print('There was an error opening the soc object file!')
-            return
+
 
     ##step02
     if args.s2_open_prepare_gene_tn5 is None:
         s2_open_prepare_gene_tn5_final = 'no'
     else:
         if args.s2_open_prepare_gene_tn5 == 'yes':
+
+            ###########################################################
+            ##this object should be provided in all the following steps
+            if args.soc_object_fl is None:
+                print('Cannot find the soc object file, please provide it')
+                return
+            else:
+                try:
+                    file = open(args.soc_object_fl, 'r')  ##check if the file is not the right file
+                except IOError:
+                    print('There was an error opening the soc object file!')
+                    return
+
             s2_open_prepare_gene_tn5_final = 'yes'
 
             ##check the gff file
