@@ -151,7 +151,7 @@ def main(argv=None):
 
     ##updaitng 012325
     if args.black_list_file is None:
-        print('Cannot find gene gff file, if users want to remove the reads under the black region, please provide it')
+        print('Cannot find black list file, if users want to remove the reads under the black region, please provide it')
     else:
         try:
             file = open(args.black_list_file, 'r')  ##check if the file is not the right file
