@@ -1,6 +1,8 @@
 ###################################################################################################
 ###################################################################################################
 ###################################################################################################
+##updating 012825 we will update the plotting of organelle ratio
+
 #' loadBEDandGenomeData
 #'
 #' This function loads obj 5 column BED file specifying the single-bp Tn5 integration sites.
@@ -416,14 +418,16 @@ buildMetaData <- function(obj,
 #' @rdname findCells_OG
 #' @export
 #'
+#'
+#'updating 012825 filt.org = T
 findCells <- function(obj,
                       output_dir,
                       set.tn5.cutoff=NULL,
                       min.cells=1000,
                       max.cells=15000,
                       min.tn5=1000,
-                      filt.org=F,
-                      org.filter.thresh=0.8,
+                      filt.org=T,
+                      org.filter.thresh=0.2,
                       filt.tss=T,
                       tss.min.freq=0.2,
                       tss.z.thresh=2,
@@ -543,7 +547,7 @@ findCells <- function(obj,
         # return
         return(obj)
     }
-    .filterOrganelle <- function(obj, cell_threshold=0.8, remove_cells=FALSE, doplot=F, main=""){
+    .filterOrganelle <- function(obj, cell_threshold=0.2, remove_cells=FALSE, doplot=F, main=""){
 
         x <- obj$meta.v1
         x$ptmt.ratio <- x$ptmt/x$total
@@ -574,7 +578,8 @@ findCells <- function(obj,
 
         return(obj)
     }
-
+  
+    
     # get meta data
     x <- obj$meta
     # order DF by total Tn5 sites
