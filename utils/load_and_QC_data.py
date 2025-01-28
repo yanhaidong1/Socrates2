@@ -77,7 +77,7 @@ def get_parsed_args():
                                                                  'Default: 1000')
 
     parser.add_argument("-org_flt_thresh", dest = 'organelle_filter_cutoff', help = 'Remove cells with an organelle ratio (Organalle/Total_reads) greater than N.'
-                                                                                    'Default: 0.8')
+                                                                                    'Default: 0.2')
 
     parser.add_argument("-tss_min_freq", dest = 'tss_min_freq_val', help = 'Minimum frequency of Tn5 sites near TSSs.'
                                                                            'Default: 0.2')
@@ -90,6 +90,7 @@ def get_parsed_args():
 
     parser.add_argument("-frip_z_thresh", dest = 'frip_z_thresh_val', help = 'Z-score threshold to remove barcodes with values below X standard deviations from the mean.'
                                                                              'Default: 2')
+
 
     ################
     ##step03 iscells
@@ -312,7 +313,7 @@ def main(argv=None):
     if args.organelle_filter_cutoff is not None:
         organelle_filter_cutoff_final = args.organelle_filter_cutoff
     else:
-        organelle_filter_cutoff_final = '0.8'
+        organelle_filter_cutoff_final = '0.2'
 
     store_final_parameter_line_list.append('organelle_filter_cutoff_final <- ' + organelle_filter_cutoff_final)
 
@@ -343,6 +344,7 @@ def main(argv=None):
         frip_z_thresh_final = '1'
 
     store_final_parameter_line_list.append('frip_z_thresh_final <- ' + frip_z_thresh_final)
+
 
     ##step03
     if args.num_test_val is not None:
