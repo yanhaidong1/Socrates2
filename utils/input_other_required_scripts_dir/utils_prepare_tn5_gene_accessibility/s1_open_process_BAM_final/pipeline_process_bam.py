@@ -29,6 +29,8 @@ def process_bam (input_other_required_scripts_dir,input_bam_fl,input_output_dir,
     print(cmd)
     subprocess.call(cmd, shell=True)
 
+    ##updating 013025
+    ##use the conda picard
     cmd = 'java -jar $EBROOTPICARD/picard.jar' + \
           ' MarkDuplicates' + \
           ' MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=1000' + \
@@ -40,6 +42,20 @@ def process_bam (input_other_required_scripts_dir,input_bam_fl,input_output_dir,
           ' ASSUME_SORT_ORDER=coordinate' + \
           ' USE_JDK_DEFLATER=true' + \
           ' USE_JDK_INFLATER=true'
+    #print(cmd)
+    #subprocess.call(cmd, shell=True)
+
+    cmd = 'picard' + \
+          ' MarkDuplicates' + \
+          ' --MAX_FILE_HANDLES_FOR_READ_ENDS_MAP 1000' + \
+          ' --REMOVE_DUPLICATES true' + \
+          ' -I ' + input_output_dir + '/temp_mapped_sorted.bam' + \
+          ' -O ' + input_output_dir + '/temp_mapped_rmpcr.bam'+ \
+          ' --METRICS_FILE ' + input_output_dir + '/dups.txt' + \
+          ' --BARCODE_TAG CB' + \
+          ' --ASSUME_SORT_ORDER coordinate' + \
+          ' --USE_JDK_DEFLATER true' + \
+          ' --USE_JDK_INFLATER true'
     print(cmd)
     subprocess.call(cmd, shell=True)
 
