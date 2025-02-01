@@ -1,6 +1,7 @@
 ###################################################################################################
 ###################################################################################################
 ###################################################################################################
+##updating 020125 we will set the max tn5
 ##updating 012825 we will update the plotting of organelle ratio
 
 #' loadBEDandGenomeData
@@ -426,6 +427,7 @@ findCells <- function(obj,
                       min.cells=1000,
                       max.cells=15000,
                       min.tn5=1000,
+                      max.tn5=100000,
                       filt.org=T,
                       org.filter.thresh=0.2,
                       filt.tss=T,
@@ -608,6 +610,18 @@ findCells <- function(obj,
         knee <- log10(cells)
     }
 
+    ##updating 020125
+    ## ensure reads < max.tn5
+    if(reads > max.tn5){
+      reads <- max.tn5
+      cells <- nrow(subset(df, df$depth<log10(reads)))
+      if(cells > max.cells){
+        cells <- max.cells
+      }
+      knee <- log10(cells)
+    }
+    
+    
     # if override spline fitting
     if(!is.null(set.tn5.cutoff)){
         reads <- set.tn5.cutoff
