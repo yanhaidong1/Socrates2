@@ -1,5 +1,6 @@
 # run Socrates on merged socrates object #
 
+##updating 020125 add the max reads
 ##updating 100821 we will do Socrates from very beginning
 ##updating 100621 we will add the harmony 
 ##updating we will directly use the function within in the Socrates
@@ -69,6 +70,7 @@ if (open_find_cells_step_final == 'yes'){
                      max.cells= max_cell_val_final,
                      set.tn5.cutoff=NULL,
                      min.tn5=min_tn5_val,
+                     max.tn5=max_tn5_val,
                      org.filter.thresh=organelle_filter_cutoff_final,
                      tss.min.freq=tss_min_freq_val_final,
                      tss.z.thresh=tss_z_thresh_final,
@@ -101,6 +103,7 @@ if (open_find_cells_step_final == 'yes'){
                      max.cells= max_cell_val_final,
                      set.tn5.cutoff=NULL,
                      min.tn5=min_tn5_val,
+                     max.tn5=max_tn5_val,
                      org.filter.thresh=organelle_filter_cutoff_final,
                      tss.min.freq=tss_min_freq_val_final,
                      tss.z.thresh=tss_z_thresh_final,
