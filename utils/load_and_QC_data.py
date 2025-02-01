@@ -76,6 +76,9 @@ def get_parsed_args():
     parser.add_argument("-min_tn5", dest = 'min_tn5_val', help = 'Lower threshold for the minimum number of Tn5 integration sites for retaining obj barcode.'
                                                                  'Default: 1000')
 
+    parser.add_argument("-max_tn5", dest = 'max_tn5_val', help = 'Lower threshold for the minimum number of Tn5 integration sites for retaining obj barcode.'
+                                                                 'Default: 200000')
+
     parser.add_argument("-org_flt_thresh", dest = 'organelle_filter_cutoff', help = 'Remove cells with an organelle ratio (Organalle/Total_reads) greater than N.'
                                                                                     'Default: 0.2')
 
@@ -309,6 +312,13 @@ def main(argv=None):
         min_tn5_val_final = '1000'
 
     store_final_parameter_line_list.append('min_tn5_val <- ' + min_tn5_val_final)
+
+    if args.max_tn5_val is not None:
+        max_tn5_val_final = args.max_tn5_val
+    else:
+        max_tn5_val_final = '200000'
+
+    store_final_parameter_line_list.append('max_tn5_val <- ' + max_tn5_val_final)
 
     if args.organelle_filter_cutoff is not None:
         organelle_filter_cutoff_final = args.organelle_filter_cutoff
