@@ -44,6 +44,17 @@ def get_parsed_args():
     parser.add_argument('-harmony', dest = 'open_harmony', help = 'Perform harmony for data from different libraries.'
                                                                   'Default: yes')
 
+    parser.add_argument('-lambda', dest = 'lambda_value', help = 'Refer from HarmonyMatrix function. Ridge regression penalty. Bigger values protect against over correction.'
+                                                                 'Default: 1')
+
+    parser.add_argument('-theta', dest = 'theta_value', help = 'Refer from HarmonyMatrix function. Diversity clustering penalty parameter.'
+                                                               'Default: 2')
+
+    parser.add_argument('-sigma', dest = 'sigma_value', help = 'Refer from HarmonyMatrix function. Width of soft kmeans clusters. '
+                                                               'Default: 0.1')
+
+
+
     parser.add_argument('-rm_temp', dest = 'remove_temp_file', help = 'Remove the temp files built by each step.'
                                                                       'Default: yes')
 
@@ -141,6 +152,28 @@ def main(argv=None):
         do_harmony = 'yes'
 
     store_final_parameter_line_list.append('do_harmony <- ' + '\'' + do_harmony + '\'')
+
+    ##updating 020225 harmony function
+    if args.lambda_value is not None:
+        lambda_value_final = args.lambda_value
+    else:
+        lambda_value_final = '1'
+
+    store_final_parameter_line_list.append('lambda_val <- ' + lambda_value_final)
+
+    if args.theta_value is not None:
+        theta_value_final = args.theta_value
+    else:
+        theta_value_final = '2'
+
+    store_final_parameter_line_list.append('theta_val <- ' + theta_value_final)
+
+    if args.sigma_value is not None:
+        sigma_value_final = args.sigma_value
+    else:
+        sigma_value_final = '0.1'
+
+    store_final_parameter_line_list.append('sigma_val <- ' + sigma_value_final)
 
 
     if args.remove_temp_file is not None:
