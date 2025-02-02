@@ -1,5 +1,6 @@
 # run Socrates on merged socrates object #
 
+##updating 020225 we will add the parameter of harmony function
 ##updating 010525 we will return a prefix.atac.soc.rds file
 ##updating 011124 we will set an option to remove the temp file
 ##updating 041722 we need to modify npc number detect doublet
@@ -362,6 +363,9 @@ if (do_harmony == 'yes'){
     
     harmony_embeddings <- HarmonyMatrix(
       nmf.rd, meta_dt, 'library',
+      lambda=lambda_val,
+      theta=theta_val,
+      sigma=sigma_val,
       do_pca = FALSE
     )
     ##add the harmony_embeddings to the obj
