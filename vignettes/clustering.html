@@ -422,14 +422,27 @@ matrix. Two options: tfidf or regmodel. Default: tfidf)<br />
 calling. Default: 1)<br />
 9. <strong>-harmony yes|no</strong> (Perform harmony to remove bactch
 effect for data from different libraries. Default: yes)<br />
-10. <strong>rm_temp yes|no</strong> (Remove the temp files built by each
+10. <strong>-lambda 1</strong> (Ridge regression penalty parameter
+within HarmonyMatrix function. Specify for each variable in vars_use.
+Lambda must be strictly positive. Smaller values result in more
+aggressive correction. Default: 1)<br />
+11. <strong>-theta 2</strong> (Diversity clustering penalty parameter
+within HarmonyMatrix function. Specify for each variable in vars_use.
+theta=0 does not encourage any diversity. Larger values of theta result
+in more diverse clusters. Default: 2)<br />
+12. <strong>-sigma 0.1</strong> (Width of soft kmeans clusters within
+HarmonyMatrix. Sigma scales the distance from a cell to cluster
+centroids. Larger values of sigma result in cells assigned to more
+clusters. Smaller values of sigma make soft kmeans cluster approach hard
+clustering. Default: 0.1)<br />
+13. <strong>rm_temp yes|no</strong> (Remove the temp files built by each
 step. Default: yes)<br />
-11. <strong>-res 0.5</strong> (Resolution of clustering. Default:
+14. <strong>-res 0.5</strong> (Resolution of clustering. Default:
 0.5)<br />
-12. <strong>-only_cluster yes|no</strong> (Only open the clustering
+15. <strong>-only_cluster yes|no</strong> (Only open the clustering
 step. Users can adjust the resolution to obtain UMAP clustering with
 different cluster count. Default: no)<br />
-13. <strong>-prefix output</strong> (Specify a prefix name for the final
+16. <strong>-prefix output</strong> (Specify a prefix name for the final
 output file. Default: output.)<br />
 </p>
 <p><strong>Outputs</strong><br />
