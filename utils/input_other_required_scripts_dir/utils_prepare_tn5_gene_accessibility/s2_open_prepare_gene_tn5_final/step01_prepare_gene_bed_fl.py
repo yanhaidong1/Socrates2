@@ -13,20 +13,26 @@ import subprocess
 import os
 
 input_gene_gff_fl = sys.argv[1]
-input_genome_fai_fl = sys.argv[2]
-input_output_dir = sys.argv[3]
+input_black_chr_str = sys.argv[2]
+input_genome_fai_fl = sys.argv[3]
+input_output_dir = sys.argv[4]
 
-target_nm = sys.argv[4] ##gene or mRNA since some gff contains the mRNA
+target_nm = sys.argv[5] ##gene or mRNA since some gff contains the mRNA
 #prefix = sys.argv[5] ##riceMSUr7 or others
 
-def prepare_gene_bed_fl (input_gene_gff_fl,input_genome_fai_fl,input_output_dir,target_nm):
+def prepare_gene_bed_fl (input_gene_gff_fl,input_black_chr_str,input_genome_fai_fl,input_output_dir,target_nm):
+
+    input_black_chr_str_list = input_black_chr_str.split(',')
 
     store_genome_name_dic = {}
     with open (input_genome_fai_fl,'r') as ipt:
         for eachline in ipt:
             eachline = eachline.strip('\n')
             col = eachline.strip().split()
-            store_genome_name_dic[col[0]] = 1
+            if col[0] not in input_black_chr_str_list:
+                store_genome_name_dic[col[0]] = 1
+
+    print('The following chromosomes are considering in the downstream analysis')
     print(store_genome_name_dic)
 
     store_gene_length_line_list = []
@@ -47,7 +53,11 @@ def prepare_gene_bed_fl (input_gene_gff_fl,input_genome_fai_fl,input_output_dir,
 
                         if dir == '+':
                             real_end = end
-                            real_start = str(int(start) - 500)
+
+                            if (int(start) - 500) < 0:
+                                real_start = '0'
+                            else:
+                                real_start = str(int(start) - 500)
                         else:
                             real_start = start
                             real_end = str(int(end) + 500)
@@ -161,4 +171,4 @@ def prepare_gene_bed_fl (input_gene_gff_fl,input_genome_fai_fl,input_output_dir,
     #cmd = 'sort -k1,1V -k2,2n ' + input_output_dir + '/opt_genes_2000up500down.bed > ' + input_output_dir + '/opt_genes_2000up500down_sorted.bed'
     #subprocess.call(cmd,shell=True)
 
-prepare_gene_bed_fl (input_gene_gff_fl,input_genome_fai_fl,input_output_dir,target_nm)
+prepare_gene_bed_fl (input_gene_gff_fl,input_black_chr_str,input_genome_fai_fl,input_output_dir,target_nm)

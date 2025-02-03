@@ -39,7 +39,7 @@ import subprocess
 #input_output_dir = sys.argv[8]
 
 def step01_prepare_gene_bed (input_other_required_scripts_dir,input_output_dir,
-                             input_gene_gff_fl,input_genome_fai_fl,category):
+                             input_gene_gff_fl,final_black_chr_str,input_genome_fai_fl,category):
 
     ##run the s1
     #store_s1_dir = input_output_dir + '/01_generate_gene_bed_fl_dir'
@@ -54,6 +54,7 @@ def step01_prepare_gene_bed (input_other_required_scripts_dir,input_output_dir,
 
     cmd = 'python ' + prepare_gene_bed_script + \
           ' ' + input_gene_gff_fl + \
+          ' ' + final_black_chr_str + \
           ' ' + input_genome_fai_fl + \
           ' ' + store_s1_dir + \
           ' ' + category
@@ -148,7 +149,7 @@ def step04_save_to_soc_obj (input_other_required_scripts_dir,input_soc_obj_fl,in
 
 
 def prepare_gene_tn5 (input_other_required_scripts_dir,input_tn5_bed_fl,input_output_dir,
-                      input_gene_gff_fl,input_genome_fai_fl,
+                      input_gene_gff_fl,final_black_chr_str,input_genome_fai_fl,
                       input_soc_obj_fl,input_prefix,
                       category = 'gene'):
 
@@ -156,7 +157,7 @@ def prepare_gene_tn5 (input_other_required_scripts_dir,input_tn5_bed_fl,input_ou
     input_final_scripts_dir = input_other_required_scripts_dir + '/utils_prepare_tn5_gene_accessibility/s2_open_prepare_gene_tn5_final'
 
     step01_prepare_gene_bed (input_final_scripts_dir,input_output_dir,
-                                 input_gene_gff_fl,input_genome_fai_fl,category)
+                                 input_gene_gff_fl,final_black_chr_str,input_genome_fai_fl,category)
 
     #step02_prepare_genome_size (input_final_scripts_dir,input_genome_fl,input_output_dir)
 
