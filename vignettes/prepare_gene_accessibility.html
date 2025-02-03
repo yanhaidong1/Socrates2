@@ -374,12 +374,15 @@ count.<br />
 Socrates2/utils/input_other_required_scripts_dir)<br />
 3. -soc_obj (The <strong>*.atac.soc.rds</strong> object obtained from
 the <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/clustering.html">Clustering</a>
-step) 4. -tn5_fl (A file obtained merged replicates obtained from <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/process_BAM.html">Processing
+step)<br />
+4. -tn5_fl (A file obtained merged replicates obtained from <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/process_BAM.html">Processing
 bam</a> step which records the coordinates of each Tn5 insertions per
 cell)<br />
 5. -Ggff_fl (A gene gff annotation file)<br />
-6. -Genome_fl (A genome fasta file)<br />
-7. -o output_dir (mkdir output_dir)<br />
+6. -black_chr (Provide a list of chromosomes that are not included in
+the features. Default: ChrPt,ChrMt)<br />
+7. -Genome_fl (A genome fasta file)<br />
+8. -o output_dir (mkdir output_dir)<br />
 </p>
 <p><strong>Optional parameters</strong><br />
 1. -category (Set gene or transcript to be calculated. Default:
@@ -405,7 +408,8 @@ python Socrates2/utils/prepare_tn5_gene_accessibiliy.py
 -soc_obj /Path/to/*.atac.soc.rds
 -tn5_fl /Path/to/opt_tn5_mq10_sorted.bed
 -Ggff_fl /Path/to/Gene.gff3
--Genome_fl /Path/to/Genome.fasta</code></pre>
+-Genome_fl /Path/to/Genome.fasta
+-black_chr ChrPt,ChrMt</code></pre>
 </div>
 <div id="calculate-gene-accessibility-1" class="section level3">
 <h3>Calculate gene accessibility</h3>
