@@ -7,7 +7,7 @@ import os
 import re
 import subprocess
 
-
+##updating 020325 add chr that not consider in the gene features
 ##updating 012325 add removing the black list step
 
 ##this script is to process data bam file from cellranger
@@ -37,6 +37,9 @@ def get_parsed_args():
 
 
     parser.add_argument("-Ggff_fl", dest='gene_gff_file', help='Provide the gene gff file used to extract exon region when permutating peaks.')
+
+    parser.add_argument("-black_chr",  dest = 'black_chromosome_string', help = 'Provide a list of chromosomes not considering in the features.'
+                                                                         'Default: ChrPt,ChrMt')
 
     #parser.add_argument("-Gmfai_fl", dest='genome_fai_file', help='Provide a fai index file of reference genome.')
 
@@ -191,6 +194,7 @@ def main(argv=None):
                     print('There was an error opening the gene gff file!')
                     return
 
+
             if args.genome_fasta_file is None:
                 print('Cannot find genome file, please provide it')
                 return
@@ -330,10 +334,14 @@ def main(argv=None):
 
         input_genome_fai_fl = input_genome_fl + '.fai'
 
+        if args.black_chromosome_string is None:
+            final_black_chr_str = 'ChrPt,ChrMt'
+        else:
+            final_black_chr_str = args.black_chromosome_string
 
         ##updating 010425
         s2_geneTn5.prepare_gene_tn5 (input_required_scripts_dir,input_tn5_bed_fl,s2_open_prepare_gene_tn5_final_dir,
-                      input_gene_gff_fl,input_genome_fai_fl,
+                      input_gene_gff_fl,final_black_chr_str,input_genome_fai_fl,
                       input_soc_obj_fl,
                       input_prefix,
                       final_category_gff)
