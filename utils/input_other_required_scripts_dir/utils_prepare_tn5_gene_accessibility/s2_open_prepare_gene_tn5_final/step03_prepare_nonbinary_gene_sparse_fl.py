@@ -25,13 +25,21 @@ def make_sparse (input_temp_unique_bed_fl,input_gene_bed_fl,input_genome_fai_fl,
     #if not os.path.exists(opt_gene_sparse_bed_dir):
     #    os.makedirs(opt_gene_sparse_bed_dir)
 
+    #cmd = 'bedtools intersect -a ' +  input_temp_unique_bed_fl + \
+    #      ' -b ' + input_gene_bed_fl + ' -wa -wb' + \
+    #      ' -g ' + input_genome_fai_fl + \
+    #      ' -sorted | perl ' + input_fastSparsetn5_pl + \
+    #      ' - > ' + input_output_dir + '/opt_gene_tn5.sparse'
+    #print(cmd)
+    #subprocess.call(cmd,shell=True)
+
     cmd = 'bedtools intersect -a ' +  input_temp_unique_bed_fl + \
-          ' -b ' + input_gene_bed_fl + ' -wa -wb' + \
-          ' -g ' + input_genome_fai_fl + \
-          ' -sorted | perl ' + input_fastSparsetn5_pl + \
+          ' -b ' + input_gene_bed_fl + ' -wa -wb' + ' | perl ' + input_fastSparsetn5_pl + \
           ' - > ' + input_output_dir + '/opt_gene_tn5.sparse'
     print(cmd)
     subprocess.call(cmd,shell=True)
+
+
 
 def change_name_gene (opt_combine_gene_fl,input_output_dir):
 
