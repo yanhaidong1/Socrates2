@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+##updating 020325 we will consider iD if there is no Name in the gff file
 ##updating 070821 consider the case that gene name has other name information change the geneID to the gene_feat
 ##updating 060421 prepare a file for the rice case and also prepare a gene length file for the step03
 ##updation 120920 generate a file that overlap 2kb upstream to 500-bp downstream
@@ -52,30 +53,41 @@ def prepare_gene_bed_fl (input_gene_gff_fl,input_genome_fai_fl,input_output_dir,
                             real_end = str(int(end) + 500)
 
                         annot_col = col[8].split(';')
-                        mt = re.match('ID=(.+)',annot_col[0])
-                        gene_id = mt.group(1)
 
-                        ##updating 070821 do not consider the  Pt and Mt
-                        if col[0] != 'ChrPt' and col[0] != 'ChrMt':
-                            mt = re.match('Name=(.+)',annot_col[1])
+                        if len(annot_col) > 1:
+                            if re.match('Name=(.+)',annot_col[1]):
+                                mt = re.match('Name=(.+)',annot_col[1])
+                                gene_feat = mt.group(1)
+                            else:
+                                mt = re.match('ID=(.+)', annot_col[0])
+                                gene_feat = mt.group(1)
+                        else:
+                            mt = re.match('ID=(.+)', annot_col[0])
                             gene_feat = mt.group(1)
 
-                            #final_line = col[0] + '\t' + real_start + '\t' + real_end + '\t' + \
-                            #             col[6] + '\t' + 'gene' + '\t' + gene_feat + '\t' + gene_id + '\t' + gene_feat
-                            final_line = col[0] + '\t' + real_start + '\t' + real_end + '\t' + \
-                                         col[6] + '\t' + 'gene' + '\t' + gene_feat + '\t' + gene_feat + '\t' + gene_feat
 
-                            store_gene_annotation_bed_list.append(final_line)
 
-                            final_line = col[0] + '\t' + real_start + '\t' + real_end + '\t' + \
-                                         gene_feat + '\t' + col[6]
-                            store_500TSS_bed_line_list.append(final_line)
+                        ##updating 070821 do not consider the  Pt and Mt
+                        #if col[0] != 'ChrPt' and col[0] != 'ChrMt':
+                        #    mt = re.match('Name=(.+)',annot_col[1])
+                        #    gene_feat = mt.group(1)
 
-                            ##updating prepare the gene length
-                            length = int(end) - int(start)
-                            #final_line = gene_id + '\t' + str(length)
-                            final_line = gene_feat + '\t' + str(length)
-                            store_gene_length_line_list.append(final_line)
+                        #final_line = col[0] + '\t' + real_start + '\t' + real_end + '\t' + \
+                        #             col[6] + '\t' + 'gene' + '\t' + gene_feat + '\t' + gene_id + '\t' + gene_feat
+                        final_line = col[0] + '\t' + real_start + '\t' + real_end + '\t' + \
+                                     col[6] + '\t' + 'gene' + '\t' + gene_feat + '\t' + gene_feat + '\t' + gene_feat
+
+                        store_gene_annotation_bed_list.append(final_line)
+
+                        final_line = col[0] + '\t' + real_start + '\t' + real_end + '\t' + \
+                                     gene_feat + '\t' + col[6]
+                        store_500TSS_bed_line_list.append(final_line)
+
+                        ##updating prepare the gene length
+                        length = int(end) - int(start)
+                        #final_line = gene_id + '\t' + str(length)
+                        final_line = gene_feat + '\t' + str(length)
+                        store_gene_length_line_list.append(final_line)
 
     #with open (input_output_dir + '/opt_gene_length.txt','w+') as opt:
     #    for eachline in store_gene_length_line_list:
