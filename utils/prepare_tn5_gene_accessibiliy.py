@@ -325,6 +325,7 @@ def main(argv=None):
         ##build the fai index
         ##updating 010425
         cmd = 'samtools faidx ' + input_genome_fl
+        subprocess.call(cmd,shell=True)
         print(cmd)
 
         input_genome_fai_fl = input_genome_fl + '.fai'
