@@ -67,8 +67,13 @@ def analyze_acr_motif(ipt_acr_fl,ipt_genome_fasta_fl,ipt_motif_fl,opt_dir,extend
         for eachline in ipt:
             eachline = eachline.strip('\n')
             if eachline.startswith('>'):
-                mt = re.match('(.+)::.+',eachline)
-                final_line = mt.group(1)
+
+                if re.match('(.+)::.+',eachline):
+                    mt = re.match('(.+)::.+',eachline)
+                    final_line = mt.group(1)
+                else:
+                    final_line = eachline
+
                 store_final_line_list.append(final_line)
             else:
                 store_final_line_list.append(eachline)
