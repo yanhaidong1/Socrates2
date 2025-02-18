@@ -33,7 +33,7 @@ def get_parsed_args():
 
     parser.add_argument("-tn5_fl", dest = 'tn5_file', help = 'Users will provide a BED file with the Tn5 integration sites.')
 
-    parser.add_argument("-Gmfai_fl", dest='genome_fai_file', help='Provide a fai index file of reference genome.')
+    #parser.add_argument("-Gmfai_fl", dest='genome_fai_file', help='Provide a fai index file of reference genome.')
 
     ##step 02 and 03
     parser.add_argument("-ct_colnm", dest='celltype_cluster_col_name',
@@ -50,6 +50,7 @@ def get_parsed_args():
     ##step 03 perform the enrichment test
     parser.add_argument("-s3_open_enrichment", dest = 'open_enrichment_test', help = 'Perform the motif enrichment test.'
                                                                                   'Default: yes')
+
 
     ##optional parameters
     ##step 01
@@ -199,15 +200,15 @@ def main(argv=None):
                 print('There was an error opening the tn5 file!')
                 return
 
-        if args.genome_fai_file is None:
-            print('Cannot find genome fai index file, please provide it')
-            return
-        else:
-            try:
-                file = open(args.genome_fai_file, 'r')  ##check if the file is not the right file
-            except IOError:
-                print('There was an error opening the fai index file!')
-                return
+        #if args.genome_fai_file is None:
+        #    print('Cannot find genome fai index file, please provide it')
+        #    return
+        #else:
+        #    try:
+        #        file = open(args.genome_fai_file, 'r')  ##check if the file is not the right file
+        #    except IOError:
+        #        print('There was an error opening the fai index file!')
+        #        return
 
     if open_enrichment_test_final == 'yes':
 
@@ -275,11 +276,11 @@ def main(argv=None):
         ###############
         input_peak_fl = args.acr_file
         input_tn5_bed_fl = args.tn5_file
-        input_genome_fai_fl = args.genome_fai_file
+        #input_genome_fai_fl = args.genome_fai_file
         input_fastSparsetn5_pl = input_required_scripts_dir + '/utils_motif_enrichment/fastSparse.tn5.pl'
         prefix = sample_prefix_final
 
-        s2_prepare_data.prepare_peak_tn5_sparse (input_peak_fl,input_tn5_bed_fl,input_genome_fai_fl,input_fastSparsetn5_pl,
+        s2_prepare_data.prepare_peak_tn5_sparse (input_peak_fl,input_tn5_bed_fl,input_fastSparsetn5_pl,
                                                  prefix,
                                                  open_prepare_data_enrichment_final_dir)
 
