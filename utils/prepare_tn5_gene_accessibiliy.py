@@ -295,7 +295,7 @@ def main(argv=None):
 
             ipt_tn5_fl = s1_open_process_BAM_final_dir + '/opt_tn5_mq' + input_qual_val + '.bed'
 
-            s1_procbam.remove_black (ipt_tn5_fl,ipt_black_list_file,s1_open_process_BAM_final_dir)
+            s1_procbam.remove_black (ipt_tn5_fl,ipt_black_list_file,s1_open_process_BAM_final_dir,remove_step_s1_temp_final)
 
 
 
