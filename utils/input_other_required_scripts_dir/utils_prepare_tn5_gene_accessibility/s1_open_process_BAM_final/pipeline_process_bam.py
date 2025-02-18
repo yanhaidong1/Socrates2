@@ -7,6 +7,7 @@
 import subprocess
 import re
 import os
+import pysam
 
 
 
@@ -31,10 +32,22 @@ def process_bam (input_other_required_scripts_dir,input_bam_fl,input_output_dir,
     print(cmd)
     subprocess.call(cmd, shell=True)
 
-    cmd = 'samtools view -h ' + input_output_dir + '/temp_mapped_sorted.bam' + ' | awk "{if ($0 ~ /^@/) {print; next} for (i=1; i<=NF; i++) {if ($i ~ /^CB:Z:/) sub(/-1$/, "", $i)} print}" ' \
-          + ' | samtools view -bh -o ' +input_output_dir + '/temp_mapped_sorted_modi.bam'
-    print(cmd)
-    subprocess.call(cmd,shell=True)
+    input_bam = input_output_dir + '/temp_mapped_sorted.bam'
+    output_bam = input_output_dir + '/temp_mapped_sorted_modi.bam'
+
+    with pysam.AlignmentFile(input_bam, "rb") as infile, \
+            pysam.AlignmentFile(output_bam, "wb", header=infile.header) as outfile:
+
+        for read in infile:
+            if read.has_tag("CB"):
+                barcode = read.get_tag("CB").rstrip("-1")
+                read.set_tag("CB", barcode, value_type='Z', replace=True)
+            outfile.write(read)
+
+    #cmd = 'samtools view -h ' + input_output_dir + '/temp_mapped_sorted.bam' + ' | awk \'{if ($0 ~ /^@/) {print; next} for (i=1; i<=NF; i++) {if ($i ~ /^CB:Z:/) sub(/-1$/, "", $i)} print}\' ' \
+    #      + ' | samtools view -bh -o ' +input_output_dir + '/temp_mapped_sorted_modi.bam'
+    #print(cmd)
+    #ubprocess.call(cmd,shell=True)
 
 
     cmd = 'picard' + \
