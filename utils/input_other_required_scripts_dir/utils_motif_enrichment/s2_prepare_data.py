@@ -10,7 +10,7 @@ import random
 
 
 
-def prepare_peak_tn5_sparse (input_peak_fl,input_tn5_bed_fl,input_genome_fai_fl,input_fastSparsetn5_pl,
+def prepare_peak_tn5_sparse (input_peak_fl,input_tn5_bed_fl,input_fastSparsetn5_pl,
                              prefix,
                              input_output_dir):
 
@@ -33,10 +33,18 @@ def prepare_peak_tn5_sparse (input_peak_fl,input_tn5_bed_fl,input_genome_fai_fl,
 
     cmd = 'bedtools intersect -a ' + sorted_tn5_bed_fl_path + \
           ' -b ' + sorted_peak_bed_fl_path + ' -wa -wb' + \
-          ' -g ' + input_genome_fai_fl + \
-          ' -sorted | perl ' + input_fastSparsetn5_pl + \
+          ' | perl ' + input_fastSparsetn5_pl + \
           ' - > ' + opt_peak_sparse_dir + '/opt_peak_' + prefix + '.sparse'
+    print(cmd)
     subprocess.call(cmd, shell=True)
+
+    #cmd = 'bedtools intersect -a ' + sorted_tn5_bed_fl_path + \
+    #      ' -b ' + sorted_peak_bed_fl_path + ' -wa -wb' + \
+    #      ' -g ' + input_genome_fai_fl + \
+    #      ' -sorted | perl ' + input_fastSparsetn5_pl + \
+    #      ' - > ' + opt_peak_sparse_dir + '/opt_peak_' + prefix + '.sparse'
+    #print(cmd)
+    #subprocess.call(cmd, shell=True)
 
     opt_peak_sparse_dir = input_output_dir + '/opt_peak_sparse_dir'
 
@@ -50,6 +58,7 @@ def prepare_peak_tn5_sparse (input_peak_fl,input_tn5_bed_fl,input_genome_fai_fl,
         flnm = mt.group(1)
 
         cmd = 'sort -k1,1V -k2,2n ' + eachfl + ' > ' + opt_peak_sparse_sorted_dir + '/' + flnm + '_sorted.sparse'
+        print(cmd)
         subprocess.call(cmd, shell=True)
 
 
@@ -92,8 +101,11 @@ def build_peak_cell_in_meta (input_meta_fl,input_peak_cell_sparse_fl,input_outpu
             if count != 1:
                 cellnm = col[0]
 
-                peak_dic = store_cell_peak_num_dic[cellnm]
-                ACR_num = len(list(peak_dic.keys()))
+                if cellnm in store_cell_peak_num_dic:
+                    peak_dic = store_cell_peak_num_dic[cellnm]
+                    ACR_num = len(list(peak_dic.keys()))
+                else:
+                    ACR_num = 0
 
                 final_line = eachline + '\t' + str(ACR_num)
                 store_final_line_list.append(final_line)
