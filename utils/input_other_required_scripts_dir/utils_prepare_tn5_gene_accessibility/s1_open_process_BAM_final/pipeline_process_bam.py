@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 
-
+##updating 021825 we will modify the bam to remove the -1
 ##updating 012325 add a new function to remove the black
 ##this script is to process bam files from the cell ranger output
 
 import subprocess
 import re
+import os
+
 
 
 def process_bam (input_other_required_scripts_dir,input_bam_fl,input_output_dir,
@@ -29,27 +31,17 @@ def process_bam (input_other_required_scripts_dir,input_bam_fl,input_output_dir,
     print(cmd)
     subprocess.call(cmd, shell=True)
 
-    ##updating 013025
-    ##use the conda picard
-    cmd = 'java -jar $EBROOTPICARD/picard.jar' + \
-          ' MarkDuplicates' + \
-          ' MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=1000' + \
-          ' REMOVE_DUPLICATES=true' + \
-          ' I=' + input_output_dir + '/temp_mapped_sorted.bam' + \
-          ' O=' + input_output_dir + '/temp_mapped_rmpcr.bam'+ \
-          ' METRICS_FILE=' + input_output_dir + '/dups.txt' + \
-          ' BARCODE_TAG=CB' + \
-          ' ASSUME_SORT_ORDER=coordinate' + \
-          ' USE_JDK_DEFLATER=true' + \
-          ' USE_JDK_INFLATER=true'
-    #print(cmd)
-    #subprocess.call(cmd, shell=True)
+    cmd = 'samtools view -h ' + input_output_dir + '/temp_mapped_sorted.bam' + ' | awk "{if ($0 ~ /^@/) {print; next} for (i=1; i<=NF; i++) {if ($i ~ /^CB:Z:/) sub(/-1$/, "", $i)} print}" ' \
+          + ' | samtools view -bh -o ' +input_output_dir + '/temp_mapped_sorted_modi.bam'
+    print(cmd)
+    subprocess.call(cmd,shell=True)
+
 
     cmd = 'picard' + \
           ' MarkDuplicates' + \
           ' --MAX_FILE_HANDLES_FOR_READ_ENDS_MAP 1000' + \
           ' --REMOVE_DUPLICATES true' + \
-          ' -I ' + input_output_dir + '/temp_mapped_sorted.bam' + \
+          ' -I ' + input_output_dir + '/temp_mapped_sorted_modi.bam' + \
           ' -O ' + input_output_dir + '/temp_mapped_rmpcr.bam'+ \
           ' --METRICS_FILE ' + input_output_dir + '/dups.txt' + \
           ' --BARCODE_TAG CB' + \
@@ -85,6 +77,12 @@ def process_bam (input_other_required_scripts_dir,input_bam_fl,input_output_dir,
     subprocess.call(cmd,shell=True)
 
     ##make Tn5 bed files
+    current_directory = os.getcwd()
+    cmd = 'cp ' + input_target_required_scripts_dir + '/perlSAM.pm ' + current_directory
+    print(cmd)
+    subprocess.call(cmd,shell=True)
+
+
     cmd = 'perl ' + input_target_required_scripts_dir + '/makeTn5bed.pl ' + input_output_dir + '/temp_fixBC_mq' + input_qual_val + '_rmpcr.bam | sort -k1,1 -k2,2n - > ' + input_output_dir + '/opt_tn5_mq' + input_qual_val + '.bed'
     print(cmd)
     subprocess.call(cmd,shell=True)
@@ -100,8 +98,11 @@ def process_bam (input_other_required_scripts_dir,input_bam_fl,input_output_dir,
         print(cmd)
         subprocess.call(cmd,shell=True)
 
+        cmd = 'rm ' + current_directory + '/perlSAM.pm'
+        print(cmd)
+        subprocess.call(cmd,shell=True)
 
-def remove_black (ipt_tn5_fl,input_black_list_fl,opt_dir):
+def remove_black (ipt_tn5_fl,input_black_list_fl,opt_dir,remove_temp_file):
 
     if re.match('.+/.+',ipt_tn5_fl):
         mt = re.match('.+/(.+)\.bed',ipt_tn5_fl)
@@ -152,9 +153,12 @@ def remove_black (ipt_tn5_fl,input_black_list_fl,opt_dir):
     bed_file.close()
     bed_file_noblack_fl.close()
 
-    cmd = 'rm ' + opt_dir + '/temp*'
-    print(cmd)
-    subprocess.call(cmd,shell=True)
+    ##remove the temp files
+    if remove_temp_file == 'yes':
+
+        cmd = 'rm ' + opt_dir + '/temp*'
+        print(cmd)
+        subprocess.call(cmd,shell=True)
 
 
 
