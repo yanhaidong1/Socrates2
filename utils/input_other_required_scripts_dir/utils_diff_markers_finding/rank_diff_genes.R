@@ -224,7 +224,7 @@ plot.new.markers   <- function(input_soc_obj_fl,output_dir,
 }
 
 
-plot.new.markers(input_soc_obj_fl,output_dir,
+plot.new.markers(input_soc_obj_fl,input_output_dir,
                  top=top_gene,
                  normT=normT_type,
                  threshold=threshold_prop,
