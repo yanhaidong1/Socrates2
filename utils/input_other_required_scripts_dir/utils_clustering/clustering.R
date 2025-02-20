@@ -144,7 +144,10 @@ mergeSocObjects <- function(obj.list){
   })
   metas <- do.call(rbind, metas)
   rownames(metas) <- metas$cellID
-  metas$library <- data.frame(do.call(rbind, strsplit(rownames(metas), "-")))[,2]
+  
+  ##udpating 021925 we will mute this library as we have developed this library before
+  #metas$library <- data.frame(do.call(rbind, strsplit(rownames(metas), "-")))[,2]
+  
   metas <- metas[colnames(counts),]
   
   # new object
@@ -252,6 +255,25 @@ if (only_cluster == 'no'){
             obj$counts <- obj$counts[Matrix::rowMeans(obj$counts > 0)>0.01,]
             obj$counts <- obj$counts[,Matrix::colSums(obj$counts)>0]
             obj$meta <- obj$meta[colnames(obj$counts),]
+            
+            ##updating 021925
+            ##modify the meta file add the lib to the cell barcode
+            libnm <- gsub('.filtered.soc.rds','',x)
+            obj_meta <- obj$meta
+            obj_counts <- obj$counts
+            
+            obj_meta$library <- libnm
+            obj_meta$cellID <- gsub('-.+','',obj_meta$cellID)
+            obj_meta$cellID <- paste0(obj_meta$cellID,'-',libnm)
+            rownames(obj_meta) <- obj_meta$cellID
+            
+            colnames(obj_counts) <- gsub('-.+','',colnames(obj_counts))
+            colnames(obj_counts) <- paste0(colnames(obj_counts),'-',libnm)
+            
+            obj$counts <- obj_counts
+            obj$meta <- obj_meta
+            ####################
+            
             return(obj)
           })
           
