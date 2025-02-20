@@ -45,15 +45,17 @@ devtools::install_github("yanhaidong1/Socrates2", ref="main")
 
 [4. Prepare gene accessibility](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html)
 
-[5. Annotate cell identity](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/annotate_cell_identity.html)
+[5. find_diff_markers](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/find_diff_markers.html)
 
-[6. Call peak per cell type](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/peak_call_per_celltype.html)
+[6. Annotate cell identity](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/annotate_cell_identity.html)
 
-[7. Identify cell-type-specific peak](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/call_diff_peaks.html)
+[7. Call peak per cell type](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/peak_call_per_celltype.html)
 
-[8. Motif enrichment analysis](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/motif_enrichment.html)
+[8. Identify cell-type-specific peak](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/call_diff_peaks.html)
 
-[9. Trjectory analysis]
+[9. Motif enrichment analysis](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/motif_enrichment.html)
+
+[10. Trjectory analysis]
 
 
 
