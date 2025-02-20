@@ -156,7 +156,7 @@ plot.new.markers   <- function(input_soc_obj_fl,output_dir,
     
     ##save the rank file to the soc obj
     final_obj <- append(ipt_soc_obj, list(
-      rank_diff_gene = impute.activity
+      rank_diff_gene = all_top.genes
     ))
     
     saveRDS(final_obj,file=paste0(output_dir,'/',input_prefix,'.atac.soc.rds'))
