@@ -69,7 +69,8 @@ loadData <- function(input_soc_object,
     ##updating 061923
     #y <- read.delim(metadata,row.names = 1)
     yy <- y
-    z <- read.table(markers, header=T)
+    #z <- read.table(markers, header=T)
+    z <- read.delim(markers,header=T)
     rownames(z) <- z$geneID
     
     #pcs <- read.table(pcs)
