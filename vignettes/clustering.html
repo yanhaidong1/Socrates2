@@ -507,8 +507,22 @@ python Socrates2/utils/clustering.py
 <p class="caption">Figure 1: example of library output</p>
 </div>
 </div>
-<div id="option-2-only-perform-clustering" class="section level3">
-<h3>Option 2: Only perform clustering</h3>
+<div id="option-2-clustering-with-a-single-replicate" class="section level3">
+<h3>Option 2: Clustering with a single replicate</h3>
+<p>If users have only one replicate, they should set -harmony no to
+prevent errors.</p>
+<p><strong>Running</strong>:</p>
+<pre class="bash"><code>mkdir input_obj_dir
+cp /Path/to/*filtered.soc.rds input_obj_dir
+
+python Socrates2/utils/clustering.py
+-script_dir Socrates2/utils/input_other_required_scripts_dir
+-o output_dir
+-ipt_obj_dir input_obj_dir
+-harmony no</code></pre>
+</div>
+<div id="option-3-only-perform-clustering" class="section level3">
+<h3>Option 3: Only perform clustering</h3>
 <p>If users wish to adjust the clustering resolution without re-running
 the entire process, they can set <code>-only_cluster yes</code> and
 specify an exact value for <code>-res</code> to control the clustering
