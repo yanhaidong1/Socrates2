@@ -7,14 +7,13 @@ import os
 import subprocess
 import re
 
+##updating 022025 add GO enrichment test
 ##this pipeline is to annotate cell identity including several methods:
 ##these methods are mainly based on the marker genes
 ##1) visualize marker genes using UMAP
 ##2) visualize marekr genes using dot plot
 ##3) aggregate the marker performance
 ##4) etc.
-
-
 
 def get_parsed_args():
 
@@ -55,8 +54,6 @@ def get_parsed_args():
     parser.add_argument("-open_only_plot", dest = 'open_only_dotplot', help = 'If open only plot, users need to provide a rds file with data already prepared.'
                                                                               'Default: no')
 
-
-
     parser.add_argument("-updated_soc_obj", dest = 'updated_soc_object_fl', help = 'Once we open only plot, we need to specify a prepared gene file used for the dotplot.')
 
 
@@ -74,6 +71,15 @@ def get_parsed_args():
     parser.add_argument("-gene_acc_mtx", dest = 'gene_accessibility_mtx', help = 'Provide the gene accessibility matrix file.')
 
     parser.add_argument("-svd_fl", dest='svd_file', help='Provide a svd file aftering the clusteirng')
+
+    ##step 04
+
+    parser.add_argument("-open_GO_annot", dest = 'open_GO_enrich_annot', help = 'Run Go enrichment analysis for the group of genes enriched in a specific cell type.')
+
+    parser.add_argument("-gene_GO_fl", dest = 'gene_GO_file', help = 'Provide a gene with GO process file that helps the GO enrichment test.')
+
+    parser.add_argument("-log2fc_cutoff", dest = 'log2fc_cutoff_val', help = 'Set a threshold to filter the genes with log2(fold change) above a specific value.'
+                                                                               'Default: 0.25.')
 
 
 
@@ -238,6 +244,37 @@ def main(argv=None):
 
         else:
             open_aggregate_annotation_final = 'no'
+
+
+
+    ##updating 022025
+    if args.open_GO_enrich_annot is None:
+        open_GO_enrich_annot_final = 'no'
+    else:
+        if args.open_GO_enrich_annot == 'yes':
+
+            open_GO_enrich_annot_final = 'yes'
+
+            if args.gene_GO_file is None:
+                print('Cannot find gene GO file, please provide it')
+                return
+            else:
+                try:
+                    file = open(args.gene_GO_file, 'r')  ##check if the file is not the right file
+                except IOError:
+                    print('There was an error opening the gene GO file!')
+                    return
+        else:
+            open_GO_enrich_annot_final = 'no'
+
+
+    if args.log2fc_cutoff_val is not None:
+        log2fc_cutoff_val_final = args.log2fc_cutoff_val
+    else:
+        log2fc_cutoff_val_final = '0.25'
+
+
+
 
 
 
@@ -425,6 +462,44 @@ def main(argv=None):
               ' ' + input_prefix
         print(cmd)
         subprocess.call(cmd,shell=True)
+
+
+    ##udpating 022025
+    if open_GO_enrich_annot_final == 'yes':
+
+        print('Users choose to open the GO enrichment test for cell type genes')
+
+        open_GO_enrich_annot_final_dir = output_dir + '/open_GO_enrich_annot_final_dir'
+        if not os.path.exists(open_GO_enrich_annot_final_dir):
+            os.makedirs(open_GO_enrich_annot_final_dir)
+
+        ##step01 prepare the input of GO
+        step01_prepare_GO_ipt_data_script = input_required_scripts_dir + '/utils_annotate_cell_identity_using_markers/perform_GO_enrich_analysis.R'
+
+        input_soc_obj_fl = args.soc_object_fl
+
+        if re.match('.+/(.+)\.atac\.soc\.rds', input_soc_obj_fl):
+            mt = re.match('.+/(.+)\.atac\.soc\.rds', input_soc_obj_fl)
+            input_prefix = mt.group(1)
+        else:
+            if re.match('(.+)\.atac\.soc\.rds', input_soc_obj_fl):
+                mt = re.match('(.+)\.atac\.soc\.rds', input_soc_obj_fl)
+                input_prefix = mt.group(1)
+            else:
+                print('Please use *.atac.soc.rds file without changing the file name')
+                return
+
+        input_gene_GO_fl = args.gene_GO_file
+
+        cmd = 'python ' + step01_prepare_GO_ipt_data_script + \
+              ' ' + input_soc_obj_fl + \
+              ' ' + input_gene_GO_fl + \
+              ' ' + log2fc_cutoff_val_final + \
+              ' ' + input_prefix + \
+              ' ' + open_GO_enrich_annot_final_dir
+        print(cmd)
+        subprocess.call(cmd, shell=True)
+
 
 
 
