@@ -45,7 +45,7 @@ devtools::install_github("yanhaidong1/Socrates2", ref="main")
 
 [4. Prepare gene accessibility](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html)
 
-[5. find_diff_markers](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/find_diff_markers.html)
+[5. Find diff markers](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/find_diff_markers.html)
 
 [6. Annotate cell identity](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/annotate_cell_identity.html)
 
