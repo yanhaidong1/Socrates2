@@ -18,6 +18,8 @@ ipt_output_dir <- as.character(args[3])
 
 ipt_plot_cex_val <- as.numeric(args[4])
 
+ipt_prefix <- as.character(args[5])
+
 ##read the file
 ipt_soc_obj <- readRDS(ipt_output_soc_obj_fl)
 
@@ -49,7 +51,7 @@ plotUMAP <- function(b, prefix="out", column="LouvainClusters_afthm", m1="umap1"
   b_filt <- b
  
   # plot space
-  pdf(paste0(ipt_output_dir,'/',prefix,".UMAP_clusters.pdf"), width=6, height=6)
+  pdf(paste0(ipt_output_dir,'/',prefix,".UMAP_annotated_cell_identity.pdf"), width=6, height=6)
   
   # test if column is present
   if(!column %in% colnames(b_filt)){
@@ -203,7 +205,7 @@ b <- merged_dt
 #target_unknown_name <- 'Unknown'
 head(b)
 ##plot_cex = 0.2
-plotUMAP(b,column='cell_identity', prefix='annot',m1="umap1", m2="umap2",mclust_size = 1,
+plotUMAP(b,column='cell_identity', prefix=ipt_prefix,m1="umap1", m2="umap2",mclust_size = 1,
          target_cluster = 'cell_identity',knowncolor_TCP = 'no',knowncolor_lib = 'no',knowncolor_tissue = 'no',
          min.reads= 1,newmeta_nm='addcol',target_unknown_name='no',openlegend = 'yes',plot_bar = 'no',
          plot_cex = ipt_plot_cex_val)
