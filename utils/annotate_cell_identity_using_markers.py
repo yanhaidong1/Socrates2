@@ -550,13 +550,25 @@ def main(argv=None):
 
         input_soc_obj_fl = args.soc_object_fl
 
+        if re.match('.+/(.+)\.atac\.soc\.rds', input_soc_obj_fl):
+            mt = re.match('.+/(.+)\.atac\.soc\.rds', input_soc_obj_fl)
+            input_prefix = mt.group(1)
+        else:
+            if re.match('(.+)\.atac\.soc\.rds', input_soc_obj_fl):
+                mt = re.match('(.+)\.atac\.soc\.rds', input_soc_obj_fl)
+                input_prefix = mt.group(1)
+            else:
+                print('Please use *.atac.soc.rds file without changing the file name')
+                return
+
         input_cell_annot_fl = args.cell_annot_identity_file
 
         cmd = 'Rscript ' + plot_UMAP_script + \
               ' ' + input_soc_obj_fl + \
               ' ' + input_cell_annot_fl + \
               ' ' + open_add_cell_annot_identity_final_dir + \
-              ' ' + dot_size_num_final
+              ' ' + dot_size_num_final + \
+              ' ' + input_prefix
         print(cmd)
         subprocess.call(cmd,shell=True)
 
