@@ -462,8 +462,8 @@ multiple marker genes within single UMAP file.</p>
 2. <strong>-script_dir</strong> (a script directory downloaded from
 GitHub: Socrates2/utils/input_other_required_scripts_dir)<br />
 3. <strong>-soc_obj</strong> (The <strong>*.atac.soc.rds</strong> object
-obtained from the <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html">Prepare
-gene accessibility</a> step)<br />
+obtained from the <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html">4.
+Prepare gene accessibility</a> step)<br />
 4. <strong>-marker_fl</strong> (A marker gene file with a column name
 called ‘GeneID’)<br />
 </p>
@@ -516,7 +516,7 @@ Socrates2)<br />
 download from Socrates2)<br />
 6. <strong>-unknown_mtx</strong> (a matrix called
 opt_gene_body_accessibility_mtx.rds with cells need to be annotated,
-which was generated within <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html">5.
+which was generated within <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html">4.
 Prepare gene accessibility</a>)<br />
 7. <strong>-species</strong> (A species name needs to be
 specified)<br />
@@ -546,6 +546,7 @@ whether we will run the specific steps. Default: All)<br />
 <p><strong>Outputs:</strong><br />
 1. opt_meta_ScAClass_predicted_cell_identity.txt<br />
 </p>
+<p><strong>Running</strong>:</p>
 <pre class="bash"><code>python Socrates2/utils/ScAClass.py  
 -d working_dir  
 -o output_dir  
@@ -560,6 +561,37 @@ whether we will run the specific steps. Default: All)<br />
 <p class="caption">Figure 6: example of prediction using ScAClass
 approach</p>
 </div>
+</div>
+<div id="option-4-validate-cell-identity-using-go-enrichment" class="section level3">
+<h3>Option 4: validate cell identity using GO enrichment</h3>
+<p>After completing cell identity annotation, users are encouraged to
+perform a Gene Ontology (GO) enrichment analysis on the de novo marker
+genes identified for each cell type, as predicted in <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/find_diff_markers.html">5.
+Find diff markers</a>. This step gathers a set of de novo marker genes
+for each cell type and conducts GO enrichment analysis using the TopGO
+package in R (Alexa and Rahnenführer, 2009).</p>
+<p><strong>Inputs</strong> (Required):<br />
+1. <strong>-open_GO_annot yes</strong><br />
+2. <strong>-script_dir</strong> (a script directory downloaded from
+GitHub: Socrates2/utils/input_other_required_scripts_dir)<br />
+3. <strong>-soc_obj</strong> (The <strong>*.atac.soc.rds</strong> object
+obtained from the <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/find_diff_markers.html">5.
+Find diff markers</a> step)<br />
+4. <strong>-gene_GO_fl</strong> (a GO file containing two tab-separated
+columns without a header. The first column represents the gene ID, while
+the second column lists the corresponding GO IDs, separated by
+commas.)<br />
+</p>
+<p><strong>Outputs:</strong><br />
+1. output_denovo_genes_GO_enrich.txt<br />
+</p>
+<p><strong>Running</strong>:</p>
+<pre class="bash"><code>python Socrates2/utils/annotate_cell_identity_using_markers.py
+-script_dir Socrates2/utils/input_other_required_scripts_dir
+-o output_dir
+-open_GO_annot yes 
+-soc_obj /Path/to/*.atac.soc.rds
+-gene_GO_fl /Path/to/GO.txt</code></pre>
 </div>
 </div>
 
