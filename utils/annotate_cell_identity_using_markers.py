@@ -7,6 +7,7 @@ import os
 import subprocess
 import re
 
+##updating 031225 add the final meta building
 ##updating 022025 add GO enrichment test
 ##this pipeline is to annotate cell identity including several methods:
 ##these methods are mainly based on the marker genes
@@ -81,6 +82,14 @@ def get_parsed_args():
     parser.add_argument("-log2fc_cutoff", dest = 'log2fc_cutoff_val', help = 'Set a threshold to filter the genes with log2(fold change) above a specific value.'
                                                                                'Default: 0.25.')
 
+
+    ##step 05
+    parser.add_argument("-open_cell_annot" , dest = 'open_add_cell_annot_identity', help = 'Build the final meta file and add the cell identity to the meta file.')
+
+    parser.add_argument("-cell_annot_fl", dest = 'cell_annot_identity_file', help = 'Provide a cell annotation identity file to add to the final column of the meta file.')
+
+    parser.add_argument("-dot_size",dest = 'dot_size_num',help = 'Specify the size of dot size of the UMAP.'
+                                                                 'Default: 0.2.')
 
 
 
@@ -275,9 +284,35 @@ def main(argv=None):
 
 
 
+    ##updating 031225
+    if args.open_add_cell_annot_identity is None:
+        open_add_cell_annot_identity_final = 'no'
+    else:
+        if args.open_add_cell_annot_identity == 'yes':
+
+            open_add_cell_annot_identity_final = 'yes'
+
+            if args.cell_annot_identity_file is None:
+                print('Cannot find cell identity annotation file, please provide it')
+                return
+            else:
+                try:
+                    file = open(args.cell_annot_identity_file, 'r')  ##check if the file is not the right file
+                except IOError:
+                    print('There was an error opening the cell identity annotation file!')
+                    return
+
+        else:
+            open_add_cell_annot_identity_final = 'no'
 
 
+    if args.dot_size_num is not None:
+        dot_size_num_final = args.dot_size_num
+    else:
+        dot_size_num_final = '0.2'
 
+
+    ##other paramters
     if args.vis_lim_value is not None:
         vis_lim_value_final = args.vis_lim_value
     else:
@@ -491,7 +526,7 @@ def main(argv=None):
 
         input_gene_GO_fl = args.gene_GO_file
 
-        cmd = 'python ' + step01_prepare_GO_ipt_data_script + \
+        cmd = 'Rscript ' + step01_prepare_GO_ipt_data_script + \
               ' ' + input_soc_obj_fl + \
               ' ' + input_gene_GO_fl + \
               ' ' + log2fc_cutoff_val_final + \
@@ -499,6 +534,32 @@ def main(argv=None):
               ' ' + open_GO_enrich_annot_final_dir
         print(cmd)
         subprocess.call(cmd, shell=True)
+
+
+    ##updating 031225
+    if open_add_cell_annot_identity_final == 'yes':
+
+        print('Users choose to open the add the cell identity to the final meta file and build a final UMAP')
+
+        open_add_cell_annot_identity_final_dir = output_dir + '/open_add_cell_annot_identity_final_dir'
+        if not os.path.exists(open_add_cell_annot_identity_final_dir):
+            os.makedirs(open_add_cell_annot_identity_final_dir)
+
+
+        plot_UMAP_script = input_required_scripts_dir + '/utils_annotate_cell_identity_using_markers/plot_cell_identity_UMAP.R'
+
+        input_soc_obj_fl = args.soc_object_fl
+
+        input_cell_annot_fl = args.cell_annot_identity_file
+
+        cmd = 'Rscript ' + plot_UMAP_script + \
+              ' ' + input_soc_obj_fl + \
+              ' ' + input_cell_annot_fl + \
+              ' ' + open_add_cell_annot_identity_final_dir + \
+              ' ' + dot_size_num_final
+        print(cmd)
+        subprocess.call(cmd,shell=True)
+
 
 
 
