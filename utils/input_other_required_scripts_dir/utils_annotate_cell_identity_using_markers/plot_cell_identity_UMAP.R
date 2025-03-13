@@ -41,7 +41,7 @@ table(merged_dt$LouvainClusters)
 
 ##this script will help to plot the UMAP cluster
 ##the mclust_size only not plot the cell number < 200 but do not conduct the filtration for the meta data
-plotUMAP <- function(b, prefix="out", column="LouvainClusters_afthm", m1="umap1", m2="umap2",
+plotUMAP <- function(b, ipt_output_dir,prefix="out", column="LouvainClusters_afthm", m1="umap1", m2="umap2",
                           target_cluster = 'LouvainClusters',knowncolor_TCP = 'no',knowncolor_lib = 'no',knowncolor_tissue = 'no',
                           mclust_size = 50,min.reads= 0.5e6,
                           newmeta_nm='addcol',target_unknown_name='no',openlegend='no',plot_bar = 'yes',
@@ -180,8 +180,8 @@ plotUMAP <- function(b, prefix="out", column="LouvainClusters_afthm", m1="umap1"
     
     ##updating 021921 add the col information to the meta
     head(b_filt)
-    b_filt$sub_cluster_color <- colv
-    #write.table(b_filt,paste0(newmeta_nm,'.txt'),sep = '\t',quote = F)
+    b_filt$celltype_color <- colv
+    write.table(b_filt,paste0(ipt_output_dir,'/',prefix,".annotated_cell_identity.meta.txt"),sep = '\t',quote = F)
     
     
     #text(x='0', y='1', '1', adj=c(0,1))
@@ -205,7 +205,7 @@ b <- merged_dt
 #target_unknown_name <- 'Unknown'
 head(b)
 ##plot_cex = 0.2
-plotUMAP(b,column='cell_identity', prefix=ipt_prefix,m1="umap1", m2="umap2",mclust_size = 1,
+plotUMAP(b,ipt_output_dir,column='cell_identity', prefix=ipt_prefix,m1="umap1", m2="umap2",mclust_size = 1,
          target_cluster = 'cell_identity',knowncolor_TCP = 'no',knowncolor_lib = 'no',knowncolor_tissue = 'no',
          min.reads= 1,newmeta_nm='addcol',target_unknown_name='no',openlegend = 'yes',plot_bar = 'no',
          plot_cex = ipt_plot_cex_val)
