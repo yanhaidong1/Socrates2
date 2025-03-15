@@ -379,18 +379,22 @@ compare the median real bootstrap specificity score to the null
 distributions. ACRs were labeled as cell-type-specific if they had a p
 value less than 0.001 (<strong>-threshold 0.001</strong>).</p>
 <p><strong>Inputs</strong> (Required):<br />
-1. <strong>-script_dir</strong> (a script directory downloaded from
+1. <strong>-script_dir</strong> (A script directory downloaded from
 GitHub: Socrates2/utils/input_other_required_scripts_dir)<br />
 2. <strong>-tn5_fl</strong> (The
 <strong>opt_tn5_mq10_sorted.bed</strong> obtained from <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html">4.
 Prepare gene accessibility</a> step which records the coordinates of
 each Tn5 insertions per cell)<br />
 3. <strong>-peak_fl</strong> (A peak BED file obtained from
-<strong>s3_open_filter_peak_final_dir</strong> of <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/peak_call_per_celltype.html">6.
+<strong>s3_open_filter_peak_final_dir</strong> of <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/peak_call_per_celltype.html">7.
 Call peak per cell type</a>)<br />
 4. <strong>-meta_fl</strong> (A final meta file with cell identities
 being annotated)<br />
-</p>
+5. <strong>-ct_colnm</strong> (A column name in the metadata file
+specifying the cell identity. If users have already executed Option 5:
+Generate the final UMAP plot with labeled cell identities under <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/annotate_cell_identity.html">6.
+Annotate cell identity</a>, the value should be <strong>-ct_colnm
+cell_identity</strong>.)</p>
 <p><strong>Overall parameters</strong> (Optional):<br />
 1. <strong>-s1_open_prepare yes|no</strong> (Run the step 01 to prepare
 the files for differentially accessible peaks calling. Default:
@@ -421,7 +425,7 @@ output_dir/s2_open_diff_peak_call_final_dir/<strong>opt.all_ACRs.classified.bed<
 -peak_fl opt_final.*.bed
 -tn5_fl opt_tn5_mq10_sorted.bed
 -meta_fl final_meta.txt
--ct_colnm ScAClass_clust
+-ct_colnm cell_identity
 -core 20</code></pre>
 </div>
 
