@@ -250,6 +250,8 @@ def main(argv=None):
 
     utils_cell_type_peak_calling_dir = input_required_scripts_dir + '/utils_cell_type_peak_calling_dir'
 
+
+
     if s1_open_prepare_tn5_file_final == 'yes':
 
         print('Users choose to run the step 01 to prepare the tn5 bed file per cell type')
@@ -259,9 +261,29 @@ def main(argv=None):
             os.makedirs(s1_open_prepare_tn5_file_final_dir)
 
         input_tn5_fl = args.tn5_bed_file
-        input_meta_fl = args.meta_file
+        #input_meta_fl = args.meta_file
         input_core_num = core_number_run
         target_colnm = args.celltype_cluster_col_name
+
+        ##updating 031525
+        ##modify the meta file to allow the cluster cell type name without ' '
+        store_final_line_list = []
+        count = 0
+        with open(args.meta_file, 'r') as ipt:
+            for eachline in ipt:
+                eachline = eachline.strip('\n')
+                count += 1
+                if count == 1:
+                    store_final_line_list.append(eachline)
+                else:
+                    eachline = eachline.replace(' ','_')
+                    store_final_line_list.append(eachline)
+
+        with open (s1_open_prepare_tn5_file_final_dir + '/temp_update_meta.txt','w+') as opt:
+            for eachline in store_final_line_list:
+                opt.write(eachline + '\n')
+
+        input_meta_fl = s1_open_prepare_tn5_file_final_dir + '/temp_update_meta.txt'
 
         s1_tn5.prepare_bed_files_parallele(input_tn5_fl, input_meta_fl,target_colnm,
                                     input_core_num,
@@ -310,7 +332,10 @@ def main(argv=None):
             os.makedirs(s3_open_filter_peak_final_dir)
 
         s2_targettn5_colNum = '2'
-        input_meta_fl = args.meta_file
+        #input_meta_fl = args.meta_file
+
+        input_meta_fl = output_dir + '/s1_open_prepare_tn5_file_final_dir' + '/temp_update_meta.txt'
+
         finalfdr_list = final_FDR_string.split(',')
 
         s3_fpeak.FDR_filteration(output_dir + '/s2_open_call_peak_final_dir', utils_cell_type_peak_calling_dir,
