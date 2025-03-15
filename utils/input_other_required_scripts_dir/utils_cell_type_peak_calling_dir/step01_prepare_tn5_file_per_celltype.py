@@ -89,15 +89,35 @@ def prepare_bed_files_parallele (input_tn5_fl, input_meta_fl,target_colnm,
     ##step02 using the target file, we will build the different dirs
     target_cluster_dic = {}
     count = 0
+
+    ##updating 031525
+    target_index = 0
+
     with open (input_meta_fl,'r') as ipt:
         for eachline in ipt:
             eachline = eachline.strip('\n')
             col = eachline.strip().split()
             #target_cluster_col = col[int(s1_targetclust_colNum)-1]
-            target_cluster_col = col[-1]
+            #target_cluster_col = col[-1]
             count += 1
-            if count != 1:
+            if count == 1:
+
+                temp_target_index = col.index(target_colnm)
+
+                all_len_col = len(col)
+
+                target_index = temp_target_index - all_len_col
+
+            else:
+
+                target_cluster_col = col[int(target_index)]
+
                 target_cluster_dic[target_cluster_col] = 1
+
+
+
+
+
 
     target_cluster_list = list(target_cluster_dic.keys())
 
