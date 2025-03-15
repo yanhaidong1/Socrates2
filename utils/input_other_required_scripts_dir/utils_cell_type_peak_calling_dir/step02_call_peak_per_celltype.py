@@ -79,7 +79,7 @@ def permute_random_regions (final_bed_fl,input_gff_fl,peak_fl,opt_dir,input_ref_
     with open (input_gff_fl,'r') as ipt:
         for eachline in ipt:
             eachline = eachline.strip('\n')
-            col = eachline.strip().split()
+            col = eachline.strip().split('\t')
             if not eachline.startswith('#'):
 
                 cate = col[2]
@@ -94,7 +94,7 @@ def permute_random_regions (final_bed_fl,input_gff_fl,peak_fl,opt_dir,input_ref_
     with open (peak_fl,'r') as ipt:
         for eachline in ipt:
             eachline = eachline.strip('\n')
-            col = eachline.strip().split()
+            col = eachline.strip().split('\t')
 
             final_line = col[0] + '\t' + col[1] + '\t' + col[2]
             store_excl_bed_line_list.append(final_line)

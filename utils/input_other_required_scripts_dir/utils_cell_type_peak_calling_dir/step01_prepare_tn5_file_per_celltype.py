@@ -24,7 +24,7 @@ def prepare_bed (input_tn5_fl,input_target_cluster_fl,input_target_meta_fl,targe
         with open (input_target_meta_fl,'r') as ipt:
             for eachline in ipt:
                 eachline = eachline.strip('\n')
-                col = eachline.strip().split()
+                col = eachline.strip().split('\t')
                 count += 1
 
                 if count == 1:
@@ -53,7 +53,7 @@ def prepare_bed (input_tn5_fl,input_target_cluster_fl,input_target_meta_fl,targe
 
         for eachline in bed_file:
             eachline = eachline.strip('\n')
-            col = eachline.strip().split()
+            col = eachline.strip().split('\t')
             cellnm = col[3]
 
             if cellnm in store_target_cellid_dic:
@@ -96,7 +96,7 @@ def prepare_bed_files_parallele (input_tn5_fl, input_meta_fl,target_colnm,
     with open (input_meta_fl,'r') as ipt:
         for eachline in ipt:
             eachline = eachline.strip('\n')
-            col = eachline.strip().split()
+            col = eachline.strip().split('\t')
             #target_cluster_col = col[int(s1_targetclust_colNum)-1]
             #target_cluster_col = col[-1]
             count += 1

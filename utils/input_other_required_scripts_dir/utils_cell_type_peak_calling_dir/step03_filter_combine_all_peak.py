@@ -47,7 +47,7 @@ def check_number_each_celltype (input_output_dir,input_meta_fl,new_fdr_dir_outpu
     with open (input_meta_fl,'r') as ipt:
         for eachline in ipt:
             eachline = eachline.strip('\n')
-            col = eachline.strip().split()
+            col = eachline.strip().split('\t')
             count += 1
             if count != 1:
                 ##updating 111622
@@ -210,7 +210,7 @@ def FDR_filteration (input_step02_output_dir,utils_cell_type_peak_calling_dir,
         with open (s3_open_filter_peak_final_dir + '/opt_' + 'final' + '.' + pval_or_qval + organ_pqval_num + '.FDR' + eachFDRnum + '.unique500bpPeaks.bed','r') as ipt:
             for eachline in ipt:
                 eachline = eachline.strip('\n')
-                col = eachline.strip().split()
+                col = eachline.strip().split('\t')
                 count += 1
                 ACRnm = 'ACR_' + str(count)
                 final_line = col[0] + '\t' + col[1] + '\t' + col[2] + '\t' + ACRnm
