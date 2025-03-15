@@ -29,7 +29,14 @@ def prepare_bed (input_tn5_fl,input_target_cluster_fl,input_target_meta_fl,targe
 
                 if count == 1:
 
-                    target_index = col.index(target_colnm)
+                    #target_index = col.index(target_colnm)
+
+                    temp_target_index = col.index(target_colnm)
+
+                    all_len_col = len(col)
+
+                    target_index = temp_target_index - all_len_col
+
 
                 else:
 
