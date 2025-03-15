@@ -211,11 +211,19 @@ def build_bigwig_fl_parallele (input_output_dir,input_final_output_dir,input_req
     if not os.path.exists(store_temp_opt_fl_dir):
         os.makedirs(store_temp_opt_fl_dir)
 
+    ##updating 031525 build the exact number of file
+    store_alltargetOrgan_bed_fl_num = len(store_alltargetOrgan_bed_fl_list)
+
+    if store_alltargetOrgan_bed_fl_num <= int(input_core_num):
+        input_core_num_final = store_alltargetOrgan_bed_fl_num
+    else:
+        input_core_num_final = int(input_core_num)
+
 
     ##split the target bed file into different
     store_core_dic = {}
     core_count = -1
-    array_split_list = np.array_split(store_alltargetOrgan_bed_fl_list, int(input_core_num))
+    array_split_list = np.array_split(store_alltargetOrgan_bed_fl_list, int(input_core_num_final))
     for eacharray in array_split_list:
         core_count += 1
 
@@ -230,7 +238,7 @@ def build_bigwig_fl_parallele (input_output_dir,input_final_output_dir,input_req
     print(store_core_dic)
 
     ##create output dir
-    for x in range(0, int(input_core_num)):
+    for x in range(0, int(input_core_num_final)):
         dir_code = x + 1
         temp_output_dir = store_temp_opt_fl_dir + '/temp_output_' + str(dir_code) + 'dir'
         if not os.path.exists(temp_output_dir):
@@ -244,9 +252,9 @@ def build_bigwig_fl_parallele (input_output_dir,input_final_output_dir,input_req
 
     s2_open_rice_organ_mode = 'no'
 
-    pool = Pool(int(input_core_num))
+    pool = Pool(int(input_core_num_final))
     run_list = []
-    for x in range(0, int(input_core_num)):
+    for x in range(0, int(input_core_num_final)):
         each_func_argument = (store_core_dic[x],
                               input_output_dir,
                               input_required_script_dir,

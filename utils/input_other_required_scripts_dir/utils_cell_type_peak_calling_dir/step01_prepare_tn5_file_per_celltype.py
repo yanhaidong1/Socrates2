@@ -93,6 +93,7 @@ def prepare_bed_files_parallele (input_tn5_fl, input_meta_fl,target_colnm,
     ##updating 031525
     target_index = 0
 
+
     with open (input_meta_fl,'r') as ipt:
         for eachline in ipt:
             eachline = eachline.strip('\n')
@@ -115,11 +116,9 @@ def prepare_bed_files_parallele (input_tn5_fl, input_meta_fl,target_colnm,
                 target_cluster_dic[target_cluster_col] = 1
 
 
-
-
-
-
     target_cluster_list = list(target_cluster_dic.keys())
+
+    target_cluster_num = len(target_cluster_list)
 
     with open (store_target_meta_fl_dir + '/temp_target_cluster_list_fl.txt','w+') as opt:
         for eachline in target_cluster_list:
@@ -129,13 +128,23 @@ def prepare_bed_files_parallele (input_tn5_fl, input_meta_fl,target_colnm,
     if not os.path.exists(temp_all_split_cluster_dir):
         os.makedirs(temp_all_split_cluster_dir)
 
+    ##udpating 031525
+    ##we will build the exact number of cluster peak file
+    if target_cluster_num <= int(input_core_num):
+
+        input_core_num_final = target_cluster_num
+    else:
+        input_core_num_final = input_core_num
+
+
+
     ##create target chr fl
-    cmd = 'split -n l/' + str(input_core_num) + ' ' + store_target_meta_fl_dir + '/temp_target_cluster_list_fl.txt' + ' ' + temp_all_split_cluster_dir + '/temp_split_'
+    cmd = 'split -n l/' + str(input_core_num_final) + ' ' + store_target_meta_fl_dir + '/temp_target_cluster_list_fl.txt' + ' ' + temp_all_split_cluster_dir + '/temp_split_'
     subprocess.call(cmd,shell=True)
 
 
     ##create output dir
-    for x in range(0, int(input_core_num)):
+    for x in range(0, int(input_core_num_final)):
         dir_code = x + 1
         temp_output_dir = store_pool_bed_dir + '/temp_output_' + str(dir_code) + 'dir'
         if not os.path.exists(temp_output_dir):
@@ -149,9 +158,9 @@ def prepare_bed_files_parallele (input_tn5_fl, input_meta_fl,target_colnm,
     ##step03 run the pipeline
     ##prepare_bed (input_subset_tn5_fl,input_target_cluster_fl,input_target_meta_fl,opt_dir,
     ##             s1_targetclust_colNum)
-    pool = Pool(int(input_core_num))
+    pool = Pool(int(input_core_num_final))
     run_list = []
-    for x in range(0, int(input_core_num)):
+    for x in range(0, int(input_core_num_final)):
         each_func_argument = (input_tn5_fl,
                               temp_split_file_list[x],
                               input_meta_fl,target_colnm,

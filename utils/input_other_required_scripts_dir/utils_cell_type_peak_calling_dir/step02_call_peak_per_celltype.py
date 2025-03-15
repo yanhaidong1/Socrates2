@@ -304,9 +304,22 @@ def run_pipeline (input_output_dir,ipt_target_bed_fl_list,input_gff_fl,input_ref
 
     #print('pool bed dir list is')
     #print(pool_bed_dir_list)
-    array_split = np.array_split(pool_bed_dir_list, int(input_core_num))
 
-    for x in range(0, int(input_core_num)):
+    ipt_number_bed_dir = len(pool_bed_dir_list)
+
+    if ipt_number_bed_dir <= int(input_core_num):
+        input_core_num_final = ipt_number_bed_dir
+    else:
+
+        input_core_num_final = int(input_core_num)
+
+
+    array_split = np.array_split(pool_bed_dir_list, int(input_core_num_final))
+
+
+
+
+    for x in range(0, int(input_core_num_final)):
         dir_code = x + 1
         temp_output_dir = store_MACS2_calling_dir + '/temp_output_' + str(dir_code) + 'dir'
         if not os.path.exists(temp_output_dir):
@@ -329,7 +342,7 @@ def run_pipeline (input_output_dir,ipt_target_bed_fl_list,input_gff_fl,input_ref
 
     ##generate a list to store the define_hetero function
     run_list = []
-    for x in range(0, int(input_core_num)):
+    for x in range(0, int(input_core_num_final)):
 
         print(store_core_dic[str(x)])
         print(temp_all_output_dir_list[x])
@@ -344,7 +357,7 @@ def run_pipeline (input_output_dir,ipt_target_bed_fl_list,input_gff_fl,input_ref
                               )
         run_list.append(each_func_argument)
 
-    pool = Pool(int(input_core_num))
+    pool = Pool(int(input_core_num_final))
     pool.map(multi_run_step02, run_list)
 
 
