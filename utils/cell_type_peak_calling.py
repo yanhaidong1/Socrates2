@@ -333,13 +333,14 @@ def main(argv=None):
 
         s2_targettn5_colNum = '2'
         #input_meta_fl = args.meta_file
+        target_colnm = args.celltype_cluster_col_name
 
         input_meta_fl = output_dir + '/s1_open_prepare_tn5_file_final_dir' + '/temp_update_meta.txt'
 
         finalfdr_list = final_FDR_string.split(',')
 
         s3_fpeak.FDR_filteration(output_dir + '/s2_open_call_peak_final_dir', utils_cell_type_peak_calling_dir,
-                        input_meta_fl, finalfdr_list, s2_targettn5_colNum,s3_open_filter_peak_final_dir,final_pval_or_qval,final_pqval_cutoff)
+                        input_meta_fl, finalfdr_list, s2_targettn5_colNum,s3_open_filter_peak_final_dir,final_pval_or_qval,final_pqval_cutoff,target_colnm)
 
 
     if s4_open_bigwig_build_final == 'yes':
