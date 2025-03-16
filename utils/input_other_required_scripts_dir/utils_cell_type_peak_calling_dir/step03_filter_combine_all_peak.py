@@ -39,20 +39,32 @@ def filter_acr (input_output_dir,input_fdr_Rscript,finalfdr,new_fdr_dir_output_d
         subprocess.call(cmd,shell=True)
 
 def check_number_each_celltype (input_output_dir,input_meta_fl,new_fdr_dir_output_dir,
-                                s2_targettn5_colNum):
+                                s2_targettn5_colNum,target_colnm):
 
+    ##updating 031625
+    ##some times the annotation is not the final
     store_organ_ct_tn5_dic = {}
     store_cellnum_dic = {}
     count = 0
+    target_index = 0
     with open (input_meta_fl,'r') as ipt:
         for eachline in ipt:
             eachline = eachline.strip('\n')
             col = eachline.strip().split('\t')
             count += 1
-            if count != 1:
+
+            if count == 1:
+                temp_target_index = col.index(target_colnm)
+
+                all_len_col = len(col)
+
+                target_index = temp_target_index - all_len_col
+
+            else:
+
                 ##updating 111622
                 #organ_ct = col[int(s1_targetclust_colNum) - 1]
-                organ_ct = col[-1]
+                organ_ct = col[int(target_index)]
                 #organ_ct = col[24]
                 tn5 = col[int(s2_targettn5_colNum)]
 
