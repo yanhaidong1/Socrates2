@@ -191,7 +191,7 @@ def combine_peak_from_clusters (input_output_dir,input_required_script_dir,prefi
 
 
 def FDR_filteration (input_step02_output_dir,utils_cell_type_peak_calling_dir,
-                     input_meta_fl,finalfdr_list,s2_targettn5_colNum,s3_open_filter_peak_final_dir,pval_or_qval,organ_pqval_num):
+                     input_meta_fl,finalfdr_list,s2_targettn5_colNum,s3_open_filter_peak_final_dir,pval_or_qval,organ_pqval_num,target_colnm):
 
     for eachFDRnum in finalfdr_list:
 
@@ -204,7 +204,7 @@ def FDR_filteration (input_step02_output_dir,utils_cell_type_peak_calling_dir,
         ##we would first load the target_organ_nm_pqval_dir since some inputs would be in this directory
         filter_acr(input_step02_output_dir, input_fdr_Rscript, eachFDRnum, target_organ_nm_pqval_FDRnum_dir)
         check_number_each_celltype(input_step02_output_dir, input_meta_fl, target_organ_nm_pqval_FDRnum_dir,
-                                   s2_targettn5_colNum)
+                                   s2_targettn5_colNum,target_colnm)
         combine_peak_from_clusters(input_step02_output_dir, utils_cell_type_peak_calling_dir, 'final',
                                    target_organ_nm_pqval_FDRnum_dir)
 
