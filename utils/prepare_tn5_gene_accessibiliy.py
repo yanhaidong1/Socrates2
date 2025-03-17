@@ -7,6 +7,7 @@ import os
 import re
 import subprocess
 
+##updating 031625 add the black list building
 ##updating 020325 add chr that not consider in the gene features
 ##updating 012325 add removing the black list step
 
@@ -27,9 +28,42 @@ def get_parsed_args():
                                                                     "Default: ./ ")
 
     ##step 01
-    parser.add_argument("-BAM_fl", dest='bam_file', help="Provide bam file obtained from cell ranger")
+    parser.add_argument("-BAM_fl", dest='bam_file', help="Provide bam file obtained from cell ranger.")
 
-    parser.add_argument("-black_fl", dest='black_list_file', help = 'Provide a black list file')
+    parser.add_argument("-black_fl", dest='black_list_file', help = 'Provide a black list file.')
+
+
+    ##################
+    ##build black list pipeline update 031625
+    parser.add_argument("-open_build_black", dest = 's1_open_build_black_file', help = 'Users choose to build a black list file.')
+
+    ##option genomic black
+    parser.add_argument("-genomic_black",dest = 'open_genomic_black',help = 'Users choose to use the genomic control file to build the black file.'
+                                                                                 'Default:yes')
+
+    parser.add_argument("-genomic_bed_fl", dest = 'genomic_bed_file', help = 'Users provide a genomic bed file if open the geonmic black option.')
+
+    parser.add_argument("-Gmfai_fl", dest='genome_fai_file', help='Provide a fai index file of reference genome.')
+
+    ##option mtpt black
+    parser.add_argument("-organelle_black", dest = 'open_organelle_black',help = 'Users choose to build the organelle control file.'
+                                                                                'Default: yes')
+
+    parser.add_argument("-Genome_fl", dest='genome_fasta_file', help='Povide a genome fasta file.')
+
+    parser.add_argument("-organelle_chr_name", dest = 'organelle_chromosome_name', help = 'Provide a organelle chromosome name seperated by comma.'
+                                                                        )
+
+    ##option repeat black
+    parser.add_argument("-repeat_black",dest = 'open_repeat_black', help = 'Users choose to build the repeat black control file.'
+                                                                           'Default: yes')
+
+    parser.add_argument("-repeatmasker_fl", dest = 'repeat_masker_file', help = 'Provide a repeat masker file.')
+
+
+
+
+
 
     ##step 02
     ##updating 010425
@@ -105,6 +139,11 @@ def get_parsed_args():
     parser.add_argument("-category",dest='category_gff', help = 'Set gene or transcript to be calculated.'
                                                         'Default: gene')
 
+
+
+
+
+
     ##parse of parameters
     args = parser.parse_args()
     return args
@@ -161,6 +200,105 @@ def main(argv=None):
     #    except IOError:
     #        print('There was an error opening the black list file!')
     #        return
+
+    ##updating 031625
+    ##make the black list file
+    open_genomic_black_final = 'yes'
+    open_organelle_black_final = 'yes'
+    open_repeat_black_final = 'yes'
+    if args.s1_open_build_black_file is None:
+        s1_open_build_black_file_final = 'no'
+    else:
+        if args.s1_open_build_black_file == 'yes':
+
+            s1_open_build_black_file_final = 'yes'
+
+            ##check the genomic black
+            if args.open_genomic_black is None:
+                open_genomic_black_final = 'yes'
+            else:
+                if args.open_genomic_black == 'yes':
+                    open_genomic_black_final = 'yes'
+                else:
+                    open_genomic_black_final = 'no'
+
+            if open_genomic_black_final == 'yes':
+
+                ##check the genomic bed file
+                if args.genomic_bed_file is None:
+                    print('Cannot find genomic bed file, please provide it')
+                    return
+                else:
+                    try:
+                        file = open(args.genomic_bed_file, 'r')  ##check if the file is not the right file
+                    except IOError:
+                        print('There was an error opening the genomic bed file!')
+                        return
+
+                ##check the genome_fai_file
+                if args.genome_fai_file is None:
+                    print('Cannot find genome fai file, please provide it')
+                    return
+                else:
+                    try:
+                        file = open(args.genome_fai_file, 'r')  ##check if the file is not the right file
+                    except IOError:
+                        print('There was an error opening the genome fai file!')
+                        return
+
+            ##check the organelle black
+            if args.open_organelle_black is None:
+                open_organelle_black_final = 'yes'
+            else:
+                if args.open_organelle_black == 'yes':
+                    open_organelle_black_final = 'yes'
+                else:
+                    open_organelle_black_final = 'no'
+
+            if open_organelle_black_final == 'yes':
+
+                if args.genome_fasta_file is None:
+                    print('Cannot find genome fasta file, please provide it')
+                    return
+                else:
+                    try:
+                        file = open(args.genome_fasta_file, 'r')  ##check if the file is not the right file
+                    except IOError:
+                        print('There was an error opening the genome fasta file!')
+                        return
+
+                if args.organelle_chromosome_name is None:
+                    print('Users must provide the chromosome name of organelle seperated by comma')
+                    return
+
+
+                    ##check the repeat black
+            if args.open_repeat_black is None:
+                open_repeat_black_final = 'yes'
+            else:
+                if args.open_repeat_black == 'yes':
+                    open_repeat_black_final = 'yes'
+                else:
+                    open_repeat_black_final = 'no'
+
+            if open_repeat_black_final == 'yes':
+
+                if args.repeat_masker_file is None:
+                    print('Cannot find repeat masker file, please provide it')
+                    return
+                else:
+                    try:
+                        file = open(args.repeat_masker_file, 'r')  ##check if the file is not the right file
+                    except IOError:
+                        print('There was an error opening the repeat masker file!')
+                        return
+
+        else:
+            s1_open_build_black_file_final = 'no'
+
+            print('Users do not build the black list file, please use \'-open_build_black yes\' to open this step')
+
+
 
 
     ##step02
@@ -269,6 +407,122 @@ def main(argv=None):
     else:
         target_cluster_nm_final = 'LouvainClusters'
 
+
+
+
+    ##updating 031625
+    if s1_open_build_black_file_final == 'yes':
+
+        open_build_black_file_final_dir = output_dir + '/open_build_black_file_final_dir'
+        if not os.path.exists(open_build_black_file_final_dir):
+            os.makedirs(open_build_black_file_final_dir)
+
+        store_final_black_file_dir = open_build_black_file_final_dir + '/store_final_black_file_dir'
+        if not os.path.exists(store_final_black_file_dir):
+            os.makedirs(store_final_black_file_dir)
+
+        print('Users choose to build the black file which records regions that will be filtered out in the following analysis')
+
+        if open_genomic_black_final == 'yes':
+
+            print ('Users will build the black file based on the genomic bed file')
+
+            genomic_black_dir = open_build_black_file_final_dir + '/genomic_black_dir'
+            if not os.path.exists(genomic_black_dir):
+                os.makedirs(genomic_black_dir)
+
+            ##step01
+            ipt_intersect_python_script = input_required_scripts_dir + '/utils_prepare_tn5_gene_accessibility/s1_open_build_black_final/genomic_black/01_intersect_with_1kwin.py'
+
+            ipt_genomic_fl = args.genomic_bed_file
+            ipt_genome_fai_fl = args.genome_fai_file
+            ipt_nobinary_script = input_required_scripts_dir + '/utils_prepare_tn5_gene_accessibility/s1_open_build_black_final/genomic_black/fastSparse.nonbinary.peak.pl'
+
+            cmd = 'python ' + ipt_intersect_python_script + \
+                  ' ' + ipt_genomic_fl + \
+                  ' ' + ipt_genome_fai_fl + \
+                  ' ' + ipt_nobinary_script + \
+                  ' ' + genomic_black_dir
+            print(cmd)
+            subprocess.call(cmd,shell=True)
+
+            ##step02
+            ipt_identify_black_region_script = input_required_scripts_dir + '/utils_prepare_tn5_gene_accessibility/s1_open_build_black_final/genomic_black/02_identify_black_region.py'
+            ipt_genomic_bed_fl = genomic_black_dir + '/opt_nb_win_read.sparse'
+
+            cmd = 'python ' + ipt_identify_black_region_script + \
+                  ' ' + ipt_genomic_bed_fl + \
+                  ' ' + genomic_black_dir
+            print(cmd)
+            subprocess.call(cmd,shell=True)
+
+            cmd = 'cp ' + genomic_black_dir + '/opt_genomic_black.bed ' + store_final_black_file_dir
+            print(cmd)
+            subprocess.call(cmd,shell=True)
+
+
+        if open_organelle_black_final == 'yes':
+
+            print('Users will build the organelle black file')
+
+            organelle_black_dir = open_build_black_file_final_dir + '/organelle_black_dir'
+            if not os.path.exists(organelle_black_dir):
+                os.makedirs(organelle_black_dir)
+
+            ##Step01
+            ipt_blast_python_script = input_required_scripts_dir + '/utils_prepare_tn5_gene_accessibility/s1_open_build_black_final/mtpt_black/01_blast_mtpt_genome.py'
+            ipt_genome_fl = args.genome_fasta_file
+            organelle_chromosome_name_final_str = args.organelle_chromosome_name
+
+            cmd = 'python ' + ipt_blast_python_script + \
+                  ' ' + ipt_genome_fl + \
+                  ' ' + organelle_black_dir + \
+                  ' ' + organelle_chromosome_name_final_str
+            print(cmd)
+            subprocess.call(cmd,shell=True)
+
+            ##Step02
+            ipt_generate_black_script =  input_required_scripts_dir + '/utils_prepare_tn5_gene_accessibility/s1_open_build_black_final/mtpt_black/02_generate_black.py'
+
+            cmd = 'python ' + ipt_generate_black_script + \
+                  ' ' + organelle_black_dir + '/opt_blast.txt' + \
+                  ' ' + organelle_black_dir + \
+                  ' ' + organelle_chromosome_name_final_str
+            print(cmd)
+            subprocess.call(cmd,shell=True)
+
+            cmd = 'cp ' + organelle_black_dir + '/opt_mtpt_black.bed ' + store_final_black_file_dir
+            print(cmd)
+            subprocess.call(cmd,shell=True)
+
+
+        if open_repeat_black_final == 'yes':
+
+            print ('Users will build the repeat black file')
+
+            repeat_black_dir = open_build_black_file_final_dir + '/repeat_black_dir'
+            if not os.path.exists(repeat_black_dir):
+                os.makedirs(repeat_black_dir)
+
+            ##Step01
+            ipt_make_black_repeatmasker_script = input_required_scripts_dir + '/utils_prepare_tn5_gene_accessibility/s1_open_build_black_final/repeat_black/make_black_repeatmask.py'
+
+            ipt_repeatmasker_fl = args.repeat_masker_file
+
+            cmd = 'python ' + ipt_make_black_repeatmasker_script + \
+                  ' ' + ipt_repeatmasker_fl + \
+                  ' ' + repeat_black_dir
+            print(cmd)
+            subprocess.call(cmd,shell=True)
+
+            cmd = 'cp ' + repeat_black_dir + '/opt_repeat_black.bed ' + store_final_black_file_dir
+            print(cmd)
+            subprocess.call(cmd, shell=True)
+
+
+        cmd = 'cat ' + store_final_black_file_dir + '/* > ' + store_final_black_file_dir + '/opt_final_black_region.txt'
+        print(cmd)
+        subprocess.call(cmd,shell=True)
 
 
 
