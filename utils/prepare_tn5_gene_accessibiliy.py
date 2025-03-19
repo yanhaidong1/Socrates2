@@ -49,7 +49,7 @@ def get_parsed_args():
     parser.add_argument("-organelle_black", dest = 'open_organelle_black',help = 'Users choose to build the organelle control file.'
                                                                                 'Default: yes')
 
-    parser.add_argument("-Genome_fl", dest='genome_fasta_file', help='Povide a genome fasta file.')
+    #parser.add_argument("-Genome_fl", dest='genome_fasta_file', help='Povide a genome fasta file.')
 
     parser.add_argument("-organelle_chr_name", dest = 'organelle_chromosome_name', help = 'Provide a organelle chromosome name seperated by comma.'
                                                                         )
