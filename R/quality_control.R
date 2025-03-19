@@ -1,6 +1,7 @@
 ###################################################################################################
 ###################################################################################################
 ###################################################################################################
+##updating 031925 add a new find cell function without knee plot
 ##updating 020125 we will set the max tn5
 ##updating 012825 we will update the plotting of organelle ratio
 
@@ -671,6 +672,7 @@ findCells <- function(obj,
     if(filt.tss){
         obj <- .filterTSS(obj, min.freq=tss.min.freq, z.thresh=tss.z.thresh, doplot=doplot, main="% TSS")
     }
+    # filter by FRiP
     if(filt.frip){
         if(filt.tss){
             obj <- .filterFRiP(obj, min.freq=frip.min.freq, z.thresh=frip.z.thresh, doplot=doplot, main="FRiP")
@@ -692,6 +694,282 @@ findCells <- function(obj,
     return(obj)
 }
 
+
+
+findCells_no_knee_plot_filter <- function(obj,
+                      output_dir,
+                      set.tn5.cutoff=NULL,
+                      min.cells=1000,
+                      max.cells=15000,
+                      min.tn5=1000,
+                      max.tn5=100000,
+                      filt.org=T,
+                      org.filter.thresh=0.2,
+                      filt.tss=T,
+                      tss.min.freq=0.2,
+                      tss.z.thresh=2,
+                      filt.frip=T,
+                      frip.min.freq=0.2,
+                      frip.z.thresh=2,
+                      doplot=F,
+                      prefix=NULL){
+  
+  # filter functions
+  .filterTSS <- function(obj, min.freq=0.2, z.thresh=3, doplot=F, main=""){
+    
+    # get meta
+    x <- subset(obj$meta.v1, obj$meta.v1$total > 0)
+    
+    # get tss props
+    x$prop <- x$tss/x$total
+    x$prop[is.na(x$prop)] <- 0
+    x$zscore <- as.numeric((x$prop-mean(x$prop, na.rm=T))/sd(x$prop, na.rm=T))
+    x$zscore[is.na(x$zscore)] <- 0
+    x$zscore[is.infinite(x$zscore) & x$zscore < 0] <- min(x$zscore[is.finite(x$zscore)])
+    x$zscore[is.infinite(x$zscore) & x$zscore > 0] <- max(x$zscore[is.finite(x$zscore)])
+    x <- x[order(x$zscore, decreasing=T),]
+    score <- any(x$zscore < -1*z.thresh)
+    if(score){
+      prop.z.min <- max(x$prop[x$zscore < -1*z.thresh])
+      if(prop.z.min < min.freq){
+        thresh <- min.freq
+      }else{
+        thresh <- prop.z.min
+      }
+    }else{
+      thresh <- min.freq
+    }
+    x <- x[order(x$total, decreasing=T),]
+    n.cells <- nrow(subset(x, x$tss/x$total >= thresh))
+    
+    # if doplot is true
+    if(doplot){
+      
+      # get density
+      den <- kde2d(log10(x$total), x$prop,
+                   n=300, h=c(0.2, 0.05),
+                   lims=c(range(log10(x$total)), c(0,1)))
+      image(den, useRaster=T, col=c("white", rev(magma(100))),
+            xlab="Tn5 integration sites per barcode (log10)", ylab="Fraction reads TSS",
+            main=main)
+      grid(lty=1, lwd=0.5, col="grey90")
+      abline(h=thresh, col="red", lty=2, lwd=2)
+      legend("topright", legend=paste("# cells = ", n.cells, sep=""), fill=NA, col=NA, border=NA)
+      box()
+    }
+    
+    # filter
+    x$prop <- NULL
+    x$zscore <- NULL
+    out <- subset(x, x$tss/x$total >= thresh)
+    
+    # rename
+    obj$meta.v2 <- out
+    
+    # return
+    return(obj)
+    
+  }
+  .filterFRiP <- function(obj, min.freq=0.1, z.thresh=2, doplot=F, main=""){
+    
+    # get meta
+    x <- subset(obj$meta.v2, obj$meta.v2$total > 0)
+    
+    # get FRiP props
+    x$prop <- x$acr/x$total
+    x$prop[is.na(x$prop)] <- 0
+    x$zscore <- as.numeric((x$prop-mean(x$prop, na.rm=T))/sd(x$prop, na.rm=T))
+    x$zscore[is.na(x$zscore)] <- 0
+    x$zscore[is.infinite(x$zscore) & x$zscore < 0] <- min(x$zscore[is.finite(x$zscore)])
+    x$zscore[is.infinite(x$zscore) & x$zscore > 0] <- max(x$zscore[is.finite(x$zscore)])
+    x <- x[order(x$zscore, decreasing=T),]
+    score <- any(x$zscore < -1*z.thresh)
+    if(score){
+      prop.z.min <- max(x$prop[x$zscore < -1*z.thresh])
+      if(prop.z.min < min.freq){
+        thresh <- min.freq
+      }else{
+        thresh <- prop.z.min
+      }
+    }else{
+      thresh <- min.freq
+    }
+    x <- x[order(x$total, decreasing=T),]
+    n.cells <- nrow(subset(x, x$acr/x$total >= thresh))
+    
+    # if doplot is true
+    if(doplot){
+      
+      # get density
+      den <- kde2d(log10(x$total), x$prop,
+                   n=300, h=c(0.2, 0.05),
+                   lims=c(range(log10(x$total)), c(0,1)))
+      image(den, useRaster=T, col=c("white", rev(magma(100))),
+            xlab="Tn5 integration sites per barcode (log10)", ylab="Fraction Tn5 insertions in ACRs",
+            main=main)
+      grid(lty=1, lwd=0.5, col="grey90")
+      abline(h=thresh, col="red", lty=2, lwd=2)
+      legend("topright", legend=paste("# cells = ", n.cells, sep=""), fill=NA, col=NA, border=NA)
+      box()
+    }
+    
+    # filter
+    x$prop <- NULL
+    x$zscore <- NULL
+    out <- subset(x, x$acr/x$total >= thresh)
+    
+    # rename
+    obj$meta.v3 <- out
+    
+    # return
+    return(obj)
+  }
+  .filterOrganelle <- function(obj, cell_threshold=0.2, remove_cells=FALSE, doplot=F, main=""){
+    
+    x <- obj$meta.v1
+    x$ptmt.ratio <- x$ptmt/x$total
+    
+    if (remove_cells == TRUE) {
+      message("... Filtering Cells based of Oragnelle Reads")
+      out_meta <- subset(x, x$ptmt.ratio <= cell_threshold)
+      
+    } else {
+      message("... Not Filtering Cells on Organelle Ratio")
+      out_meta <- x
+    }
+    
+    n.cells = nrow(out_meta)
+    if(doplot){
+      hist(x$ptmt.ratio, xlim=c(0,1),
+           breaks=102,
+           xlab="Organelle Ratio",
+           ylab="Counts",
+           main=main)
+      abline(v=cell_threshold, col="red", lty=2, lwd=2)
+      legend("topright", legend=paste("# cells = ", n.cells, sep=""), fill=NA, col=NA, border=NA)
+      
+    }
+    
+    #write back
+    obj$meta.v1 <- out_meta
+    
+    return(obj)
+  }
+  
+  
+  # get meta data
+  x <- obj$meta
+  # order DF by total Tn5 sites
+  x <- x[order(x$total, decreasing=T),]
+  rank <- log10(seq(1:nrow(x)))
+  depth <- log10(x$total+1)
+  df <- data.frame(rank=rank, depth=depth)
+  fit <- smooth.spline(rank, depth, spar=0.1)
+  
+  # find local minima slope
+  X <- data.frame(t=seq(min(rank),max(rank),length=nrow(df)))
+  Y <- predict(fit, newdata=X, deriv=1)
+  xvals <- Y$x
+  yvals <- Y$y
+  knee <- xvals[which.min(yvals[min.cells:max.cells])]
+  cells <- which.min(yvals[min.cells:max.cells])
+  reads <- (10^(min(df[1:cells,]$depth))) - 1
+  
+  # ensure reads > min.tn5
+  if(reads < min.tn5){
+    reads <- min.tn5
+    cells <- nrow(subset(df, df$depth>log10(reads)))
+    if(cells > max.cells){
+      cells <- max.cells
+    }
+    knee <- log10(cells)
+  }
+  
+  ##updating 020125
+  ## ensure reads < max.tn5
+  if(reads > max.tn5){
+    reads <- max.tn5
+    cells <- nrow(subset(df, df$depth<log10(reads)))
+    if(cells > max.cells){
+      cells <- max.cells
+    }
+    knee <- log10(cells)
+  }
+  
+  
+  # if override spline fitting
+  if(!is.null(set.tn5.cutoff)){
+    reads <- set.tn5.cutoff
+    cells <- nrow(subset(df, df$depth>log10(reads)))
+    if(cells > max.cells){
+      cells <- max.cells
+    }
+    knee <- log10(cells)
+  }
+  
+  # if number of cells less than threshold
+  if(cells < min.cells){
+    cells <- min.cells
+    knee <- log10(cells)
+  }
+  reads <- 10^(depth[cells])
+  
+  
+  if(filt.org == T){plot_num = 3} else {plot_num = 2}
+  
+  # plot
+  if(doplot){
+    if(!is.null(prefix)){pdf(paste0(output_dir,'/',prefix,".QC_FIGURES.pdf"), width=12, height=4)}
+    layout(matrix(c(1:plot_num), nrow=1))
+    #plot(rank[(cells+1):length(rank)], depth[(cells+1):length(rank)],
+    #     type="l", lwd=2, col="grey75", main=prefix,
+    #     xlim=range(rank), ylim=range(depth),
+    #     xlab="Barcode rank (log10)",
+    #     ylab="Tn5 integration sites per barcode (log10)")
+    #lines(rank[1:cells], depth[1:cells], lwd=2, col="darkorchid4")
+    #grid(lty=1, lwd=0.5, col="grey90")
+    #abline(v=knee, col="red", lty=2)
+    #abline(h=log10(reads), col="red", lty=2)
+    #legend("bottomleft", legend=paste("# cells=",cells,", # reads=",reads,sep=""), fill=NA, col=NA, border=NA)
+  }
+  
+  # append meta
+  #obj$meta.v1 <- head(x, n=cells)
+  
+  ##updating 031925 no filteration we use the x
+  obj$meta.v1 <- x
+  
+  message("Making Dotplot")
+  # filter by Organelle
+  if(filt.org == T){
+    obj <- .filterOrganelle(obj, remove_cells=filt.org, cell_threshold = org.filter.thresh, doplot=doplot, main="Organelle Ratio")
+  }
+  
+  # filter by TSS
+  if(filt.tss){
+    obj <- .filterTSS(obj, min.freq=tss.min.freq, z.thresh=tss.z.thresh, doplot=doplot, main="% TSS")
+  }
+  # filter by FRiP
+  if(filt.frip){
+    if(filt.tss){
+      obj <- .filterFRiP(obj, min.freq=frip.min.freq, z.thresh=frip.z.thresh, doplot=doplot, main="FRiP")
+    }else{
+      obj$meta.v2 <- obj$meta.v1
+      obj <- .filterFRiP(obj, min.freq=frip.min.freq, z.thresh=frip.z.thresh, doplot=doplot, main="FRiP")
+    }
+  }
+  if(!filt.tss & !filt.frip){
+    obj$meta.v2 <- obj$meta.v1
+    obj$meta.v3 <- obj$meta.v2
+  }
+  
+  
+  if(doplot){
+    if(!is.null(prefix)){dev.off()}
+  }
+  # return
+  return(obj)
+}
 
 ###################################################################################################
 ###################################################################################################
