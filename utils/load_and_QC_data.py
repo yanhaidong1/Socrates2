@@ -7,6 +7,7 @@ import os
 import subprocess
 import re
 
+##updating 031925 add a step to not filter knee plot filtration
 ##this pipeline is to load the data and perform the QC
 
 def get_parsed_args():
@@ -65,7 +66,9 @@ def get_parsed_args():
                                                                                   'Default: yes')
 
     #parser.add_argument("-ipt_raw_obj", dest = 'input_raw_object', help = 'Provide an object file obtained from the -open_build_obj.')
-
+    ##updating 031925
+    parser.add_argument("-knee_plot_filter",dest = 'knee_plot_filter_cell', help = 'If users want to open the knee plot filtration.'
+                                                                                   'Default: yes')
 
     parser.add_argument("-min_cells", dest = 'min_cell_val', help = 'Lower limit on the number of identified cells.'
                                                                     'Defaults: 1000')
@@ -292,6 +295,15 @@ def main(argv=None):
     store_final_parameter_line_list.append('tss_window_size_final <- ' + tss_window_size_final)
 
     ##step02 parameters
+    ##updating 031925
+    if args.knee_plot_filter_cell is not None:
+        knee_plot_filter_cell_final = args.knee_plot_filter_cell
+    else:
+        knee_plot_filter_cell_final = 'yes'
+
+    store_final_parameter_line_list.append('open_knee_plot_filter_cell <- ' + '\'' + knee_plot_filter_cell_final + '\'')
+
+
     if args.min_cell_val is not None:
         min_cell_val_final = args.min_cell_val
     else:
