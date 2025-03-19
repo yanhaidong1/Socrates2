@@ -63,20 +63,42 @@ if (open_find_cells_step_final == 'yes'){
   if (open_build_object_final == 'yes'){
 
     message(" - finding cells ...")
-    obj <- findCells(obj, 
-                     output_dir,
-                     doplot=T,
-                     min.cells= min_cell_val_final,
-                     max.cells= max_cell_val_final,
-                     set.tn5.cutoff=NULL,
-                     min.tn5=min_tn5_val,
-                     max.tn5=max_tn5_val,
-                     org.filter.thresh=organelle_filter_cutoff_final,
-                     tss.min.freq=tss_min_freq_val_final,
-                     tss.z.thresh=tss_z_thresh_final,
-                     frip.min.freq=frip_min_freq_final,
-                     frip.z.thresh=frip_z_thresh_final,
-                     prefix=out)
+    
+    ##udpating 031925
+    if (open_knee_plot_filter_cell == 'yes'){
+      obj <- findCells(obj, 
+                       output_dir,
+                       doplot=T,
+                       min.cells= min_cell_val_final,
+                       max.cells= max_cell_val_final,
+                       set.tn5.cutoff=NULL,
+                       min.tn5=min_tn5_val,
+                       max.tn5=max_tn5_val,
+                       org.filter.thresh=organelle_filter_cutoff_final,
+                       tss.min.freq=tss_min_freq_val_final,
+                       tss.z.thresh=tss_z_thresh_final,
+                       frip.min.freq=frip_min_freq_final,
+                       frip.z.thresh=frip_z_thresh_final,
+                       prefix=out)
+    }else{
+      obj <- findCells_no_knee_plot_filter(obj, 
+                       output_dir,
+                       doplot=T,
+                       min.cells= min_cell_val_final,
+                       max.cells= max_cell_val_final,
+                       set.tn5.cutoff=NULL,
+                       min.tn5=min_tn5_val,
+                       max.tn5=max_tn5_val,
+                       org.filter.thresh=organelle_filter_cutoff_final,
+                       tss.min.freq=tss_min_freq_val_final,
+                       tss.z.thresh=tss_z_thresh_final,
+                       frip.min.freq=frip_min_freq_final,
+                       frip.z.thresh=frip_z_thresh_final,
+                       prefix=out)
+      
+    }
+    
+    
     
     obj <- generateMatrix(obj,
                           filtered=T, 
@@ -96,20 +118,44 @@ if (open_find_cells_step_final == 'yes'){
     #                 frip.min.freq=0.2,
     #                 frip.z.thresh=1,
     #                 prefix=out)
-    obj <- findCells(obj, 
-                     output_dir,
-                     doplot=T,
-                     min.cells= min_cell_val_final,
-                     max.cells= max_cell_val_final,
-                     set.tn5.cutoff=NULL,
-                     min.tn5=min_tn5_val,
-                     max.tn5=max_tn5_val,
-                     org.filter.thresh=organelle_filter_cutoff_final,
-                     tss.min.freq=tss_min_freq_val_final,
-                     tss.z.thresh=tss_z_thresh_final,
-                     frip.min.freq=frip_min_freq_final,
-                     frip.z.thresh=frip_z_thresh_final,
-                     prefix=out)
+    
+    ##udpating 031925
+    if (open_knee_plot_filter_cell == 'yes'){
+      
+      obj <- findCells(obj, 
+                       output_dir,
+                       doplot=T,
+                       min.cells= min_cell_val_final,
+                       max.cells= max_cell_val_final,
+                       set.tn5.cutoff=NULL,
+                       min.tn5=min_tn5_val,
+                       max.tn5=max_tn5_val,
+                       org.filter.thresh=organelle_filter_cutoff_final,
+                       tss.min.freq=tss_min_freq_val_final,
+                       tss.z.thresh=tss_z_thresh_final,
+                       frip.min.freq=frip_min_freq_final,
+                       frip.z.thresh=frip_z_thresh_final,
+                       prefix=out)
+    }else{
+      
+      obj <- findCells_no_knee_plot_filter(obj, 
+                       output_dir,
+                       doplot=T,
+                       min.cells= min_cell_val_final,
+                       max.cells= max_cell_val_final,
+                       set.tn5.cutoff=NULL,
+                       min.tn5=min_tn5_val,
+                       max.tn5=max_tn5_val,
+                       org.filter.thresh=organelle_filter_cutoff_final,
+                       tss.min.freq=tss_min_freq_val_final,
+                       tss.z.thresh=tss_z_thresh_final,
+                       frip.min.freq=frip_min_freq_final,
+                       frip.z.thresh=frip_z_thresh_final,
+                       prefix=out)
+      
+    }
+    
+    
     
     obj <- generateMatrix(obj,
                           filtered=T, 
