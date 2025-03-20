@@ -939,11 +939,9 @@ findCells_no_knee_plot_filter <- function(obj,
   }
   
   # append meta
-  #obj$meta.v1 <- head(x, n=cells)
+  obj$meta.v1 <- head(x, n=cells)
   
-  ##updating 031925 no filteration we use the x
-  obj$meta.v1 <- x
-  
+ 
   message("Making Dotplot")
   # filter by Organelle
   if(filt.org == T){
