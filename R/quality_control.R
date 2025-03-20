@@ -872,8 +872,13 @@ findCells_no_knee_plot_filter <- function(obj,
   xvals <- Y$x
   yvals <- Y$y
   knee <- xvals[which.min(yvals[min.cells:max.cells])]
-  cells <- which.min(yvals[min.cells:max.cells])
-  reads <- (10^(min(df[1:cells,]$depth))) - 1
+  
+  ##updating 032025 do not use the slop to find the cells
+  #cells <- which.min(yvals[min.cells:max.cells])
+  #reads <- (10^(min(df[1:cells,]$depth))) - 1
+  
+  cells <- 0
+  reads <- 0
   
   # ensure reads > min.tn5
   if(reads < min.tn5){
