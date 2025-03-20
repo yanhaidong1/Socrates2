@@ -390,69 +390,72 @@ file)<br />
 gff file)<br />
 </p>
 <p><strong>Overall parameters</strong> (Optional):<br />
+<strong>parameters:</strong> when initiating
+<strong>-open_build_obj</strong>:<br />
 1. <strong>-open_build_obj yes|no</strong> (Build and store all the data
 into an object. Default: yes)<br />
-2. <strong>-open_find_cells yes|no</strong> (Filter QC and build an
-overall data quality. Default: yes)<br />
-3. <strong>-open_is_cells yes|no</strong> (Compares each barcode to
-background and cell bulk reference to identify barcodes representing
-ambient DNA or broken nuclei. Default: yes)<br />
-4. <strong>-prefix</strong> (Provide a prefix added in the output files.
-Default: output)<br />
-5. <strong>-win_size 500</strong> (Divide the genome into multiple
-bins/windows, and each bin/window spans a specific size (bp). Default:
-500)<br />
-</p>
-<p><strong>Parameters</strong> when initiating
-<strong>-open_build_obj</strong>:<br />
-1. <strong>-shift -75</strong> (Shift the start coordinates upstream
+2. <strong>-shift -75</strong> (Shift the start coordinates upstream
 when calling macs2 tool. Default: 75)<br />
-2. <strong>-extsize 150</strong> (Extends the fragment length downstream
+3. <strong>-extsize 150</strong> (Extends the fragment length downstream
 when calling macs2 tool. Default: 150)<br />
-3. <strong>-fdr 0.1</strong> (Significance cut-off for peak calling when
+4. <strong>-fdr 0.1</strong> (Significance cut-off for peak calling when
 calling macs2 tool. Default: 0.1)<br />
-4. <strong>-tss_size 2000</strong> (Size of windows flanking TSS for
+5. <strong>-tss_size 2000</strong> (Size of windows flanking TSS for
 estimating proportion of Tn5 integration sites near gene TSSs. Default:
 2000)<br />
 </p>
-<p><strong>Parameters</strong> when initiating
+<p><strong>parameters:</strong> when initiating
 <strong>-open_find_cells</strong>:<br />
-1. <strong>-ipt_raw_obj prefix.raw_obj.rds</strong> (Provide an object
+1. <strong>-open_find_cells yes|no</strong> (Filter QC and build an
+overall data quality. Default: yes)<br />
+2. <strong>-ipt_raw_obj prefix.raw_obj.rds</strong> (Provide an object
 file obtained from the -open_build_obj.)<br />
-2. <strong>-min_cells 1000</strong> (Lower limit on the number of
+3. <strong>-min_cells 1000</strong> (Lower limit on the number of
 identified cells. Default: 1000)<br />
-3. <strong>-max_cells 16000</strong> (Upper limit on the number of
+4. <strong>-max_cells 16000</strong> (Upper limit on the number of
 identified cells. Default: 16000)<br />
-4. <strong>-min_tn5 1000</strong> (Lower threshold for the minimum
+5. <strong>-min_tn5 1000</strong> (Lower threshold for the minimum
 number of Tn5 integration sites for retaining obj barcode. Default:
 1000)<br />
-5. <strong>-org_flt_thresh 0.8</strong> (Remove cells with an organelle
+6. <strong>-org_flt_thresh 0.8</strong> (Remove cells with an organelle
 ratio (Organalle/Total_reads) greater than N. Default: 0.8)<br />
-6. <strong>-tss_min_freq 0.2</strong> (Minimum frequency of Tn5 sites
+7. <strong>-tss_min_freq 0.2</strong> (Minimum frequency of Tn5 sites
 near TSSs. Default: 0.2)<br />
-7. <strong>-tss_z_thresh 2</strong> (Z-score threshold to remove
+8. <strong>-tss_z_thresh 2</strong> (Z-score threshold to remove
 barcodes below the mean. Default: 2)<br />
-8. <strong>-frip_min_freq 0.2</strong> (Minimum frequency of Tn5 sites
+9. <strong>-frip_min_freq 0.2</strong> (Minimum frequency of Tn5 sites
 within ACRs. Default: 0.2)<br />
-9. <strong>frip_z_thresh 2</strong> (Z-score threshold to remove
+10. <strong>-frip_z_thresh 2</strong> (Z-score threshold to remove
 barcodes with values below X standard deviations from the mean. Default:
 2)<br />
-</p>
-<p><strong>Parameters</strong> when initiating
+11. <strong>-knee_plot_filter yes|no</strong> (Use the knee plot with
+slope-based filtering to exclude cells that do not meet the required
+criteria.)</p>
+<p><strong>Parameters:</strong> when initiating
 <strong>-open_is_cells</strong>:<br />
-1. <strong>-ipt_findcell_obj prefix.findcell_obj.rds</strong> (Provide
+1. <strong>-open_is_cells yes|no</strong> (Compares each barcode to
+background and cell bulk reference to identify barcodes representing
+ambient DNA or broken nuclei. Default: yes)<br />
+2. <strong>-ipt_findcell_obj prefix.findcell_obj.rds</strong> (Provide
 an object obtained from the -open_find_cells.)<br />
-2. <strong>-num_test 20000</strong>(Number of barcodes to query (ranked
+3. <strong>-num_test 20000</strong>(Number of barcodes to query (ranked
 by total # of unique Tn5 insertions. Default: 20000)<br />
-3. <strong>-num_tn5 NULL</strong> (Set the minimum number of Tn5
+4. <strong>-num_tn5 NULL</strong> (Set the minimum number of Tn5
 insertions to select test cells. Overridden by num.test. Default:
 NULL)<br />
-4. <strong>-num_REF 1000</strong> (Number of cells to use as the cell
+5. <strong>-num_REF 1000</strong> (Number of cells to use as the cell
 bulk reference (top X cells based on # unique Tn5 insertions). Default:
 1000)<br />
-5. <strong>-background_cutoff 100</strong> (Maximum unique Tn5
+6. <strong>-background_cutoff 100</strong> (Maximum unique Tn5
 insertions to use for selecting barcodes for the background reference
 set. Default: 100)<br />
+</p>
+<p><strong>Other parameters</strong><br />
+1. <strong>-prefix</strong> (Provide a prefix added in the output files.
+Default: output)<br />
+2. <strong>-win_size 500</strong> (Divide the genome into multiple
+bins/windows, and each bin/window spans a specific size (bp). Default:
+500)<br />
 </p>
 <p><strong>Outputs</strong><br />
 1. <strong>prefix.QC.rds</strong><br />
