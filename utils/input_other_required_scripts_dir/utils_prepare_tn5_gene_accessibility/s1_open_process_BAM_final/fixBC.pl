@@ -45,16 +45,14 @@ while(<F>){
 		}
 		elsif($col[$i] =~ /RG:Z:/){
 			my @id = split(":",$col[$i]);
-			my @tag1 = split("_",$id[2]);
-			$tag = join("",$tag1[0],$tag1[1],$tag1[2]);
+			#my @tag1 = split("_",$id[2]);
+			#$tag = join("",$tag1[0],$tag1[1],$tag1[2]);
+			$tag = $id[2]
 		}
 	}
 	if($hasbc > 0){
 		#$bc =~ s/-1/-$tag/;
-
-        ##updating 032925
-        ##we directly add the tag
-        $bc .= "-$tag";
+		$bc .= "-$tag";
 
 		# initialize Pt/Mt hashes
 		if(!$chl{$bc}){
