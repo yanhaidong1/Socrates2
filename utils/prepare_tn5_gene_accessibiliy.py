@@ -184,7 +184,7 @@ def main(argv=None):
                 try:
                     file = open(args.bam_file, 'r')  ##check if the file is not the right file
                 except IOError:
-                    print('There was an error opening the tn5 file!')
+                    print('There was an error opening the BAM file!')
                     return
 
         else:
