@@ -50,7 +50,11 @@ while(<F>){
 		}
 	}
 	if($hasbc > 0){
-		$bc =~ s/-1/-$tag/;
+		#$bc =~ s/-1/-$tag/;
+
+        ##updating 032925
+        ##we directly add the tag
+        $bc .= "-$tag";
 
 		# initialize Pt/Mt hashes
 		if(!$chl{$bc}){
