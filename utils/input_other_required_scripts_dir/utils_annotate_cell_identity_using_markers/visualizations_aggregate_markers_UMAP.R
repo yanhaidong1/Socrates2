@@ -2,6 +2,7 @@
 ## per cell annotation ##
 #########################
 
+##updating 040325 we will make a version that allow the duplicate gene
 ##updating 010525 make the umap and store the meta into obejct and also store the meta directly in the output
 ##updating 110424 
 ##updating 110221 add the output dir
@@ -71,7 +72,9 @@ loadData <- function(input_soc_object,
     yy <- y
     #z <- read.table(markers, header=T)
     z <- read.delim(markers,header=T)
-    rownames(z) <- z$geneID
+    
+    ##updating 040325 we will not allow them to be the row name that will avoid the duplicate
+    #rownames(z) <- z$geneID
     
     #pcs <- read.table(pcs)
     pcs <- input_soc_object$svd
