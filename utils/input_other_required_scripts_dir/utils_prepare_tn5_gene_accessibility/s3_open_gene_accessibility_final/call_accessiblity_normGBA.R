@@ -20,7 +20,7 @@ input_output_dir <- as.character(args[3])
 
 ##load libraries
 library(Matrix)
-library(gplots)
+#library(gplots)
 library(RColorBrewer)
 library(irlba)
 library(proxy)
