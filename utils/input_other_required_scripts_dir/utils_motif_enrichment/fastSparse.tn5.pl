@@ -13,7 +13,7 @@ while(<F>){
 	}
 	chomp;
 	my @col = split("\t",$_);
-	$col[0] = 'chr' . $col[0];
+	#$col[0] = 'chr' . $col[0];
 	if($col[0] =~ /B73V/){
 		$col[0] =~ s/chrB73V4_ctg/chrB73V4ctg/g;
 	}
