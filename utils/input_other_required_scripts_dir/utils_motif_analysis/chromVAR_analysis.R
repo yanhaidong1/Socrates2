@@ -74,7 +74,7 @@ library(SummarizedExperiment)
 library(GenomicAlignments)
 library(dplyr)
 library(TFBSTools)
-library(JASPAR2022)
+library(JASPAR2024)
 library(pheatmap)
 library(circlize)
 
