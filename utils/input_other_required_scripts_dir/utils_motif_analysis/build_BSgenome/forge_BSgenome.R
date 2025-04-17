@@ -12,13 +12,14 @@ library(BSgenome)
 args <- commandArgs(TRUE)
 ipt_seed_file <- as.character(args[1])
 output_dir <- as.character(args[2])
-peaks.in <- as.character(args[3])
+ipt_genome_name <- as.character(args[3])
+#peaks.in <- as.character(args[3])
 
 my_file <- read.dcf(ipt_seed_file, fields = NULL, all = FALSE, keep.white = NULL) 
 my_file
 write.dcf(my_file , file = paste0(output_dir,'/',"seed.dcf"), append = FALSE, useBytes = FALSE, indent = 0.1 * getOption("width"), width = 0.9 * getOption("width"), keep.white = NULL)
-unlink(c("BSgenome.Osativa323v7"), recursive = TRUE, force = TRUE)
-forgeBSgenomeDataPkg(paste0(output_dir,'/',"seed.dcf"))
+unlink(c(ipt_genome_name), recursive = TRUE, force = TRUE)
+forgeBSgenomeDataPkg(paste0(output_dir,'/',"seed.dcf"),destdir=output_dir)
 
 ##in the terminal
 ##R CMD build BSgenome.Osa.323.v7
@@ -45,12 +46,12 @@ forgeBSgenomeDataPkg(paste0(output_dir,'/',"seed.dcf"))
 
 
 ##Test
-my_file <- read.dcf("seed_file.txt", fields = NULL, all = FALSE, keep.white = NULL) 
-my_file
-write.dcf(my_file , file = "seed.dcf", append = FALSE, useBytes = FALSE, indent = 0.1 * getOption("width"), width = 0.9 * getOption("width"), keep.white = NULL)
+#my_file <- read.dcf("seed_file.txt", fields = NULL, all = FALSE, keep.white = NULL) 
+#my_file
+#write.dcf(my_file , file = "seed.dcf", append = FALSE, useBytes = FALSE, indent = 0.1 * getOption("width"), width = 0.9 * getOption("width"), keep.white = NULL)
 
-library(BSgenome)
-unlink(c("OrfTxdb"), recursive = TRUE, force = TRUE)
-forgeBSgenomeDataPkg("seed.dcf")
+#library(BSgenome)
+#unlink(c("OrfTxdb"), recursive = TRUE, force = TRUE)
+#forgeBSgenomeDataPkg("seed.dcf")
 
 
