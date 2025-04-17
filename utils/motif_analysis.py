@@ -337,6 +337,10 @@ def main(argv=None):
                     print('There was an error opening the genome fasta file!')
                     return
 
+            if args.BSgenome_name is None:
+                print('please provide the BSgenome name that will be loaded from R')
+                return
+
         else:
             if args.open_build_BSgenome_lib == 'no':
                 open_build_BSgenome_lib_final = 'no'
@@ -552,7 +556,13 @@ def main(argv=None):
                 opt.write('>' + eachid + '\n' + store_seq_dic[eachid])
             store_chr_list.append(eachid)
 
-        store_chr_str = ','.join(store_chr_list)
+        abs_src_seqdir_path = os.path.abspath(src_seqdir)
+
+        store_chr_list_new = []
+        for eachchr in store_chr_list:
+            new_chr = '\'' +  eachchr + '\''
+            store_chr_list_new.append(new_chr)
+        store_chr_str_new = ','.join(store_chr_list_new)
 
         #sep_genome(input_genome_fl, input_output_dir)
         store_final_line_list = []
@@ -565,24 +575,45 @@ def main(argv=None):
                      'Author: Genome' + '\n' + \
                      'common_name: Genome' + '\n' + \
                      'provider: Genome' + '\n' + \
-                     'provider_version: 1.0.0' + '\n' + \
+                     'provider_version: Acyr_1.0' + '\n' + \
                      'release_date: 0.0.0' + '\n' + \
                      'release_name: ' + BSgenome_ID + '\n' + \
                      'BSgenomeObjname: Genome' + '\n' + \
                      'source_url: xxxxx' + '\n' + \
                      'organism_biocview: AnnotationData, BSgenome' + '\n' + \
-                     'seqnames: c(' + store_chr_str + ')' + '\n' + \
+                     'seqnames: c(' + store_chr_str_new + ')' + '\n' + \
                      'SrcDataFiles: Genome' + '\n' + \
-                     'seqfiles_suffix: .fasta' + '\n' + \
-                     'seqs_srcdir: ' + src_seqdir
+                     'seqs_srcdir: ' + abs_src_seqdir_path
         store_final_line_list.append(final_line)
 
         with open (step00_build_BSgenome_dir + '/seed_file.txt','w+') as opt:
             for eachline in store_final_line_list:
                 opt.write(eachline + '\n')
 
+        ##use the R to build the seed.dcf
+        ipt_build_BSgenome_R_script = input_required_scripts_dir + '/utils_motif_analysis/build_BSgenome/forge_BSgenome.R'
 
-        ##we will test the forge first and check if the seed_file works
+        cmd = 'Rscript ' + ipt_build_BSgenome_R_script + \
+              ' ' + step00_build_BSgenome_dir + '/seed_file.txt' + \
+              ' ' + step00_build_BSgenome_dir + \
+              ' ' + BSgenome_ID
+        print(cmd)
+        subprocess.call(cmd,shell=True)
+
+        ##use the linux to run
+        cmd = 'R CMD build ' + BSgenome_ID
+        print(cmd)
+        subprocess.call(cmd,shell=True)
+
+        cmd = 'R CMD check ' + BSgenome_ID + '_1.0.0.tar.gz'
+        print(cmd)
+        subprocess.call(cmd,shell=True)
+
+        cmd = 'R CMD INSTALL ' + BSgenome_ID + '_1.0.0.tar.gz'
+        print(cmd)
+        subprocess.call(cmd,shell=True)
+
+
 
 
 
