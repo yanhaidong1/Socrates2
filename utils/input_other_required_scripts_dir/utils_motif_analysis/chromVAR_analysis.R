@@ -334,7 +334,7 @@ getJasparMotifs_new <- function (species = "Homo sapiens", collection = "CORE", 
   opts["species"] <- species
   opts["collection"] <- collection
   opts <- c(opts, list(...))
-  out <- TFBSTools::getMatrixSet(JASPAR2022::JASPAR2022, opts)
+  out <- TFBSTools::getMatrixSet(JASPAR2024::JASPAR2024, opts)
   if (!isTRUE(all.equal(TFBSTools::name(out), names(out))))
     names(out) <- paste(names(out), TFBSTools::name(out),
                         sep = "_")
