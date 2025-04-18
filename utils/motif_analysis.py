@@ -94,9 +94,13 @@ def get_parsed_args():
 
     parser.add_argument("-BSgenome", dest = 'BSgenome_name', help = 'Provide a BSgenome name for the built genome of a species.')
 
+    parser.add_argument("-jasmotifmtx", dest = 'jasmotif_matrix', help = 'Provide a jasmotif matrix. This file is obtained from the github.')
 
+    ##the chromVAR needs the acr and meta files
 
     ##updating 040925
+
+
 
 
 
@@ -303,6 +307,39 @@ def main(argv=None):
                 print('please provide the BSgenome name that will be loaded from R')
                 return
 
+            if args.meta_file is None:
+                print('Cannot find cell meta file, please provide it')
+                return
+            else:
+                try:
+                    file = open(args.meta_file, 'r')  ##check if the file is not the right file
+                except IOError:
+                    print('There was an error opening the cell meta file!')
+                    return
+
+            if args.acr_file is None:
+                print('Cannot find ACR file, please provide it')
+                return
+            else:
+                try:
+                    file = open(args.acr_file, 'r')  ##check if the file is not the right file
+                except IOError:
+                    print('There was an error opening the ACR file!')
+                    return
+
+            if args.jasmotif_matrix is None:
+                print('Cannot find jasmotif matrix file, please provide it')
+                return
+            else:
+                try:
+                    file = open(args.jasmotif_matrix, 'r')  ##check if the file is not the right file
+                except IOError:
+                    print('There was an error opening the jasmotif matrix file!')
+                    return
+
+
+
+
 
         else:
 
@@ -485,6 +522,7 @@ def main(argv=None):
 
 
         ipt_R_script = input_required_scripts_dir + '/utils_motif_analysis/chromVAR_analysis.R'
+        print(ipt_R_script)
         ipt_peak_tn5_fl = args.acr_Tn5_file
         ipt_acr_fl = args.acr_file
         ipt_meta_fl = args.meta_file
@@ -502,7 +540,7 @@ def main(argv=None):
 
         ##for the GCBias
         store_final_parameter_line_list = []
-        store_final_parameter_line_list.append('fragment_counts <- addGCBias(fragment_counts, genome=' + BSgenome_name_str)
+        store_final_parameter_line_list.append('fragment_counts <- addGCBias(fragment_counts, genome=' + BSgenome_name_str + ')')
         with open(step02_motif_deviation_score_generation_dir + '/load_GCBias.config', 'w+') as opt:
             for eachline in store_final_parameter_line_list:
                 opt.write(eachline + '\n')
@@ -511,17 +549,20 @@ def main(argv=None):
         ##for the matchMotifs
         store_final_parameter_line_list = []
         store_final_parameter_line_list.append(
-            'motif <- matchMotifs(jaspmotifs, filtered_counts, genome = ' + BSgenome_name_str)
+            'motif <- matchMotifs(jaspmotifs, filtered_counts, genome = ' + BSgenome_name_str + ')')
         with open(step02_motif_deviation_score_generation_dir + '/load_matchMotifs.config', 'w+') as opt:
             for eachline in store_final_parameter_line_list:
                 opt.write(eachline + '\n')
         ipt_load_matchmotif_config_fl = step02_motif_deviation_score_generation_dir + '/load_matchMotifs.config'
+
+        ipt_jasmotif_mtx_fl = args.jasmotif_matrix
 
         cmd = 'Rscript ' + ipt_R_script + \
               ' ' + core_number_run + \
               ' ' + ipt_peak_tn5_fl + \
               ' ' + ipt_acr_fl + \
               ' ' + ipt_meta_fl + \
+              ' ' + ipt_jasmotif_mtx_fl + \
               ' ' + step02_motif_deviation_score_generation_dir + \
               ' ' + ipt_load_BSgenome_config_fl + \
               ' ' + ipt_load_GCBias_config_fl + \
