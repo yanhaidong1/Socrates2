@@ -24,16 +24,21 @@ peaks.in <- as.character(args[3])
 #species <- as.character(args[4]) ##eg. soybean;rice_MSU;rice_323
 
 meta <- read.delim(as.character(args[4]),row.names = 1)
+
+ipt_motif_rds_fl <- as.character(args[5])
+
 #rownames(meta) <- meta$cellID
-output_dir <- as.character(args[5])
+output_dir <- as.character(args[6])
+
+
 
 ##parameter
 #min_fragments_per_peak_val <- as.numeric(args[6]) ##for all organ version it is 2500
 min_fragments_per_peak_val <- 2000
 
-input_BSgenome_config_fl <- as.character(args[6])
-input_GCbias_config_fl <- as.character(args[7])
-input_motifmatch_config_fl <- as.character(args[8])
+input_BSgenome_config_fl <- as.character(args[7])
+input_GCbias_config_fl <- as.character(args[8])
+input_motifmatch_config_fl <- as.character(args[9])
 
 
 
@@ -74,7 +79,7 @@ library(SummarizedExperiment)
 library(GenomicAlignments)
 library(dplyr)
 library(TFBSTools)
-library(JASPAR2024)
+#library(JASPAR2024) we will not read the library as we already have 2022 one as teh input 
 library(pheatmap)
 library(circlize)
 
@@ -327,22 +332,27 @@ write.csv(as.data.frame(filtered_peaks),paste0(output_dir,'/temp_filtered_peaks.
 message("Running motif analysis ...")
 ##the chromVAR has function to get the JasparMotifs
 
-##updating 021721
+##updating 021721 it does no work
 getJasparMotifs_new <- function (species = "Homo sapiens", collection = "CORE", ...)
 {
   opts <- list()
   opts["species"] <- species
   opts["collection"] <- collection
   opts <- c(opts, list(...))
-  out <- TFBSTools::getMatrixSet(JASPAR2024::JASPAR2024, opts)
+  out <- TFBSTools::getMatrixSet(JASPAR2022::JASPAR2022, opts)
+  #out <- TFBSTools::getMatrixSet(JASPAR2024, opts)
   if (!isTRUE(all.equal(TFBSTools::name(out), names(out))))
     names(out) <- paste(names(out), TFBSTools::name(out),
                         sep = "_")
   return(out)
 }
 
+#################
+##updating 041725 debug we will import a known jaspmotifs
 message("get the motif devs score")
-jaspmotifs       <- getJasparMotifs_new(species = "Arabidopsis thaliana")
+#jaspmotifs       <- getJasparMotifs_new(species = "Arabidopsis thaliana")
+jaspmotifs <- readRDS(ipt_motif_rds_fl)
+
 
 source(input_motifmatch_config_fl)
 
