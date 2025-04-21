@@ -53,7 +53,7 @@ devtools::install_github("yanhaidong1/Socrates2", ref="main")
 
 [8. Identify cell-type-specific peak](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/call_diff_peaks.html)
 
-[9. Motif enrichment analysis](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/motif_enrichment.html)
+[9. Motif analysis](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/motif_analysis.html)
 
 [10. Trjectory analysis]
 
