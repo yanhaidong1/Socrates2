@@ -34,6 +34,9 @@ def get_parsed_args():
     parser.add_argument("-open_build_BSgenome", dest='open_build_BSgenome_lib',
                         help='This step helps users build a BSgenome library.')
 
+
+
+
     ##step 01
     parser.add_argument("-genome_fl", dest='genome_fasta_file', help='Povide a genome fasta file.')
 
@@ -98,8 +101,12 @@ def get_parsed_args():
 
     ##the chromVAR needs the acr and meta files
 
-    ##updating 040925
+    ##option 042425
+    ##add an option to smooth the deviation score
+    parser.add_argument("-open_smooth_dev_score", dest = 'open_smooth_motif_dev_score' ,help = 'Smooth the deviation score.'
+                                                                                               'Default: yes')
 
+    parser.add_argument("-svd_fl", dest = 'svd_file', help = 'If users initiate smooth deviation score step, they must provide the SVD file.')
 
 
 
@@ -135,6 +142,7 @@ def main(argv=None):
     open_prepare_data_enrichment_final = 'no'
     open_enrichment_test_final = 'no'
     down_sample_cell_final = 'yes'
+    open_smooth_motif_dev_score_final = 'yes'
 
 
     ##motif enrichment test
@@ -337,8 +345,35 @@ def main(argv=None):
                     print('There was an error opening the jasmotif matrix file!')
                     return
 
+            ##updating 042425
+            if args.open_smooth_motif_dev_score is None:
+                open_smooth_motif_dev_score_final = 'yes'
+            else:
+                if args.open_smooth_motif_dev_score == 'yes':
+                    open_smooth_motif_dev_score_final = 'yes'
+                else:
+                    if args.open_smooth_motif_dev_score == 'no':
+                        open_smooth_motif_dev_score_final = 'no'
+                    else:
+                        print("Please use \'-open_smooth_dev_score no\', to close this step")
+                        return
 
+            if open_smooth_motif_dev_score_final == 'yes':
 
+                if args.svd_file is None:
+                    print('Cannot find SVD file, please provide it')
+                    return
+                else:
+                    try:
+                        file = open(args.svd_file, 'r')  ##check if the file is not the right file
+                    except IOError:
+                        print('There was an error opening the SVD file!')
+                        return
+
+                if args.celltype_cluster_col_name is None:
+                    print('Please provide the name of column specifying the cell type identity in the meta file.')
+
+                    return
 
 
         else:
@@ -356,6 +391,12 @@ def main(argv=None):
 
         open_motif_deviation_score_final = 'no'
         #print("Users can use \'-open_motif_DevScore yes\', to open this step")
+
+
+    ##upating 042425
+
+
+
 
 
     ##build the BS genome
@@ -571,11 +612,36 @@ def main(argv=None):
         subprocess.call(cmd,shell=True)
 
 
+        ##updating 042425
+        if open_smooth_motif_dev_score_final == 'yes':
+
+            ipt_svd_fl = args.svd_file
+
+            ipt_motif_deviation_score_fl = step02_motif_deviation_score_generation_dir + '/' + 'motif.deviations.txt'
+
+            print('- open conduct smooth for the motif deviation score')
+
+            motif_smooth_script = input_required_scripts_dir + '/utils_motif_analysis/smooth_motif_deviation.R'
+
+            ipt_target_cluster_nm = args.celltype_cluster_col_name
+
+            cmd = 'Rscript ' + motif_smooth_script + \
+                  ' ' + ipt_meta_fl + \
+                  ' ' + ipt_motif_deviation_score_fl + \
+                  ' ' + ipt_svd_fl + \
+                  ' ' + sample_prefix_final + \
+                  ' ' + ipt_target_cluster_nm + \
+                  ' ' + step02_motif_deviation_score_generation_dir
+            print(cmd)
+            subprocess.call(cmd, shell=True)
+
+
+
     ######################
     ##Optional: help users to build the BSgenome
     if open_build_BSgenome_lib_final == 'yes':
 
-        step00_build_BSgenome_dir = output_dir + '/00_build_BSgenome_dir'
+        step00_build_BSgenome_dir = output_dir + '/step00_build_BSgenome_dir'
         if not os.path.exists(step00_build_BSgenome_dir):
             os.makedirs(step00_build_BSgenome_dir)
 
@@ -631,28 +697,30 @@ def main(argv=None):
             for eachline in store_final_line_list:
                 opt.write(eachline + '\n')
 
-        ##use the R to build the seed.dcf
-        ipt_build_BSgenome_R_script = input_required_scripts_dir + '/utils_motif_analysis/build_BSgenome/forge_BSgenome.R'
+        ##it does not work for the forge script so we will not help build the forage
 
-        cmd = 'Rscript ' + ipt_build_BSgenome_R_script + \
-              ' ' + step00_build_BSgenome_dir + '/seed_file.txt' + \
-              ' ' + step00_build_BSgenome_dir + \
-              ' ' + BSgenome_ID
-        print(cmd)
-        subprocess.call(cmd,shell=True)
+        ##use the R to build the seed.dcf
+        #ipt_build_BSgenome_R_script = input_required_scripts_dir + '/utils_motif_analysis/build_BSgenome/forge_BSgenome.R'
+
+        #cmd = 'Rscript ' + ipt_build_BSgenome_R_script + \
+        #      ' ' + step00_build_BSgenome_dir + '/seed_file.txt' + \
+        #      ' ' + step00_build_BSgenome_dir + \
+        #      ' ' + BSgenome_ID
+        #print(cmd)
+        #subprocess.call(cmd,shell=True)
 
         ##use the linux to run
-        cmd = 'R CMD build ' + BSgenome_ID
-        print(cmd)
-        subprocess.call(cmd,shell=True)
+        #cmd = 'R CMD build ' + BSgenome_ID
+        #print(cmd)
+        #subprocess.call(cmd,shell=True)
 
-        cmd = 'R CMD check ' + BSgenome_ID + '_1.0.0.tar.gz'
-        print(cmd)
-        subprocess.call(cmd,shell=True)
+        #cmd = 'R CMD check ' + BSgenome_ID + '_1.0.0.tar.gz'
+        #print(cmd)
+        #subprocess.call(cmd,shell=True)
 
-        cmd = 'R CMD INSTALL ' + BSgenome_ID + '_1.0.0.tar.gz'
-        print(cmd)
-        subprocess.call(cmd,shell=True)
+        #cmd = 'R CMD INSTALL ' + BSgenome_ID + '_1.0.0.tar.gz'
+        #print(cmd)
+        #subprocess.call(cmd,shell=True)
 
 
 
