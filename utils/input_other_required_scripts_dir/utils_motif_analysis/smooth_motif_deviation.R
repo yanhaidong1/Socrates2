@@ -176,7 +176,12 @@ message("loading data ...")
 a <- read.delim(input,row.names = 1)
 
 b <- t(as.matrix(read.table(motifs)))
-pcs <- read.table(pc.dat)
+
+##udpating 042425
+#pcs <- read.table(pc.dat)
+soc_obj <- readRDS(pc.dat)
+pcs <- soc_obj$svd
+
 ids <- intersect(rownames(a), colnames(b))
 ids <- intersect(ids, rownames(pcs))
 a <- a[ids,]
