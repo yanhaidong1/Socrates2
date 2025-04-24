@@ -106,8 +106,7 @@ def get_parsed_args():
     parser.add_argument("-open_smooth_dev_score", dest = 'open_smooth_motif_dev_score' ,help = 'Smooth the deviation score.'
                                                                                                'Default: yes')
 
-    parser.add_argument("-svd_fl", dest = 'svd_file', help = 'If users initiate smooth deviation score step, they must provide the SVD file.')
-
+    parser.add_argument("-soc_obj", dest='soc_object_fl', help='Provide an object obtained from the clustering step.')
 
 
 
@@ -360,14 +359,14 @@ def main(argv=None):
 
             if open_smooth_motif_dev_score_final == 'yes':
 
-                if args.svd_file is None:
-                    print('Cannot find SVD file, please provide it')
+                if args.soc_object_fl is None:
+                    print('Cannot find soc object file from clustering step, please provide it')
                     return
                 else:
                     try:
-                        file = open(args.svd_file, 'r')  ##check if the file is not the right file
+                        file = open(args.soc_object_fl, 'r')  ##check if the file is not the right file
                     except IOError:
-                        print('There was an error opening the SVD file!')
+                        print('There was an error opening the soc object file from clustering step!')
                         return
 
                 if args.celltype_cluster_col_name is None:
@@ -615,7 +614,7 @@ def main(argv=None):
         ##updating 042425
         if open_smooth_motif_dev_score_final == 'yes':
 
-            ipt_svd_fl = args.svd_file
+            ipt_svd_obj_fl = args.soc_object_fl
 
             ipt_motif_deviation_score_fl = step02_motif_deviation_score_generation_dir + '/' + 'motif.deviations.txt'
 
@@ -628,7 +627,7 @@ def main(argv=None):
             cmd = 'Rscript ' + motif_smooth_script + \
                   ' ' + ipt_meta_fl + \
                   ' ' + ipt_motif_deviation_score_fl + \
-                  ' ' + ipt_svd_fl + \
+                  ' ' + ipt_svd_obj_fl + \
                   ' ' + sample_prefix_final + \
                   ' ' + ipt_target_cluster_nm + \
                   ' ' + step02_motif_deviation_score_generation_dir
