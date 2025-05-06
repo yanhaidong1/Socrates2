@@ -377,7 +377,8 @@ gene accessibility</a> step)<br />
 4. <strong>-marker_fl</strong> (A marker gene file consisting of three
 tab-separated columns: the first column contains the gene ID, the second
 column lists the gene symbol, and the third column specifies the cell
-type represented by the gene.)<br />
+type represented by the gene. The column headers should be geneID,
+symbol, and type.)<br />
 5. <strong>-o output_dir</strong> (mkdir output_dir)<br />
 </p>
 <p><strong>Optional parameters:</strong><br />
@@ -461,6 +462,22 @@ chromatin accessibility of each marker gene. The outputs will return a
 single meta file recording predicted cell identity and also include
 several PNG image files that visualize the average performance of
 multiple marker genes within single UMAP file.</p>
+<p>Cell type annotation begins with (1) Cell Identity Enrichment, where
+marker-based Z-scores are calculated by comparing observed chromatin
+accessibility at marker loci against 1,000 permuted background
+distributions, generating cell-type-specific enrichment profiles while
+accounting for marker specificity through entropy-based filtering. These
+initial predictions are refined through (2) Smoothed Marker Enrichment,
+where a k=15 nearest-neighbor graph in PCA space facilitates
+diffusion-based smoothing (3 steps) of enrichment scores, effectively
+propagating confident local annotations while normalizing probabilities.
+The pipeline then employs (3) Weighted k-Nearest Neighbors (k=25) to
+propagate labels from high-confidence cells (top 5% by smoothed scores),
+with distance-weighted voting and secondary graph smoothing. Finally,
+(4) Logistic Regression (GLMnet) trains an L1-regularized classifier on
+genome-wide accessibility patterns from high-confidence cells, using
+10-fold cross-validation to optimize feature selection before applying
+identical diffusion smoothing to predictions.</p>
 <p><strong>Inputs</strong> (Required):<br />
 1. <strong>-open_aggregateAnnot yes</strong><br />
 2. <strong>-script_dir</strong> (a script directory downloaded from
