@@ -58,7 +58,9 @@ training_dt <- readRDS(input_training_exp_fl)
 #rownames(training_dt) <- training_dt[,1]  ## set rownames
 #training_dt <- training_dt[, -1]           ## remove the first variable
 
-testing_dt <- readRDS(input_testing_exp_fl)
+testing_obj <- readRDS(input_testing_exp_fl)
+##updating 050725 we will use the soc to be the test
+testing_dt <- testing_obj$gene_acc
 #rownames(testing_dt) <- testing_dt[,1]  ## set rownames
 #testing_dt <- testing_dt[, -1]           ## remove the first variable
 
