@@ -552,9 +552,9 @@ GitHub: Socrates2/utils/input_other_required_scripts_dir)<br />
 Socrates2)<br />
 5. <strong>-train_meta</strong> (input_reference_cell_meta_fl can be
 download from Socrates2)<br />
-6. <strong>-unknown_mtx</strong> (a matrix called
-opt_gene_body_accessibility_mtx.rds with cells need to be annotated,
-which was generated within <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html">4.
+6. <strong>-unknown_mtx</strong> (The <strong>*.atac.soc.rds</strong>
+object obtained from the output_dir/open_gene_accessibility_final_dir
+folder, which is generated during <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html">4.
 Prepare gene accessibility</a>)<br />
 7. <strong>-species</strong> (A species name needs to be
 specified)<br />
@@ -591,7 +591,7 @@ whether we will run the specific steps. Default: All)<br />
 -script_dir Socrates2/utils/input_other_required_scripts_dir
 -train_mtx input_reference_mtx  
 -train_meta input_reference_cell_meta_fl  
--unknown_mtx opt_gene_body_accessibility_mtx.rds
+-unknown_mtx /Path/to/*.atac.soc.rds
 -species rice
 -organ seedling</code></pre>
 <div class="figure">
