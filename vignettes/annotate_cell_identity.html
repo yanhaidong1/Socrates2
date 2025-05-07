@@ -478,6 +478,21 @@ with distance-weighted voting and secondary graph smoothing. Finally,
 genome-wide accessibility patterns from high-confidence cells, using
 10-fold cross-validation to optimize feature selection before applying
 identical diffusion smoothing to predictions.</p>
+<p>The final cluster-annotation functionality generates consensus cell
+type labels at the cluster level by aggregating single-cell predictions
+through a weighted voting system. For each Louvain cluster, it first
+filters out low-confidence “unknown” single-cell annotations from each
+method (smoothed marker enrichment, kNN, and logistic regression), then
+calculates the proportion of each cell type within the cluster. The
+final cluster label is assigned to the cell type with the highest
+proportion, with ties resolved by selecting the first occurring label.
+This process creates four new metadata columns
+(cluster_annotation_smooth, cluster_annotation_knn,
+cluster_annotation_glmnet) that represent method-specific cluster-level
+consensus calls, providing more robust annotations by leveraging
+agreement among cells within the same neighborhood while maintaining
+transparency about prediction confidence and method-specific
+discrepancies.</p>
 <p><strong>Inputs</strong> (Required):<br />
 1. <strong>-open_aggregateAnnot yes</strong><br />
 2. <strong>-script_dir</strong> (a script directory downloaded from
@@ -603,7 +618,7 @@ Find diff markers</a> step)<br />
 4. <strong>-gene_GO_fl</strong> (a GO file containing two tab-separated
 columns without a header. The first column represents the gene ID, while
 the second column lists the corresponding GO IDs, separated by
-commas.)<br />
+tabs.)<br />
 </p>
 <p><strong>Outputs:</strong><br />
 1. output_denovo_genes_GO_enrich.txt<br />
