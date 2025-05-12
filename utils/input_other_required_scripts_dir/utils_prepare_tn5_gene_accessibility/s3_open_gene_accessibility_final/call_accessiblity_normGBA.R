@@ -28,6 +28,8 @@ library(png)
 library(sctransform)
 library(ggplot2)
 
+options(future.globals.maxSize = 3000 * 1024^2)
+
 ##load data
 message(" - loading data ...")
 #if (file.exists(paste0(output_dir,'/temp_mtx.rds'))){
