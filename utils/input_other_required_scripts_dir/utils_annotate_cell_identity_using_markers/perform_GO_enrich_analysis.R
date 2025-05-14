@@ -18,7 +18,7 @@ output_dir <- as.character(args[5])
 
 #########
 ##step 01 read the soc and build the list of target gene files
-obj_dt <- readRDS()
+obj_dt <- readRDS(input_soc_obj_fl)
 
 rank_diff_gene_dt <- obj_dt$rank_diff_gene
 
