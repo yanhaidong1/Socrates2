@@ -55,7 +55,7 @@ devtools::install_github("yanhaidong1/Socrates2", ref="main")
 
 [9. Motif analysis](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/motif_analysis.html)
 
-[10. Trjectory analysis]
+[10. Trajectory analysis](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/trajectory_analysis.html)
 
 
 
