@@ -109,6 +109,8 @@ def get_parsed_args():
     parser.add_argument("-soc_obj", dest='soc_object_fl', help='Provide an object obtained from the clustering step.')
 
 
+    ##updating 050725
+    ##add a function to plot the smooth motif deviation in the UMAP
 
 
 

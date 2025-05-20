@@ -5,6 +5,8 @@
 ##it has two step
 ##step01 prepare the peak sparse file
 ##step02 make the DAR analysis
+##updating 051925 step03 find the diff peak among diff groups
+
 
 import argparse
 import glob
@@ -38,11 +40,17 @@ def get_parsed_args():
 
 
     ##step 02
-    parser.add_argument("-s2_open_diff_peak", dest='s2_open_diff_peak_call',help='Run the step 02 to call the DA peak.'
+    parser.add_argument("-s2_open_diff_ct_peak", dest='s2_open_diff_peak_call',help='Run the step 02 to call the DA peak per cell type.'
                                                                                  'Default: yes')
 
 
     parser.add_argument("-meta_fl", dest='meta_file', help='Provide the meta file recording cell identity information.')
+
+
+    ##updating 051925
+    ##step 03
+    parser.add_argument("-s3_open_diff_gp_peak", dest= 's3_open_diff_group_peak', help = 'Run the step 03 to call the DA peak for the specific group.'
+                                                                                         'Default: no')
 
 
     ##Optional
@@ -53,7 +61,7 @@ def get_parsed_args():
                         help='Define the cluster column name of the meta file.')
 
     parser.add_argument("-stat_test", dest='stat_test_method', help='Users need to provide the method used for the stat test. pnorm or perm.'
-                                                                    'Default: perm. ')
+                                                                    'Default: perm.')
 
     parser.add_argument("-threshold", dest='threshold_val', help = 'The threshold value for statistical testing.'
                                                                    'Default: 0.001')
@@ -66,6 +74,10 @@ def get_parsed_args():
 
     parser.add_argument("-prefix", dest = 'prefix_str', help = 'Prefix for output.'
                                                                'Default:opt')
+
+
+    ##updating 051925
+    parser.add_argument("-gp_colnm", dest = 'group_col_name', help = 'Users need to provide a group column name will be used for the diff peaks calling.')
 
 
     #parser.add_argument("-upsample_method", dest= 'upsampling_method',help = 'Users need to define the method used for the upsampling. Sample read or sample cell'
@@ -165,6 +177,25 @@ def main(argv=None):
             print('Users choose to close the open diff peak calling, please use \'-s2_open_diff_peak yes\' to open this step')
 
 
+    ##updating 051925
+    if args.s3_open_diff_group_peak is None:
+
+        s3_open_diff_group_peak_final = 'no'
+
+    else:
+
+        if args.s3_open_diff_group_peak == 'yes':
+            s3_open_diff_group_peak_final = 'yes'
+
+            if args.group_col_name is None:
+                print('Please provide a group column name within the meta file')
+                return
+
+
+        else:
+            print('Users choose to close the open diff peak calling per group, please use \'-s3_open_diff_gp_peak yes\' to open this step')
+            return
+
 
 
     store_final_parameter_line_list = []
@@ -225,6 +256,14 @@ def main(argv=None):
 
     store_final_parameter_line_list.append('prefix <- ' + '\'' + prefix_str_final + '\'')
 
+
+    ##updating 051925
+    if args.group_col_name is not None:
+        group_col_name_final = args.group_col_name
+    else:
+        group_col_name_final = 'na'
+
+    store_final_parameter_line_list.append('target_treat_colnm <- ' + '\'' + group_col_name_final + '\'')
 
 
     with open(output_dir + '/temp_defined_parameters.config', 'w+') as opt:
@@ -288,6 +327,34 @@ def main(argv=None):
             print('Please check the step01 and make sure opt_accessibility.txt and opt_peak.bed file existing in the s1_open_prepare_peak_tn5_final_dir/opt_prepare_peak_acc_dir')
 
 
+
+    if s3_open_diff_group_peak_final == 'yes':
+
+        print('Users will call the differential accessible peaks across defined group.')
+
+        s3_open_diff_group_peak_final_dir = output_dir + '/s3_open_diff_group_peak_final_dir'
+        if not os.path.exists(s3_open_diff_group_peak_final_dir):
+            os.makedirs(s3_open_diff_group_peak_final_dir)
+
+        R_script = input_required_scripts_dir + '/utils_diff_peak_calling/s3_call_treat_ctACR.Bootstrap.R'
+
+        ipt_peak_sparse_fl = output_dir + '/s1_open_prepare_peak_tn5_final/opt_prepare_peak_acc_dir/opt_accessibility.txt'
+        ipt_meta_fl = args.meta_file
+        ipt_peak_fl = output_dir + '/s1_open_prepare_peak_tn5_final/opt_prepare_peak_acc_dir/opt_peak.bed'
+
+        if os.path.isfile(ipt_peak_sparse_fl) == True:
+
+            cmd = 'Rscript ' + R_script + \
+                  ' ' + ipt_peak_sparse_fl + \
+                  ' ' + ipt_meta_fl + \
+                  ' ' + ipt_peak_fl + \
+                  ' ' + output_dir + '/temp_defined_parameters.config' + \
+                  ' ' + s3_open_diff_group_peak_final_dir
+            print(cmd)
+            subprocess.call(cmd,shell=True)
+
+        else:
+            print('Please check the step01 and make sure opt_accessibility.txt and opt_peak.bed file existing in the s1_open_prepare_peak_tn5_final_dir/opt_prepare_peak_acc_dir')
 
 
 
