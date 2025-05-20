@@ -101,7 +101,8 @@ def step03_prepare_gene_sparse (input_other_required_scripts_dir,input_tn5_bed_f
     input_target_required_pipeline_scripts_dir = input_other_required_scripts_dir
 
     prepare_sparse_script = input_target_required_pipeline_scripts_dir + '/step03_prepare_nonbinary_gene_sparse_fl.py'
-    nbfastSparsetn5_pl_script = input_target_required_pipeline_scripts_dir + '/fastSparse.nonbinary.peak.pl'
+    ##updating 052025 change pl to py
+    nbfastSparsetn5_pl_script = input_target_required_pipeline_scripts_dir + '/fastSparse.nonbinary.peak.py'
 
     input_gene_bed_fl = input_output_dir + '/opt_genes_500bpTSS_sorted.bed'
 
