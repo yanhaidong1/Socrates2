@@ -436,7 +436,9 @@ def main(argv=None):
 
             ipt_genomic_fl = args.genomic_bed_file
             ipt_genome_fai_fl = args.genome_fai_file
-            ipt_nobinary_script = input_required_scripts_dir + '/utils_prepare_tn5_gene_accessibility/s1_open_build_black_final/genomic_black/fastSparse.nonbinary.peak.pl'
+            #ipt_nobinary_script = input_required_scripts_dir + '/utils_prepare_tn5_gene_accessibility/s1_open_build_black_final/genomic_black/fastSparse.nonbinary.peak.pl'
+            ##updating 052025
+            ipt_nobinary_script = input_required_scripts_dir + '/utils_prepare_tn5_gene_accessibility/s1_open_build_black_final/genomic_black/fastSparse.nonbinary.peak.py'
 
             cmd = 'python ' + ipt_intersect_python_script + \
                   ' ' + ipt_genomic_fl + \
