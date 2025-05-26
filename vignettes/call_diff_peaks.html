@@ -399,8 +399,9 @@ cell_identity</strong>.)</p>
 1. <strong>-s1_open_prepare yes|no</strong> (Run the step 01 to prepare
 the files for differentially accessible peaks calling. Default:
 yes)<br />
-2. <strong>-s2_open_diff_peak yes|no</strong> (Run the step 02 to call
-the differentially accessible peaks. Default: yes)<br />
+2. <strong>-s2_open_diff_ct_peak yes|no</strong> (Run the step 02 to
+call the differentially accessible peaks per cell type. Default:
+yes)<br />
 3. <strong>-core</strong> (Set cores we will use for the parallele
 analysis. Default: 1)<br />
 4. <strong>-stat_test</strong> (Users need to provide the method used
@@ -413,10 +414,11 @@ to generate. Default: 1000)<br />
 the entropy metric to generate. Default: 1000)<br />
 8. <strong>-prefix</strong> (Prefix for output. Default: opt)<br />
 </p>
-<p><strong>Outputs</strong><br />
-1.
-output_dir/s2_open_diff_peak_call_final_dir/<strong>opt.all_ACRs.classified.bed</strong><br />
-</p>
+<div id="option-1-call-cell-type-specific-acrs" class="section level3">
+<h3>Option 1: Call cell-type-specific ACRs</h3>
+<p>This option is used to identify cell-type-specific ACRs. Users must
+specify the column name in the metadata file that contains cell type
+information using the <code>-ct_colnm</code> parameter.</p>
 <p><strong>Running</strong>:<br />
 </p>
 <pre class="bash"><code>python Socrates2/utils/diff_peak_calling.py
@@ -427,6 +429,42 @@ output_dir/s2_open_diff_peak_call_final_dir/<strong>opt.all_ACRs.classified.bed<
 -meta_fl final_meta.txt
 -ct_colnm cell_identity
 -core 20</code></pre>
+<p><strong>Outputs</strong><br />
+1.
+output_dir/s2_open_diff_peak_call_final_dir/<strong>opt.all_ACRs.classified.bed</strong><br />
+</p>
+</div>
+<div id="option-2-call-group-specific-acrs" class="section level3">
+<h3>Option 2: Call group-specific ACRs</h3>
+<p>This option is used to identify group-specific ACRs. Users must
+provide a metadata file and specify the column containing cell type
+information using the <code>-ct_colnm</code> parameter, as well as the
+column containing group information using the <code>-gp_colnm</code>
+parameter. This function will identify group-specific ACRs within each
+cell type. For example, if users have treatment and control groups, it
+can be used to detect ACRs that exhibit significantly higher or lower
+chromatin accessibility in the treatment group compared to the
+control.</p>
+<p><strong>Running</strong>:<br />
+</p>
+<pre class="bash"><code>python Socrates2/utils/diff_peak_calling.py
+-script_dir Socrates2/utils/input_other_required_scripts_dir
+-o output_dir
+-s2_open_diff_ct_peak no
+-s3_open_diff_gp_peak yes
+-peak_fl opt_final.*.bed
+-tn5_fl opt_tn5_mq10_sorted.bed
+-meta_fl final_meta.txt
+-ct_colnm cell_identity
+-gp_colnm treatment_group
+-core 20</code></pre>
+<p><strong>Outputs</strong><br />
+1.
+output_dir/s3_open_diff_group_peak_final_dir/<em>/<strong>opt.all_ACRs.classified.bed</strong><br />
+2.
+output_dir/s3_open_diff_group_peak_final_dir/</em>/<strong>opt.*.cts.ACRs.bed</strong><br />
+</p>
+</div>
 </div>
 
 
