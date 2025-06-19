@@ -1,5 +1,7 @@
 # run Socrates on merged socrates object #
 
+##updating 031225 we will not build the subclustering as it will complex the processing, high res will solve the issue
+##updating 031125 we will open the win sparse in order to perform the subclustering
 ##updating 020225 we will add the parameter of harmony function
 ##updating 010525 we will return a prefix.atac.soc.rds file
 ##updating 011124 we will set an option to remove the temp file
@@ -145,6 +147,10 @@ mergeSocObjects <- function(obj.list){
   metas <- do.call(rbind, metas)
   rownames(metas) <- metas$cellID
   
+  ##updating 061925
+  ##we will still open this one
+  metas$library <- data.frame(do.call(rbind, strsplit(rownames(metas), "-")))[,2]
+  
   ##udpating 021925 we will mute this library as we have developed this library before
   #metas$library <- data.frame(do.call(rbind, strsplit(rownames(metas), "-")))[,2]
   
@@ -256,22 +262,24 @@ if (only_cluster == 'no'){
             obj$counts <- obj$counts[,Matrix::colSums(obj$counts)>0]
             obj$meta <- obj$meta[colnames(obj$counts),]
             
+            
+            ##updating 061925 close the following
             ##updating 021925
             ##modify the meta file add the lib to the cell barcode
-            libnm <- gsub('.filtered.soc.rds','',x)
-            obj_meta <- obj$meta
-            obj_counts <- obj$counts
+            #libnm <- gsub('.filtered.soc.rds','',x)
+            #obj_meta <- obj$meta
+            #obj_counts <- obj$counts
             
-            obj_meta$library <- libnm
-            obj_meta$cellID <- gsub('-.+','',obj_meta$cellID)
-            obj_meta$cellID <- paste0(obj_meta$cellID,'-',libnm)
-            rownames(obj_meta) <- obj_meta$cellID
+            #obj_meta$library <- libnm
+            #obj_meta$cellID <- gsub('-.+','',obj_meta$cellID)
+            #obj_meta$cellID <- paste0(obj_meta$cellID,'-',libnm)
+            #rownames(obj_meta) <- obj_meta$cellID
             
-            colnames(obj_counts) <- gsub('-.+','',colnames(obj_counts))
-            colnames(obj_counts) <- paste0(colnames(obj_counts),'-',libnm)
+            #colnames(obj_counts) <- gsub('-.+','',colnames(obj_counts))
+            #colnames(obj_counts) <- paste0(colnames(obj_counts),'-',libnm)
             
-            obj$counts <- obj_counts
-            obj$meta <- obj_meta
+            #obj$counts <- obj_counts
+            #obj$meta <- obj_meta
             ####################
             
             return(obj)
@@ -458,6 +466,7 @@ if (do_harmony == 'yes'){
   #write.table(nmf.rd, file=paste0(input_output_dir,'/',aft_clust_out,'_rHM_reduced_dimensions.txt'), quote=F, row.names=T, col.names=T, sep="\t")
   # # save data --------------------------------------------------------------
   #saveRDS(soc.obj, file=paste0(input_output_dir,'/',aft_clust_out,".rHM.processed_final.rds"))
+  
   
   ##return a win matrix
   #mtx_m <- soc.obj$counts
