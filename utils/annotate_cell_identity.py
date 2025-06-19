@@ -7,6 +7,7 @@ import os
 import subprocess
 import re
 
+##updating 061925 we will add a new function to obtain the PerM per cell type
 ##updating 031225 add the final meta building
 ##updating 022025 add GO enrichment test
 ##this pipeline is to annotate cell identity including several methods:
@@ -91,6 +92,14 @@ def get_parsed_args():
     parser.add_argument("-dot_size",dest = 'dot_size_num',help = 'Specify the size of dot size of the UMAP.'
                                                                  'Default: 0.2.')
 
+
+    ##step 06
+    parser.add_argument("-open_gene_CPM", dest = 'open_cal_gene_CPM', help = 'This function is to calculate the CPM per gene.')
+
+    parser.add_argument("-meta_fl", dest = 'meta_file', help = 'Provide a meta file that could be used for the CPM calculation.')
+
+    parser.add_argument("-celltype_col",  dest = 'celltype_column_name', help = 'Provide a cell type column name.d'
+                                                                                'Default: cell_identity')
 
 
     ##parse of parameters
@@ -304,6 +313,39 @@ def main(argv=None):
 
         else:
             open_add_cell_annot_identity_final = 'no'
+
+
+    ##updating 061925
+    if args.open_cal_gene_CPM is None:
+        open_cal_gene_CPM_final = 'no'
+    else:
+        if args.open_cal_gene_CPM == 'yes':
+            open_cal_gene_CPM_final = 'yes'
+
+            if args.soc_object_fl is None:
+                print('Cannot find the soc object file, please provide it')
+                return
+            else:
+                try:
+                    file = open(args.soc_object_fl, 'r')  ##check if the file is not the right file
+                except IOError:
+                    print('There was an error opening the soc object file!')
+                    return
+
+            if args.meta_file is None:
+                print('Cannot find the final meta file, please provide it')
+                return
+            else:
+                try:
+                    file = open(args.meta_file, 'r')  ##check if the file is not the right file
+                except IOError:
+                    print('There was an error opening the final meta file!')
+                    return
+
+
+        else:
+            open_cal_gene_CPM_final = 'no'
+
 
 
     if args.dot_size_num is not None:
@@ -572,6 +614,47 @@ def main(argv=None):
         print(cmd)
         subprocess.call(cmd,shell=True)
 
+
+    ##udpating 061925
+    if open_cal_gene_CPM_final == 'yes':
+
+        print('Users choose to open calculate the CPM of gene per cell type')
+
+        open_cal_gene_CPM_final_dir = output_dir + '/open_cal_gene_CPM_final_dir'
+        if not os.path.exists(open_cal_gene_CPM_final_dir):
+            os.makedirs(open_cal_gene_CPM_final_dir)
+
+
+        plot_getPerM_script = input_required_scripts_dir + '/utils_annotate_cell_identity_using_markers/getPerM_celltypes.R'
+
+        if args.celltype_column_name is None:
+            celltype_column_name_final = 'cell_identity'
+        else:
+            celltype_column_name_final = args.celltype_column_name
+
+        input_soc_obj_fl = args.soc_object_fl
+        input_meta_fl = args.meta_file
+        input_clust_col_nm = celltype_column_name_final
+
+        if re.match('.+/(.+)\.atac\.soc\.rds', input_soc_obj_fl):
+            mt = re.match('.+/(.+)\.atac\.soc\.rds', input_soc_obj_fl)
+            input_prefix = mt.group(1)
+        else:
+            if re.match('(.+)\.atac\.soc\.rds', input_soc_obj_fl):
+                mt = re.match('(.+)\.atac\.soc\.rds', input_soc_obj_fl)
+                input_prefix = mt.group(1)
+            else:
+                print('Please use *.atac.soc.rds file without changing the file name')
+                return
+
+        cmd = 'Rscript ' + plot_getPerM_script + \
+              ' ' + input_soc_obj_fl + \
+              ' ' + input_meta_fl + \
+              ' ' + input_clust_col_nm + \
+              ' ' + open_cal_gene_CPM_final_dir + \
+              ' ' + input_prefix
+        print(cmd)
+        subprocess.call(cmd,shell=True)
 
 
 
