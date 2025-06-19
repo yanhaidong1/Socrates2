@@ -13,10 +13,10 @@ import sys
 import os
 
 
-from input_other_required_scripts_dir.utils_cell_type_peak_calling_dir import step01_prepare_tn5_file_per_celltype as s1_tn5
-from input_other_required_scripts_dir.utils_cell_type_peak_calling_dir import step02_call_peak_per_celltype as s2_pcall
-from input_other_required_scripts_dir.utils_cell_type_peak_calling_dir import step03_filter_combine_all_peak as s3_fpeak
-from input_other_required_scripts_dir.utils_cell_type_peak_calling_dir import step04_build_bigwig_file as s4_bigwig
+from input_other_required_scripts_dir.utils_cell_type_peak_calling_dir_python import step01_prepare_tn5_file_per_celltype as s1_tn5
+from input_other_required_scripts_dir.utils_cell_type_peak_calling_dir_python import step02_call_peak_per_celltype as s2_pcall
+from input_other_required_scripts_dir.utils_cell_type_peak_calling_dir_python import step03_filter_combine_all_peak as s3_fpeak
+from input_other_required_scripts_dir.utils_cell_type_peak_calling_dir_python import step04_build_bigwig_file as s4_bigwig
 
 def get_parsed_args():
 
@@ -248,7 +248,7 @@ def main(argv=None):
         final_FDR_string = args.FDR_string
 
 
-    utils_cell_type_peak_calling_dir = input_required_scripts_dir + '/utils_cell_type_peak_calling_dir'
+    utils_cell_type_peak_calling_dir = input_required_scripts_dir + '/utils_cell_type_peak_calling_dir_python'
 
 
 

@@ -15,7 +15,7 @@ import os
 import subprocess
 
 
-from input_other_required_scripts_dir.utils_diff_peak_calling import s1_make_peak_sparse as s1_prepare
+from input_other_required_scripts_dir.utils_diff_peak_calling_python import s1_make_peak_sparse as s1_prepare
 
 
 def get_parsed_args():
@@ -282,7 +282,7 @@ def main(argv=None):
 
         input_peak_fl = args.peak_file
         input_tn5_bed_fl = args.tn5_bed_file
-        input_fastSparsetn5_pl = input_required_scripts_dir + '/utils_diff_peak_calling/fastSparse.tn5.pl'
+        input_fastSparsetn5_pl = input_required_scripts_dir + '/utils_diff_peak_calling_python/fastSparse.tn5.py'
 
         s1_prepare.make_sparse (input_peak_fl,input_tn5_bed_fl,input_fastSparsetn5_pl,
                                 s1_open_prepare_peak_tn5_final_dir)
@@ -304,7 +304,7 @@ def main(argv=None):
         if not os.path.exists(s2_open_diff_peak_call_final_dir):
             os.makedirs(s2_open_diff_peak_call_final_dir)
 
-        R_script = input_required_scripts_dir + '/utils_diff_peak_calling/s2_call_ctACR.Bootstrap.R'
+        R_script = input_required_scripts_dir + '/utils_diff_peak_calling_python/s2_call_ctACR.Bootstrap.R'
 
 
         ipt_peak_sparse_fl = output_dir + '/s1_open_prepare_peak_tn5_final/opt_prepare_peak_acc_dir/opt_accessibility.txt'
@@ -336,7 +336,7 @@ def main(argv=None):
         if not os.path.exists(s3_open_diff_group_peak_final_dir):
             os.makedirs(s3_open_diff_group_peak_final_dir)
 
-        R_script = input_required_scripts_dir + '/utils_diff_peak_calling/s3_call_treat_ctACR.Bootstrap.R'
+        R_script = input_required_scripts_dir + '/utils_diff_peak_calling_python/s3_call_treat_ctACR.Bootstrap.R'
 
         ipt_peak_sparse_fl = output_dir + '/s1_open_prepare_peak_tn5_final/opt_prepare_peak_acc_dir/opt_accessibility.txt'
         ipt_meta_fl = args.meta_file
