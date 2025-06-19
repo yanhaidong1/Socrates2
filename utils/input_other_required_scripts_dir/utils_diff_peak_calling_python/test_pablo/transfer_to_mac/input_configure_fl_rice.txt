@@ -1,0 +1,8 @@
+step01=no
+step02=yes
+s2_prefix=rice
+s2_target_cluster=Final_annotation_TCP_up
+s2_threshold=.0001
+s2_stat_test=perm
+s2_null_permutations=2000
+s2_entropy_bootstraps=2000
