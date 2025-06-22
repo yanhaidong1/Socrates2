@@ -11,7 +11,7 @@ input_soc_object <- readRDS(input_soc_object_fl)
 
 ipt_meta_dt <- input_soc_object$meta
 
-write.table(ipt_meta_dt,paste0(input_output_dir,'/temp_meta_fl.txt'))
+write.table(ipt_meta_dt,paste0(input_output_dir,'/temp_meta_fl.txt'),quote = F,sep = '\t')
 
 
 
