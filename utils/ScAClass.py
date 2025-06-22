@@ -9,7 +9,7 @@ import subprocess
 import re
 import glob
 
-
+##updating 062225 we will use the obj as the input for the ScAClass
 ##updating 110424 we will set the tissue and organ to be the reference
 ##updating 102224 we will split the training into different part to run the data to reduce the time by setting a low mem option
 ##updating 090723 add a step to update the clusterings
@@ -50,7 +50,13 @@ def get_parsed_args():
     parser.add_argument("-top_ft_num", dest = 'top_variant_ft_num', help = 'Once the low mem open, users could set a top variant ft number.')
 
 
-    parser.add_argument("-clustering_fl", dest='clustering_fl_path', help = 'Provide a clustering file to build a clustering based annotation.')
+    #parser.add_argument("-clustering_fl", dest='clustering_fl_path', help = 'Provide a clustering file to build a clustering based annotation.')
+
+    ##updating 062225
+    parser.add_argument("-clust_soc_obj", dest = 'clust_soc_obj_fl', help = 'Provide a clustering object to build a clustering based annotation.')
+
+
+
 
     parser.add_argument("-running_steps", dest='running_steps', help = 'Provide running steps to check whether we will run the specific steps.'
                                                                        'Format is -running_steps 1,2,3,4'
@@ -123,12 +129,22 @@ def main(argv=None):
             print('There was an error opening the train meta file!')
             return
 
-    if args.clustering_fl_path is not None:
+    #if args.clustering_fl_path is not None:
+    #    try:
+    #        file = open(args.clustering_fl_path, 'r')  ##check if the file is not the right file
+    #    except IOError:
+    #        print('There was an error opening the clustering file!')
+    #        return
+
+    if args.clust_soc_obj_fl is not None:
         try:
-            file = open(args.clustering_fl_path, 'r')  ##check if the file is not the right file
+            file = open(args.clust_soc_obj_fl, 'r')  ##check if the file is not the right file
         except IOError:
-            print('There was an error opening the clustering file!')
+            print('There was an error opening the clustering object file!')
             return
+
+
+
 
     if args.species_name is None:
         print('Cannot find species name, please provide it')
@@ -200,7 +216,7 @@ def main(argv=None):
 
     if args.running_steps is None:
 
-        if args.clustering_fl_path is not None:
+        if args.clust_soc_obj_fl is not None:
             final_running_steps = '1,2,3,4'
             final_running_steps_list = final_running_steps.split(',')
         else:
@@ -422,7 +438,6 @@ def main(argv=None):
             for eachline in store_final_line_list:
                 opt.write(eachline + '\n')
 
-
     ########
     ##step04
     ##build another cell type annotation based on the clustering results
@@ -432,11 +447,20 @@ def main(argv=None):
         print ('Step 4 use the clustering file to update the cell identities')
         ipt_script = utils_dir + '/Step04_update_cell_identity_by_cluster.py'
         cmd = 'python ' + ipt_script + \
-              ' ' + args.clustering_fl_path + \
+              ' ' + args.clust_soc_obj_fl + \
+              ' ' + utils_dir + '/Step04_read_soc_obj.R' + \
               ' ' + output_dir + '/opt_final_cell_annotation.txt' + \
               ' ' + output_dir
         print(cmd)
         subprocess.call(cmd,shell=True)
+
+        ##updating 121324
+        ##if we provide the clustering file with UMAP it will automatically build the UMAP with annotated cell information.
+
+
+
+
+
 
 
 
