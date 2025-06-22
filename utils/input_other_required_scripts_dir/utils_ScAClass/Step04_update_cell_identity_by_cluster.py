@@ -8,16 +8,28 @@ import sys
 import subprocess
 import os
 
-input_clustering_fl = sys.argv[1]
-input_cell_prediction_fl = sys.argv[2]
-input_output_dir = sys.argv[3]
 
-def update_prediction_by_cluster (input_clustering_fl,input_cell_prediction_fl,input_output_dir):
+input_clustering_fl = sys.argv[1]
+input_Rscript_fl = sys.argv[2]
+input_cell_prediction_fl = sys.argv[3]
+input_output_dir = sys.argv[4]
+
+def update_prediction_by_cluster (input_clustering_fl,input_Rscript_fl,input_cell_prediction_fl,input_output_dir):
+
+
+    cmd = 'Rscript ' + input_Rscript_fl + \
+          ' ' + input_clustering_fl + \
+          ' ' + input_output_dir
+    print(cmd)
+    subprocess.call(cmd,shell=True)
+
+    ipt_cluster_meta_fl = input_output_dir + '/temp_meta_fl.txt'
+
 
     ##eachPC + '\t' + eachmethod + '\t' + eachcell + '\t' + final_annot
     store_cluster_cell_list_dic = {}
     count = 0
-    with open (input_clustering_fl,'r') as ipt:
+    with open (ipt_cluster_meta_fl,'r') as ipt:
         for eachline in ipt:
             eachline = eachline.strip('\n')
             col = eachline.strip().split()
@@ -108,7 +120,7 @@ def update_prediction_by_cluster (input_clustering_fl,input_cell_prediction_fl,i
 
     store_final_line_list = []
     count = 0
-    with open (input_clustering_fl,'r') as ipt:
+    with open (ipt_cluster_meta_fl,'r') as ipt:
         for eachline in ipt:
             eachline = eachline.strip('\n')
             col = eachline.strip().split()
@@ -135,7 +147,7 @@ def update_prediction_by_cluster (input_clustering_fl,input_cell_prediction_fl,i
         for eachline in store_final_line_list:
             opt.write(eachline + '\n')
 
-update_prediction_by_cluster (input_clustering_fl,input_cell_prediction_fl,input_output_dir)
+update_prediction_by_cluster (input_clustering_fl,input_Rscript_fl,input_cell_prediction_fl,input_output_dir)
 
 
 
