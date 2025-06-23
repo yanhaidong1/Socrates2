@@ -520,13 +520,22 @@ built.</p></li>
 -genome_fl Socrates2/raw_input_data/gene.fa
 -BSgenome riceV7</code></pre>
 <p>After generating the <strong>seed_file.txt</strong> and
-<strong>scr_seqdir</strong>, users should use these files to install the
-<strong>BSgenome</strong> package. The installation must be performed in
-a Linux environment.<br />
-Additionally, users may edit the <strong>seed_file.txt</strong> to
-specify a more accurate version if needed. In the following example,
-version <strong>1.0.0</strong> is used.<br />
+<strong>scr_seqdir</strong>, users should use these files to forage the
+<strong>BSgenome</strong> package in <strong>R
+environment</strong>.<br />
+Users may edit the <strong>seed_file.txt</strong> to specify a more
+accurate version if needed. In the following example, version
+<strong>1.0.0</strong> is used.<br />
 </p>
+<p><strong>Running</strong>:<br />
+</p>
+<pre class="r"><code>library(BSgenome)
+my_file &lt;- read.dcf(&quot;seed_file.txt&quot;, fields = NULL, all = FALSE, keep.white = NULL) 
+write.dcf(my_file , file = &quot;seed.dcf&quot;, append = FALSE, useBytes = FALSE, indent = 0.1 * getOption(&quot;width&quot;), width = 0.9 * getOption(&quot;width&quot;), keep.white = NULL)
+unlink(c(&quot;riceV7&quot;), recursive = TRUE, force = TRUE)
+forgeBSgenomeDataPkg(&quot;seed.dcf&quot;)</code></pre>
+<p>After the foraging step, the next installation must be performed in
+<strong>Linux environment</strong>.</p>
 <p><strong>Running</strong>:<br />
 </p>
 <pre class="bash"><code>R CMD build riceV7
