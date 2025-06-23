@@ -402,17 +402,21 @@ yes)<br />
 2. <strong>-s2_open_diff_ct_peak yes|no</strong> (Run the step 02 to
 call the differentially accessible peaks per cell type. Default:
 yes)<br />
-3. <strong>-core</strong> (Set cores we will use for the parallele
+3. <strong>-s3_open_diff_gp_peak yes|no</strong> (Run the step 03 to
+call group-specific peaks per cell type. Default: no)<br />
+4. <strong>-core</strong> (Set cores we will use for the parallele
 analysis. Default: 1)<br />
-4. <strong>-stat_test</strong> (Users need to provide the method used
+5. <strong>-stat_test</strong> (Users need to provide the method used
 for the stat test. pnorm or perm. Default: perm.)<br />
-5. <strong>-threshold</strong> (The threshold value for statistical
+6. <strong>-threshold</strong> (The threshold value for statistical
 testing. Default: 0.001)<br />
-6. <strong>-null_permutations</strong> (The number of null permutations
+7. <strong>-null_permutations</strong> (The number of null permutations
 to generate. Default: 1000)<br />
-7. <strong>-entropy_bootstraps</strong> (The number of bootstraps for
+8. <strong>-entropy_bootstraps</strong> (The number of bootstraps for
 the entropy metric to generate. Default: 1000)<br />
-8. <strong>-prefix</strong> (Prefix for output. Default: opt)<br />
+9. <strong>-prefix</strong> (Prefix for output. Default: opt)<br />
+10. <strong>-gp_colnm</strong> (The column containing group information
+used to call group-specific peaks.)<br />
 </p>
 <div id="option-1-call-cell-type-specific-acrs" class="section level3">
 <h3>Option 1: Call cell-type-specific ACRs</h3>
