@@ -659,10 +659,19 @@ def main(argv=None):
 
         store_chr_list = []
         for eachid in store_seq_dic:
+
+            ##add the fa or fasta at the same time
+            opt_fl_nm = eachid + '.fa'
+            with open(src_seqdir + '/' + opt_fl_nm, 'w+') as opt:
+                opt.write('>' + eachid + '\n' + store_seq_dic[eachid])
+
             opt_fl_nm = eachid + '.fasta'
             with open(src_seqdir + '/' + opt_fl_nm, 'w+') as opt:
                 opt.write('>' + eachid + '\n' + store_seq_dic[eachid])
+
             store_chr_list.append(eachid)
+
+
 
         abs_src_seqdir_path = os.path.abspath(src_seqdir)
 
