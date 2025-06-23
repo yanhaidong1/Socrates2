@@ -7,6 +7,8 @@ import os
 from multiprocessing import Pool
 import numpy as np
 
+##updating 062325 fix issue of filtering big peak
+
 
 def multi_run_step02(args):
     return call_peaks_MACS2_prepare_tn5_peak(*args)
@@ -55,6 +57,24 @@ def running_macs2 (ipt_bed_fl,g_size,opt_dir,clustid,pval_or_qval,pqval_num,
               ' --bdg ' + \
               ' -n cluster.' + clustid + '.macs2'
         subprocess.call(cmd, shell=True)
+
+
+##updating 062325
+def filter_out_big_peak (ipt_peak_fl,ipt_opt_dir,organ_ct_nm):
+
+    store_final_line_list = []
+    with open (ipt_peak_fl,'r') as ipt:
+        for eachline in ipt:
+            eachline = eachline.strip('\n')
+            col = eachline.strip().split()
+            if (int(col[2]) - int(col[1])) < 1000:
+                store_final_line_list.append(eachline)
+
+    with open (ipt_opt_dir + '/cluster.' + organ_ct_nm + '.macs2_peaks.flt.narrowPeak','w+') as opt:
+        for eachline in store_final_line_list:
+            opt.write(eachline + '\n')
+
+
 
 def intersect_predicted_peak_bed_fl (peak_fl,final_bed_fl,opt_dir,store_raw_peak_intersect_dir):
 
@@ -197,7 +217,10 @@ def call_peaks_MACS2_prepare_tn5_peak (input_dir_list,
                             running_macs2(final_bed_fl, g_size, opt_dir, organ_ct_nm, pval_or_qval, pqval_num,SLOCAL, LLOCAL, max_gap,extsize,shiftsize)
 
                             ##intersect with predicted peaks
-                            peak_fl = opt_dir + '/cluster.' + organ_ct_nm + '.macs2_peaks.narrowPeak'
+                            temp_peak_fl = opt_dir + '/cluster.' + organ_ct_nm + '.macs2_peaks.narrowPeak'
+                            filter_out_big_peak(temp_peak_fl, opt_dir, organ_ct_nm)
+                            peak_fl = opt_dir + '/cluster.' + organ_ct_nm + '.macs2_peaks.flt.narrowPeak'
+
                             cmd = 'cp ' + peak_fl + ' ' + store_MACS2_raw_peak_dir
                             subprocess.call(cmd,shell=True)
                             intersect_predicted_peak_bed_fl(peak_fl, final_bed_fl, opt_dir,store_raw_peak_intersect_dir)
@@ -205,7 +228,7 @@ def call_peaks_MACS2_prepare_tn5_peak (input_dir_list,
                         if s2_open_permute == 'yes':
                             ##updating 032422 we will continue for the function
                             ##shuffle
-                            peak_fl = opt_dir + '/cluster.' + organ_ct_nm + '.macs2_peaks.narrowPeak'
+                            peak_fl = opt_dir + '/cluster.' + organ_ct_nm + '.macs2_peaks.flt.narrowPeak'
                             permute_random_regions(final_bed_fl, input_gff_fl, peak_fl, opt_dir, input_ref_fai_fl, organ_ct_nm,store_control_peak_dir,input_unmappable_fl)
 
                 else:
@@ -218,7 +241,10 @@ def call_peaks_MACS2_prepare_tn5_peak (input_dir_list,
                                       max_gap,extsize,shiftsize)
 
                         ##intersect with predicted peaks
-                        peak_fl = opt_dir + '/cluster.' + organ_ct_nm + '.macs2_peaks.narrowPeak'
+                        temp_peak_fl = opt_dir + '/cluster.' + organ_ct_nm + '.macs2_peaks.narrowPeak'
+                        filter_out_big_peak(temp_peak_fl, opt_dir, organ_ct_nm)
+                        peak_fl = opt_dir + '/cluster.' + organ_ct_nm + '.macs2_peaks.flt.narrowPeak'
+
                         cmd = 'cp ' + peak_fl + ' ' + store_MACS2_raw_peak_dir
                         subprocess.call(cmd, shell=True)
                         intersect_predicted_peak_bed_fl(peak_fl, final_bed_fl, opt_dir, store_raw_peak_intersect_dir)
@@ -226,7 +252,7 @@ def call_peaks_MACS2_prepare_tn5_peak (input_dir_list,
                     ##updating 032422 we will continue for the function
                     ##shuffle
                     if s2_open_permute == 'yes':
-                        peak_fl = opt_dir + '/cluster.' + organ_ct_nm + '.macs2_peaks.narrowPeak'
+                        peak_fl = opt_dir + '/cluster.' + organ_ct_nm + '.macs2_peaks.flt.narrowPeak'
 
                         permute_random_regions(final_bed_fl, input_gff_fl, peak_fl, opt_dir, input_ref_fai_fl, organ_ct_nm,
                                                store_control_peak_dir, input_unmappable_fl)
@@ -248,7 +274,10 @@ def call_peaks_MACS2_prepare_tn5_peak (input_dir_list,
                               max_gap,extsize,shiftsize)
 
                 ##intersect with predicted peaks
-                peak_fl = opt_dir + '/cluster.' + organ_ct_nm + '.macs2_peaks.narrowPeak'
+                temp_peak_fl = opt_dir + '/cluster.' + organ_ct_nm + '.macs2_peaks.narrowPeak'
+                filter_out_big_peak(temp_peak_fl, opt_dir, organ_ct_nm)
+                peak_fl = opt_dir + '/cluster.' + organ_ct_nm + '.macs2_peaks.flt.narrowPeak'
+
                 cmd = 'cp ' + peak_fl + ' ' + store_MACS2_raw_peak_dir
                 print(cmd)
                 subprocess.call(cmd, shell=True)
@@ -258,7 +287,7 @@ def call_peaks_MACS2_prepare_tn5_peak (input_dir_list,
             ##shuffle
             if s2_open_permute == 'yes':
 
-                peak_fl = opt_dir + '/cluster.' + organ_ct_nm + '.macs2_peaks.narrowPeak'
+                peak_fl = opt_dir + '/cluster.' + organ_ct_nm + '.macs2_peaks.flt.narrowPeak'
 
                 permute_random_regions(final_bed_fl, input_gff_fl, peak_fl, opt_dir, input_ref_fai_fl, organ_ct_nm,
                                        store_control_peak_dir, input_unmappable_fl)

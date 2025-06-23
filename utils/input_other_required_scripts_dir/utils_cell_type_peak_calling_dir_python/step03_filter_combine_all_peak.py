@@ -24,7 +24,7 @@ def filter_acr (input_output_dir,input_fdr_Rscript,finalfdr,new_fdr_dir_output_d
         mt = re.match('.+/(.+)',eachfl)
         flnm = mt.group(1)
 
-        mt = re.match('cluster\.(.+)\.macs2_peaks.narrowPeak',flnm)
+        mt = re.match('cluster\.(.+)\.macs2_peaks\.flt\.narrowPeak',flnm)
 
         organ_ct = mt.group(1)
 
@@ -99,7 +99,7 @@ def check_number_each_celltype (input_output_dir,input_meta_fl,new_fdr_dir_outpu
                 eachline = eachline.strip('\n')
                 flt_number_peak += 1
 
-        raw_peak_fl = store_raw_peak_dir + '/cluster.' + organ_ct + '.macs2_peaks.narrowPeak'
+        raw_peak_fl = store_raw_peak_dir + '/cluster.' + organ_ct + '.macs2_peaks.flt.narrowPeak'
         raw_number_peak = 0
         with open (raw_peak_fl,'r') as ipt:
             for eachline in ipt:
