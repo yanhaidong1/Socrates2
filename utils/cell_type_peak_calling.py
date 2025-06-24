@@ -5,6 +5,7 @@
 ##this script is to directly run MACS2 based on previous developed bed files
 ##and save the dtemp files to run MACS2 for different threshold
 
+##updating 062425 we will filter peaks excess the range of Gmfai
 ##updating 110524 we will introduce a new function to prepare the big wig file
 
 import argparse
@@ -341,6 +342,13 @@ def main(argv=None):
 
         s3_fpeak.FDR_filteration(output_dir + '/s2_open_call_peak_final_dir', utils_cell_type_peak_calling_dir,
                         input_meta_fl, finalfdr_list, s2_targettn5_colNum,s3_open_filter_peak_final_dir,final_pval_or_qval,final_pqval_cutoff,target_colnm)
+
+        ##updating 062425
+        input_ref_fai_fl = args.genome_fai_file
+        all_fl_list = glob.glob(s3_open_filter_peak_final_dir + '/*Peaks.bed')
+        for eachfl in all_fl_list:
+            s3_fpeak.filter_peak_by_chr_size(eachfl, input_ref_fai_fl, s3_open_filter_peak_final_dir)
+
 
 
     if s4_open_bigwig_build_final == 'yes':
