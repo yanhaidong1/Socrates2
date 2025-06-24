@@ -5,6 +5,7 @@ import glob
 import subprocess
 import os
 
+##updating 062425 add a function to filter out peaks that is out of genome size per chromosome
 
 
 
@@ -243,6 +244,91 @@ def FDR_filteration (input_step02_output_dir,utils_cell_type_peak_calling_dir,
         cmd = 'mv ' + s3_open_filter_peak_final_dir + '/opt_' + 'final' + '.' + pval_or_qval + organ_pqval_num + '.FDR' + eachFDRnum + '.unique500bpPeaks_new.bed ' + s3_open_filter_peak_final_dir + '/opt_' + 'final' + '.' + pval_or_qval + organ_pqval_num + '.FDR' + eachFDRnum + '.unique500bpPeaks.bed'
         print(cmd)
         subprocess.call(cmd,shell=True)
+
+
+
+
+##updating 062425
+def filter_peak_by_chr_size (ipt_filtered_peak_fl, ipt_fa_fai_fl,ipt_opt_dir):
+
+
+    mt = re.match('.+/(.+)\.bed',ipt_filtered_peak_fl)
+    flnm = mt.group(1)
+
+
+    store_chr_max_size_dic = {}
+    with open (ipt_fa_fai_fl,'r') as ipt:
+        for eachline in ipt:
+            eachline = eachline.strip('\n')
+            col = eachline.strip().split()
+            chrnm = col[0]
+            chrsize = col[1]
+            store_chr_max_size_dic[chrnm] = chrsize
+
+    store_chr_ACRloclist_dic = {}
+    with open (ipt_filtered_peak_fl,'r') as ipt:
+        for eachline in ipt:
+            eachline = eachline.strip('\n')
+            col = eachline.strip().split('\t')
+
+            chrnm = col[0]
+            acrloc = col[0] + '\t' + col[1] + '\t' + col[2]
+
+            if chrnm in store_chr_ACRloclist_dic:
+                store_chr_ACRloclist_dic[chrnm].append(acrloc)
+            else:
+                store_chr_ACRloclist_dic[chrnm] = []
+                store_chr_ACRloclist_dic[chrnm].append(acrloc)
+
+    store_final_line_list = []
+    acrid = 0
+    for eachchrnm in store_chr_max_size_dic:
+        chrmax_size = store_chr_max_size_dic[eachchrnm]
+
+        if eachchrnm in store_chr_ACRloclist_dic:
+
+            acrloclist = store_chr_ACRloclist_dic[eachchrnm]
+
+            count = 0
+            for eachacrloc in acrloclist:
+
+                acrid += 1
+
+                count += 1
+                if count == len(acrloclist):
+
+                    lastacr = eachacrloc
+                    lastacr_list = lastacr.split('\t')
+                    end_loc = lastacr_list[-1]
+
+                    if int(end_loc) < int(chrmax_size):
+
+                        ##we will keep this line
+                        final_acr = lastacr + '\t' + str('ACR_' + str(acrid))
+                        store_final_line_list.append(final_acr)
+
+                else:
+                    final_acr = eachacrloc + '\t' + str('ACR_' + str(acrid))
+                    store_final_line_list.append(final_acr)
+
+
+    with open (ipt_opt_dir  + '/temp_' + flnm + '.fixsize.bed','w+') as opt:
+        for eachline in store_final_line_list:
+            opt.write(eachline + '\n')
+
+    cmd = 'sort -k1,1V -k2,2n ' + ipt_opt_dir  + '/temp_' + flnm + '.fixsize.bed > ' + \
+          ipt_opt_dir + '/' + flnm + '.fx.sorted.bed'
+    print(cmd)
+    subprocess.call(cmd,shell=True)
+
+    cmd = 'rm ' + ipt_opt_dir  + '/temp_' + flnm + '.fixsize.bed'
+    print(cmd)
+    subprocess.call(cmd,shell=True)
+
+
+
+
+
 
 
 
