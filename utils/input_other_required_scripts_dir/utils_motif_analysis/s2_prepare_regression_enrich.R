@@ -25,7 +25,9 @@ if (file.exists(paste0(output_dir,'/opt_all_motif_matches_mtx.rds'))){
 
   ##load files
   ACR_motif_dt <- read.delim(input_fimo_results_fl,header = F)
-  ACR_motif_dt$peaknm <- paste0('chr',ACR_motif_dt$V1,'_',ACR_motif_dt$V2,'_',ACR_motif_dt$V3)
+  #ACR_motif_dt$peaknm <- paste0('chr',ACR_motif_dt$V1,'_',ACR_motif_dt$V2,'_',ACR_motif_dt$V3)
+  ##upating 062525
+  ACR_motif_dt$peaknm <- paste0(ACR_motif_dt$V1,'_',ACR_motif_dt$V2,'_',ACR_motif_dt$V3)
   ACR_motif_dt$number <- 1
   
   ##filter motif
