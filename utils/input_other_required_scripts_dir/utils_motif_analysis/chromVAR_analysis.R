@@ -1,6 +1,7 @@
 ###################################################################################################
 ###                             chromVAR analysis of scATAC data                                ###
 ###################################################################################################
+##updating 062625 we will adjust the min fragments per peak val
 ##updating 040925 we will load the species which has been built the BSgenome 
 ##updating 071323 add the ara BS
 ##updating 042923 we will debug to keep the peak order same as the matrix
@@ -34,7 +35,12 @@ output_dir <- as.character(args[6])
 
 ##parameter
 #min_fragments_per_peak_val <- as.numeric(args[6]) ##for all organ version it is 2500
-min_fragments_per_peak_val <- 2000
+
+cellnum = nrow(meta)
+
+#min_fragments_per_peak_val <- 2000
+min_fragments_per_peak_val <- cellnum*0.1
+
 
 input_BSgenome_config_fl <- as.character(args[7])
 input_GCbias_config_fl <- as.character(args[8])
