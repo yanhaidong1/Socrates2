@@ -329,7 +329,7 @@ def main(argv=None):
     target_config_fl = output_dir + '/temp_defined_parameters.config'
 
     if 'TF' in final_run_category_list:
-        target_tf_acc_threeCol_fl = step01_prepare_sparse_fl_dir + '/.TF.acc.rds'
+        target_tf_acc_threeCol_fl = step01_prepare_sparse_fl_dir + '/TF.acc.rds'
     else:
         target_tf_acc_threeCol_fl = 'na'
 
