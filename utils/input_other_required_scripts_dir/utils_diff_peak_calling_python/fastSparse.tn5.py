@@ -17,7 +17,10 @@ for line in sys.stdin:
     line = line.rstrip('\n')
     col = line.split('\t')
 
-    col[0] = 'chr' + col[0]
+    ##updaitng 062725 we will not add the chr
+    #col[0] = 'chr' + col[0]
+
+
     if "B73V" in col[0]:
         col[0] = col[0].replace('chrB73V4_ctg', 'chrB73V4ctg')
 
