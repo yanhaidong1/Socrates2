@@ -1551,7 +1551,7 @@ if (openTF == 'yes'){
 if (openGN == 'yes'){
   #tg_set <- read.delim(target_gene_set,row.names=1)
   collect_targetGN_set_opt_dir <- output_dir
-  tgn <- plotTargetGN(obj, out, collect_targetGN_set_opt_dir,cluster=LC, prefix=prefix, threads=threads, tests=diff.Gns, target_gene_set = NULL,FDR=0.05)
+  tgn <- plotTrajGN(obj, out, collect_targetGN_set_opt_dir,cluster=LC, prefix=prefix, threads=threads, tests=diff.Gns, target_gene_set = NULL,FDR=0.05)
 }
 if (openTGN == 'yes'){
   tg_set <- read.delim(target_gene_set,row.names=1)
