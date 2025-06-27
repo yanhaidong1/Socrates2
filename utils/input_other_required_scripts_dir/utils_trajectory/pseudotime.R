@@ -257,6 +257,8 @@ loadData_option_version   <- function(sm_fl, mt_fl,gn_fl, tf_fl, ma_fl, rd_fl, d
   if (mt_fl != 'na'){
     message(" - loading motif ...")
     mt <- t(read.table(mt_fl))
+  }else{
+    mt <- 'na'
   }
   
   ##load the gene
@@ -1390,7 +1392,7 @@ plotTargetGN <- function(obj, pt, collect_targetGN_set_opt_dir,cluster=1, prefix
   write.table(fit, file=paste0(collect_targetGN_set_opt_dir,'/',prefix,".Gene_pt_sorted.txt"), quote=F, row.names=T, col.names=T, sep="\t")
   
   
-  library(scales)
+  #library(scales)
   #tb <- read.table('Cotyledon_Adaxial_Parenchyma.Gene_pt.txt')
   #fit <- tb
   #prefix <- 'Cotyledon_Adaxial_Parenchyma'
@@ -1404,19 +1406,19 @@ plotTargetGN <- function(obj, pt, collect_targetGN_set_opt_dir,cluster=1, prefix
   
   
   # plot
-  #message(" - plotting cell trajectory ...")
-  #cols <- viridis(100)
-  #cols <- colorRampPalette(c('grey80','grey75',brewer.pal(8,'YlOrRd')[2:8]))(100)
-  #pdf(paste0(collect_targetGN_set_opt_dir,'/',prefix,".trajectoryTargetGene.pdf"), width=10, height=10)
-  #heatmap.2(fit, trace="none", col=cols, Colv=NA, Rowv=NA, dendrogram="none",
-  #          scale="none", labRow = NA, labCol=NA, useRaster=T,
-  #          ylab=paste("Genes", paste0("(n=",nrow(fit),")"), sep=" "))
-  #dev.off()
+  message(" - plotting cell trajectory ...")
+  cols <- viridis(100)
+  cols <- colorRampPalette(c('grey80','grey75',brewer.pal(8,'YlOrRd')[2:8]))(100)
+  pdf(paste0(collect_targetGN_set_opt_dir,'/',prefix,".trajectoryGene.pdf"), width=10, height=10)
+  heatmap.2(fit, trace="none", col=cols, Colv=NA, Rowv=NA, dendrogram="none",
+            scale="none", labRow = NA, labCol=NA, useRaster=T,
+            ylab=paste("Genes", paste0("(n=",nrow(fit),")"), sep=" "))
+  dev.off()
   
-  #pdf(paste0(collect_targetGN_set_opt_dir,'/',prefix,".trajectoryTargetGene_lb.pdf"), width=5, height=5)
-  #plot.new()
-  #add.color.bar(0.1, cols,lwd=10, title=NULL, lims=c(0,1),prompt=F,x=0.3,y=0.5,outline=TRUE,digits = 1)
-  #dev.off()
+  pdf(paste0(collect_targetGN_set_opt_dir,'/',prefix,".trajectoryGene_lb.pdf"), width=5, height=5)
+  plot.new()
+  add.color.bar(0.1, cols,lwd=10, title=NULL, lims=c(0,1),prompt=F,x=0.3,y=0.5,outline=TRUE,digits = 1)
+  dev.off()
   
   # return
   return(fit)
@@ -1452,12 +1454,13 @@ findCor    <- function(acr, mt, tf, x){
 ###################################################################################################
 message(paste0('analyze ',prefix))
 
-if (file.exists(paste0(output_dir,'/',prefix,".pseudotime_allgene.RDS"))){
-  obj <- readRDS(paste0(output_dir,'/',prefix,".pseudotime_allgene.RDS"))
-}else{
+##updating 062725 we will reload everything if users want to focuse on one more specific items 
+#if (file.exists(paste0(output_dir,'/',prefix,".pseudotime_allgene.RDS"))){
+#  obj <- readRDS(paste0(output_dir,'/',prefix,".pseudotime_allgene.RDS"))
+#}else{
   obj <- loadData_option_version(sparse, motif, gene, tfgene, meta, svd, doL2=0, traj,open_equal_cellnum_diff_clusters,column=target_cluster_col)
   saveRDS(obj, file=paste0(output_dir,'/',prefix,".pseudotime_allgene.RDS"))
-}
+#}
 
 #obj <- loadData_c(sparse,meta,svd,motif,doL2=0, traj)
 #saveRDS(obj, file=paste0(prefix,".pseudotime.rds"))
@@ -1551,9 +1554,10 @@ if (openTF == 'yes'){
 if (openGN == 'yes'){
   #tg_set <- read.delim(target_gene_set,row.names=1)
   collect_targetGN_set_opt_dir <- output_dir
-  tgn <- plotTrajGN(obj, out, collect_targetGN_set_opt_dir,cluster=LC, prefix=prefix, threads=threads, tests=diff.Gns, target_gene_set = NULL,FDR=0.05)
+  tgn <- plotTargetGN(obj, out, collect_targetGN_set_opt_dir,cluster=LC, prefix=prefix, threads=threads, tests=diff.Gns, target_gene_set = NULL,FDR=0.05)
 }
 if (openTGN == 'yes'){
+  collect_targetGN_set_opt_dir <- output_dir
   tg_set <- read.delim(target_gene_set,row.names=1)
   tgn <- plotTargetGN(obj, out, collect_targetGN_set_opt_dir,cluster=LC, prefix=prefix, threads=threads, tests=diff.Gns, target_gene_set = tg_set,FDR=0.05)
 }
