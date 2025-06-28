@@ -1,3 +1,4 @@
+##updating 062825 we will write the opt obj
 ##updating 031225 this script is to annotate the cell identity and plot the final UMAP
 
 
@@ -210,4 +211,20 @@ plotUMAP(b,ipt_output_dir,column='cell_identity', prefix=ipt_prefix,m1="umap1", 
          target_cluster = 'cell_identity',knowncolor_TCP = 'no',knowncolor_lib = 'no',knowncolor_tissue = 'no',
          min.reads= 1,newmeta_nm='addcol',target_unknown_name='no',openlegend = 'yes',plot_bar = 'no',
          plot_cex = ipt_plot_cex_val)
+
+
+##updating 062825
+##write out the object
+final_obj <- append(ipt_soc_obj, list(
+  final_meta = paste0(ipt_output_dir,'/',ipt_prefix,".annotated_cell_identity.meta.txt")
+))
+
+saveRDS(final_obj,file=paste0(ipt_output_dir,'/',ipt_prefix,'.atac.soc.rds'))
+
+
+
+
+
+
+
 
