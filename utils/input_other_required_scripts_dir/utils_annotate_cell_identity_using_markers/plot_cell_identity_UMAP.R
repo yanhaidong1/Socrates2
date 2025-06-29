@@ -215,8 +215,9 @@ plotUMAP(b,ipt_output_dir,column='cell_identity', prefix=ipt_prefix,m1="umap1", 
 
 ##updating 062825
 ##write out the object
+final_meta_dt <- read.table(paste0(ipt_output_dir,'/',ipt_prefix,".annotated_cell_identity.meta.txt"))
 final_obj <- append(ipt_soc_obj, list(
-  final_meta = paste0(ipt_output_dir,'/',ipt_prefix,".annotated_cell_identity.meta.txt")
+  final_meta = final_meta_dt
 ))
 
 saveRDS(final_obj,file=paste0(ipt_output_dir,'/',ipt_prefix,'.atac.soc.rds'))
