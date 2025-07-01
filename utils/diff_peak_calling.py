@@ -6,6 +6,7 @@
 ##step01 prepare the peak sparse file
 ##step02 make the DAR analysis
 ##updating 051925 step03 find the diff peak among diff groups
+##updating 063025 we will use the object to
 
 
 import argparse
@@ -13,6 +14,7 @@ import glob
 import sys
 import os
 import subprocess
+import re
 
 
 from input_other_required_scripts_dir.utils_diff_peak_calling_python import s1_make_peak_sparse as s1_prepare
@@ -33,6 +35,10 @@ def get_parsed_args():
     parser.add_argument("-s1_open_prepare", dest='s1_open_prepare_peak_tn5',
                         help='Run the step 01 to prepare peak tn5 file.'
                              'Default: yes')
+
+    ##updating 063025
+    parser.add_argument("-soc_obj", dest='soc_object_fl',
+                        help='Provide an object obtained from the peak calling step.')
 
     parser.add_argument("-peak_fl", dest = 'peak_file', help = 'Provide the final peak file.')
 
@@ -124,15 +130,32 @@ def main(argv=None):
 
             s1_open_prepare_peak_tn5_final = 'yes'
 
-            if args.peak_file is None:
-                print('Cannot find the peak file, please provide it')
-                return
-            else:
+            ##updating 063025
+            ##if users provide the soc from the last step
+            if args.soc_object_fl is not None:
+                print('Use object from the last step as the input file')
                 try:
-                    file = open(args.peak_file, 'r')  ##check if the file is not the right file
+                    file = open(args.soc_object_fl, 'r')  ##check if the file is not the right file
                 except IOError:
-                    print('There was an error opening the peak file!')
+                    print('There was an error opening the object file!')
                     return
+                use_soc_object_as_ipt = 'yes'
+            else:
+                use_soc_object_as_ipt = 'no'
+
+            if use_soc_object_as_ipt == 'no':
+
+                print('Do not use object from the last step as the input file and please provide the peak file as input')
+
+                if args.peak_file is None:
+                    print('Cannot find the peak file, please provide it')
+                    return
+                else:
+                    try:
+                        file = open(args.peak_file, 'r')  ##check if the file is not the right file
+                    except IOError:
+                        print('There was an error opening the peak file!')
+                        return
 
             if args.tn5_bed_file is None:
                 print('Cannot find the tn5 file, please provide it')
@@ -160,15 +183,32 @@ def main(argv=None):
 
             s2_open_diff_peak_call_final = 'yes'
 
-            if args.meta_file is None:
-                print('Cannot find the meta file, please provide it')
-                return
-            else:
+            ##updating 063025
+            if args.soc_object_fl is not None:
+                print('Use object from the last step as the input file')
                 try:
-                    file = open(args.meta_file, 'r')  ##check if the file is not the right file
+                    file = open(args.soc_object_fl, 'r')  ##check if the file is not the right file
                 except IOError:
-                    print('There was an error opening the meta file!')
+                    print('There was an error opening the object file!')
                     return
+                use_soc_object_as_ipt = 'yes'
+            else:
+                use_soc_object_as_ipt = 'no'
+
+            if use_soc_object_as_ipt == 'no':
+
+                print(
+                    'Do not use object from the last step as the input file and please provide the meta file as input')
+
+                if args.meta_file is None:
+                    print('Cannot find the meta file, please provide it')
+                    return
+                else:
+                    try:
+                        file = open(args.meta_file, 'r')  ##check if the file is not the right file
+                    except IOError:
+                        print('There was an error opening the meta file!')
+                        return
 
 
         else:
@@ -207,15 +247,21 @@ def main(argv=None):
 
     store_final_parameter_line_list.append('thread_num <- ' + core_number_final)
 
+
     if args.celltype_cluster_col_name is not None:
         celltype_cluster_col_name_final = args.celltype_cluster_col_name
-
         store_final_parameter_line_list.append('target_cluster <- ' + '\'' + celltype_cluster_col_name_final + '\'')
-
     else:
-        if s2_open_diff_peak_call_final == 'yes':
-            print ('Please use \'-ct_colnm\' to specify the column name showing cell identity.')
-            return
+
+        ##updating 063025
+        if args.soc_object_fl is not None:
+            celltype_cluster_col_name_final = 'cell_identity'
+            store_final_parameter_line_list.append('target_cluster <- ' + '\'' + celltype_cluster_col_name_final + '\'')
+        else:
+            if s2_open_diff_peak_call_final == 'yes':
+                print ('Please use \'-ct_colnm\' to specify the column name showing cell identity once users do not use the object as the input file.')
+                return
+
 
     if args.stat_test_method is not None:
         stat_test_method_final = args.stat_test_method
@@ -279,8 +325,22 @@ def main(argv=None):
         if not os.path.exists(s1_open_prepare_peak_tn5_final_dir):
             os.makedirs(s1_open_prepare_peak_tn5_final_dir)
 
+        ##updating 063025
+        if args.soc_object_fl is not None:
 
-        input_peak_fl = args.peak_file
+            ipt_object_file = args.soc_object_fl
+            cmd = 'Rscript ' + input_required_scripts_dir + '/utils_diff_peak_calling_python/read_object.R' + \
+                  ' ' + ipt_object_file + \
+                  ' ' + s1_open_prepare_peak_tn5_final_dir
+            print(cmd)
+            subprocess.call(cmd,shell=True)
+
+            input_peak_fl = s1_open_prepare_peak_tn5_final_dir + '/temp_peak.txt'
+
+        else:
+
+            input_peak_fl = args.peak_file
+
         input_tn5_bed_fl = args.tn5_bed_file
         input_fastSparsetn5_pl = input_required_scripts_dir + '/utils_diff_peak_calling_python/fastSparse.tn5.py'
 
@@ -305,23 +365,58 @@ def main(argv=None):
             os.makedirs(s2_open_diff_peak_call_final_dir)
 
         R_script = input_required_scripts_dir + '/utils_diff_peak_calling_python/s2_call_ctACR.Bootstrap.R'
-
+        R_script_saveobj = input_required_scripts_dir + '/utils_diff_peak_calling_python/s2_call_ctACR.Bootstrap_saveobj.R'
 
         ipt_peak_sparse_fl = output_dir + '/s1_open_prepare_peak_tn5_final/opt_prepare_peak_acc_dir/opt_accessibility.txt'
-        ipt_meta_fl = args.meta_file
+
+        ##updating 063025
+        if args.soc_object_fl is not None:
+            ipt_meta_fl = output_dir + '/s1_open_prepare_peak_tn5_final/temp_unmodi_update_meta.txt'
+        else:
+            ipt_meta_fl = args.meta_file
+
         ipt_peak_fl = output_dir + '/s1_open_prepare_peak_tn5_final/opt_prepare_peak_acc_dir/opt_peak.bed'
 
         if os.path.isfile(ipt_peak_sparse_fl) == True:
 
-            ##check the peak sparse fl is existing or not
-            cmd = 'Rscript ' + R_script + \
-                  ' ' + ipt_peak_sparse_fl + \
-                  ' ' + ipt_meta_fl + \
-                  ' ' + ipt_peak_fl + \
-                  ' ' + output_dir + '/temp_defined_parameters.config' + \
-                  ' ' + s2_open_diff_peak_call_final_dir
-            print(cmd)
-            subprocess.call(cmd,shell=True)
+            ##updating 063025
+            if args.soc_object_fl is not None:
+
+                ipt_soc_obj_fl = args.soc_object_fl
+
+                if re.match('.+/(.+)\.atac\.soc\.rds', ipt_soc_obj_fl):
+                    mt = re.match('.+/(.+)\.atac\.soc\.rds', ipt_soc_obj_fl)
+                    input_prefix = mt.group(1)
+                else:
+                    if re.match('(.+)\.atac\.soc\.rds', ipt_soc_obj_fl):
+                        mt = re.match('(.+)\.atac\.soc\.rds', ipt_soc_obj_fl)
+                        input_prefix = mt.group(1)
+                    else:
+                        print('Please use *.atac.soc.rds file without changing the file name')
+                        return
+
+                cmd = 'Rscript ' + R_script_saveobj + \
+                      ' ' + ipt_peak_sparse_fl + \
+                      ' ' + ipt_meta_fl + \
+                      ' ' + ipt_peak_fl + \
+                      ' ' + ipt_soc_obj_fl + \
+                      ' ' + input_prefix + \
+                      ' ' + output_dir + '/temp_defined_parameters.config' + \
+                      ' ' + s2_open_diff_peak_call_final_dir
+                print(cmd)
+                subprocess.call(cmd,shell=True)
+
+
+            else:
+                ##check the peak sparse fl is existing or not
+                cmd = 'Rscript ' + R_script + \
+                      ' ' + ipt_peak_sparse_fl + \
+                      ' ' + ipt_meta_fl + \
+                      ' ' + ipt_peak_fl + \
+                      ' ' + output_dir + '/temp_defined_parameters.config' + \
+                      ' ' + s2_open_diff_peak_call_final_dir
+                print(cmd)
+                subprocess.call(cmd,shell=True)
 
         else:
             print('Please check the step01 and make sure opt_accessibility.txt and opt_peak.bed file existing in the s1_open_prepare_peak_tn5_final_dir/opt_prepare_peak_acc_dir')
@@ -339,7 +434,15 @@ def main(argv=None):
         R_script = input_required_scripts_dir + '/utils_diff_peak_calling_python/s3_call_treat_ctACR.Bootstrap.R'
 
         ipt_peak_sparse_fl = output_dir + '/s1_open_prepare_peak_tn5_final/opt_prepare_peak_acc_dir/opt_accessibility.txt'
-        ipt_meta_fl = args.meta_file
+
+        ##updating 063025
+
+        if args.soc_object_fl is not None:
+            ipt_meta_fl = output_dir + '/s1_open_prepare_peak_tn5_final/temp_unmodi_update_meta.txt'
+        else:
+            ipt_meta_fl = args.meta_file
+
+
         ipt_peak_fl = output_dir + '/s1_open_prepare_peak_tn5_final/opt_prepare_peak_acc_dir/opt_peak.bed'
 
         if os.path.isfile(ipt_peak_sparse_fl) == True:
