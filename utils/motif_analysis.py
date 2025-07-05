@@ -6,6 +6,7 @@ import sys
 import subprocess
 import os
 from Bio import SeqIO
+import re
 
 from input_other_required_scripts_dir.utils_motif_analysis import s1_run_fimo
 from input_other_required_scripts_dir.utils_motif_analysis import s2_prepare_data
@@ -27,7 +28,7 @@ def get_parsed_args():
 
     ##updating 040925
     ##add a step to build the chromVAR
-    parser.add_argument("-open_motif_enrich", dest='open_motif_enrichment_analysis', help = 'Open the motif enrichment analysis to obtain the motifs enriched in the cell-type-specific ACRs.')
+    parser.add_argument("-open_motif_enrich", dest='open_motif_enrichment_analysis', help = 'Open the motif enrichment analysis to obtain the motifs enriched in the cell-type-specific ACRs. Default: no')
 
     parser.add_argument("-open_motif_DevScore", dest = 'open_motif_deviation_score', help = 'Open the calculation of motif deviation score.')
 
@@ -43,6 +44,11 @@ def get_parsed_args():
     parser.add_argument("-motif_fl", dest= 'motif_MEME_file',help = 'Provide a motif MEME file.')
 
     parser.add_argument("-acr_fl", dest = 'acr_file', help = 'Provide a ACR file used for predicting motifs within ACRs.')
+
+    ##updating 070425
+    parser.add_argument("-soc_obj", dest='soc_object_fl',
+                        help='Provide an object obtained from the peak calling or diff peak calling step.')
+
 
     ##step 02
     parser.add_argument("-meta_fl", dest = 'meta_file', help = 'Provide a meta with annotated cell identity.')
@@ -106,7 +112,9 @@ def get_parsed_args():
     parser.add_argument("-open_smooth_dev_score", dest = 'open_smooth_motif_dev_score' ,help = 'Smooth the deviation score.'
                                                                                                'Default: yes')
 
-    parser.add_argument("-soc_obj", dest='soc_object_fl', help='Provide an object obtained from the clustering step.')
+
+
+
 
 
     ##updating 050725
@@ -227,27 +235,52 @@ def main(argv=None):
                         print('There was an error opening the motif MEME file!')
                         return
 
-                if args.acr_file is None:
-                    print('Cannot find ACR file, please provide it')
-                    return
+                ##updating 070425
+                if args.soc_object_fl is None:
+
+                    print('Cannot find the soc object file, please provide it. Or provide a ACR file')
+
+                    if args.acr_file is None:
+                        print('Cannot find ACR file, please provide it')
+                        return
+                    else:
+                        try:
+                            file = open(args.acr_file, 'r')  ##check if the file is not the right file
+                        except IOError:
+                            print('There was an error opening the ACR file!')
+                            return
                 else:
                     try:
-                        file = open(args.acr_file, 'r')  ##check if the file is not the right file
+                        file = open(args.soc_object_fl, 'r')  ##check if the file is not the right file
                     except IOError:
-                        print('There was an error opening the ACR file!')
+                        print('There was an error opening the soc object file!')
                         return
+
+
 
             if open_prepare_data_enrichment_final == 'yes':
 
-                if args.meta_file is None:
-                    print('Cannot find cell meta file, please provide it')
-                    return
+                ##updating 070425
+                if args.soc_object_fl is None:
+
+                    print('Cannot find the soc object file, please provide it. Or provide a meta file')
+
+                    if args.meta_file is None:
+                        print('Cannot find cell meta file, please provide it')
+                        return
+                    else:
+                        try:
+                            file = open(args.meta_file, 'r')  ##check if the file is not the right file
+                        except IOError:
+                            print('There was an error opening the cell meta file!')
+                            return
                 else:
                     try:
-                        file = open(args.meta_file, 'r')  ##check if the file is not the right file
+                        file = open(args.soc_object_fl, 'r')  ##check if the file is not the right file
                     except IOError:
-                        print('There was an error opening the cell meta file!')
+                        print('There was an error opening the soc object file!')
                         return
+
 
                 if args.tn5_file is None:
                     print('Cannot find tn5 file, please provide it')
@@ -271,9 +304,21 @@ def main(argv=None):
 
             if open_enrichment_test_final == 'yes':
 
-                if args.celltype_cluster_col_name is None:
-                    print('Please provide the name of column specifying the cell type identity in the meta file.')
+                ##updating 070425
+                if args.soc_object_fl is None:
 
+                    print('Cannot find the soc object file, please provide it. Or provide a meta file')
+
+                    if args.celltype_cluster_col_name is None:
+                        print('Please provide the name of column specifying the cell type identity in the meta file.')
+                        return
+
+                else:
+                    try:
+                        file = open(args.soc_object_fl, 'r')  ##check if the file is not the right file
+                    except IOError:
+                        print('There was an error opening the soc object file!')
+                        return
 
 
         else:
@@ -302,39 +347,42 @@ def main(argv=None):
 
             open_motif_deviation_score_final = 'yes'
 
-            if args.acr_Tn5_file is None:
-                print('Cannot find ACR Tn5 file, please provide it')
-                return
-            else:
-                try:
-                    file = open(args.acr_Tn5_file, 'r')  ##check if the file is not the right file
-                except IOError:
-                    print('There was an error opening the ACR Tn5 file!')
+            if args.soc_object_fl is None:
+
+                if args.acr_Tn5_file is None:
+                    print('Cannot find ACR Tn5 file, please provide it')
                     return
+                else:
+                    try:
+                        file = open(args.acr_Tn5_file, 'r')  ##check if the file is not the right file
+                    except IOError:
+                        print('There was an error opening the ACR Tn5 file!')
+                        return
+
+                if args.meta_file is None:
+                    print('Cannot find cell meta file, please provide it')
+                    return
+                else:
+                    try:
+                        file = open(args.meta_file, 'r')  ##check if the file is not the right file
+                    except IOError:
+                        print('There was an error opening the cell meta file!')
+                        return
+
+
+                if args.acr_file is None:
+                    print('Cannot find ACR file, please provide it')
+                    return
+                else:
+                    try:
+                        file = open(args.acr_file, 'r')  ##check if the file is not the right file
+                    except IOError:
+                        print('There was an error opening the ACR file!')
+                        return
 
             if args.BSgenome_name is None:
                 print('please provide the BSgenome name that will be loaded from R')
                 return
-
-            if args.meta_file is None:
-                print('Cannot find cell meta file, please provide it')
-                return
-            else:
-                try:
-                    file = open(args.meta_file, 'r')  ##check if the file is not the right file
-                except IOError:
-                    print('There was an error opening the cell meta file!')
-                    return
-
-            if args.acr_file is None:
-                print('Cannot find ACR file, please provide it')
-                return
-            else:
-                try:
-                    file = open(args.acr_file, 'r')  ##check if the file is not the right file
-                except IOError:
-                    print('There was an error opening the ACR file!')
-                    return
 
             if args.jasmotif_matrix is None:
                 print('Cannot find jasmotif matrix file, please provide it')
@@ -361,6 +409,12 @@ def main(argv=None):
 
             if open_smooth_motif_dev_score_final == 'yes':
 
+                    #if args.celltype_cluster_col_name is None:
+                   #    print('Please provide the name of column specifying the cell type identity in the meta file.')
+
+                    #    return
+
+
                 if args.soc_object_fl is None:
                     print('Cannot find soc object file from clustering step, please provide it')
                     return
@@ -371,10 +425,7 @@ def main(argv=None):
                         print('There was an error opening the soc object file from clustering step!')
                         return
 
-                if args.celltype_cluster_col_name is None:
-                    print('Please provide the name of column specifying the cell type identity in the meta file.')
 
-                    return
 
 
         else:
@@ -474,7 +525,28 @@ def main(argv=None):
             if not os.path.exists(open_predict_motif_within_ACR_final_dir):
                 os.makedirs(open_predict_motif_within_ACR_final_dir)
 
-            input_acr_fl = args.acr_file
+            ##updating 070425
+            ##we will extract the acr file from the object
+            if args.soc_object_fl is not None:
+
+                ipt_R_script = input_required_scripts_dir + '/utils_motif_analysis/read_object.R'
+                ipt_soc_object = args.soc_object_fl
+
+                cmd = 'Rscript ' + ipt_R_script + \
+                      ' ' + ipt_soc_object + \
+                      ' ' + open_predict_motif_within_ACR_final_dir
+                print(cmd)
+                subprocess.call(cmd,shell=True)
+
+                input_acr_fl = open_predict_motif_within_ACR_final_dir + '/temp_peak.txt'
+
+            else:
+
+                cmd = 'cp ' + args.acr_file + ' ' + open_predict_motif_within_ACR_final_dir + '/temp_peak.txt'
+                subprocess.call(cmd,shell=True)
+                print(cmd)
+                input_acr_fl = open_predict_motif_within_ACR_final_dir + '/temp_peak.txt'
+
             input_genome_fasta_fl = args.genome_fasta_file
             input_motif_fl = args.motif_MEME_file
 
@@ -492,9 +564,9 @@ def main(argv=None):
                 os.makedirs(open_prepare_data_enrichment_final_dir)
 
             ###############
-            input_peak_fl = args.acr_file
+            input_peak_fl = step01_motif_enrichment_analysis_dir + '/open_predict_motif_within_ACR_final_dir' + '/temp_peak.txt'
+
             input_tn5_bed_fl = args.tn5_file
-            #input_genome_fai_fl = args.genome_fai_file
             input_fastSparsetn5_pl = input_required_scripts_dir + '/utils_motif_analysis/fastSparse.tn5.pl'
             prefix = sample_prefix_final
 
@@ -503,7 +575,21 @@ def main(argv=None):
                                                      open_prepare_data_enrichment_final_dir)
 
             #############
-            input_meta_fl = args.meta_file
+            ##updating 070425
+            if args.soc_object_fl is not None:
+
+                ##if soc object is already existing, the temp meta file is already built
+                input_meta_fl = step01_motif_enrichment_analysis_dir + '/open_predict_motif_within_ACR_final_dir' + '/temp_meta.txt'
+
+            else:
+
+                cmd = 'cp ' + args.meta_file + ' ' + open_prepare_data_enrichment_final_dir + '/temp_meta.txt'
+                subprocess.call(cmd, shell=True)
+                print(cmd)
+                input_meta_fl = open_prepare_data_enrichment_final_dir + '/temp_meta.txt'
+
+
+
             input_peak_cell_sparse_fl = open_prepare_data_enrichment_final_dir + '/opt_peak_sparse_sorted_dir/opt_peak_' + prefix + '_sorted.sparse'
             prefix_meta = 'addACRnum'
 
@@ -512,7 +598,11 @@ def main(argv=None):
             if down_sample_cell_final == 'yes':
 
                 cutoff_cellnm = cell_number_cutoff_final
-                target_colnm = args.celltype_cluster_col_name
+
+                if args.soc_object_fl is not None:
+                    target_colnm = 'cell_identity'
+                else:
+                    target_colnm = args.celltype_cluster_col_name
 
                 s2_prepare_data.downsampling (cutoff_cellnm,open_prepare_data_enrichment_final_dir,prefix_meta,target_colnm)
 
@@ -542,7 +632,12 @@ def main(argv=None):
                 prefix_meta = 'addACRnum'
                 ipt_final_meta_fl = step01_motif_enrichment_analysis_dir + '/open_prepare_data_enrichment_final_dir' + '/opt_' + prefix_meta + '.txt'
 
-            ipt_target_cluster_nm = args.celltype_cluster_col_name
+            if args.soc_object_fl is not None:
+                ipt_target_cluster_nm = 'cell_identity'
+            else:
+                ipt_target_cluster_nm = args.celltype_cluster_col_name
+
+
 
             cmd = 'Rscript ' + ipt_R_script + \
                   ' ' + step01_motif_enrichment_analysis_dir + '/open_prepare_data_enrichment_final_dir' + \
@@ -553,6 +648,79 @@ def main(argv=None):
             print(cmd)
             subprocess.call(cmd, shell=True)
 
+            ##upating 070425
+            ##modify the results and save them into a soc object
+            store_final_line_list = []
+            count = 0
+            with open(open_enrichment_test_final_dir + '/opt_motif_enrichment_cluster.txt', 'r') as ipt:
+                for eachline in ipt:
+                    eachline = eachline.strip('\n')
+                    col = eachline.strip().split('\t')
+                    count += 1
+                    if count != 1:
+
+                        fc = col[2]
+
+                        if '=' in col[3]:
+                            motif_col = col[3].split()
+                            beta_temp = motif_col[2]
+                            beta = beta_temp.replace(')', '')
+                        else:
+                            beta = col[3]
+
+
+                        celltype = col[-2]
+
+
+                        final_line = col[-3] + '\t' + celltype + '\t' + fc + '\t' + beta + '\t' + col[-1]
+                        store_final_line_list.append(final_line)
+
+                    else:
+                        final_line = 'motif' + '\t' + 'celltype' + '\t' + 'fc' + '\t' + 'beta' + '\t' + 'FDR'
+                        store_final_line_list.append(final_line)
+
+            with open(open_enrichment_test_final_dir + '/' + 'opt_motif_enrichment_cluster.clean.txt', 'w+') as opt:
+                for eachline in store_final_line_list:
+                    opt.write(eachline + '\n')
+
+
+            ##save them to an object
+            if args.soc_object_fl is not None:
+
+                print ('Users choose to save the results to an object')
+
+                ipt_R_script = input_required_scripts_dir + '/utils_motif_analysis/save_object_motif_enrich.R'
+                ipt_enrich_result_fl = open_enrichment_test_final_dir + '/' + 'opt_motif_enrichment_cluster.clean.txt'
+                all_fl_list = glob.glob(step01_motif_enrichment_analysis_dir + '/open_prepare_data_enrichment_final_dir/opt_peak_sparse_sorted_dir/*')
+                ipt_peak_tn5_fl = ''
+                for eachfl in all_fl_list:
+                    mt = re.match('.+/(.+)',eachfl)
+                    flnm = mt.group(1)
+                    if '_sorted.sparse' in flnm:
+                        ipt_peak_tn5_fl = eachfl
+
+                ipt_soc_obj_fl = args.soc_object_fl
+
+                if re.match('.+/(.+)\.atac\.soc\.rds', ipt_soc_obj_fl):
+                    mt = re.match('.+/(.+)\.atac\.soc\.rds', ipt_soc_obj_fl)
+                    input_prefix = mt.group(1)
+                else:
+                    if re.match('(.+)\.atac\.soc\.rds', ipt_soc_obj_fl):
+                        mt = re.match('(.+)\.atac\.soc\.rds', ipt_soc_obj_fl)
+                        input_prefix = mt.group(1)
+                    else:
+                        print('Please use *.atac.soc.rds file without changing the file name')
+                        return
+
+                cmd = 'Rscript ' + ipt_R_script + \
+                      ' ' + ipt_soc_obj_fl + \
+                      ' ' + ipt_enrich_result_fl + \
+                      ' ' + ipt_peak_tn5_fl + \
+                      ' ' + input_prefix + \
+                      ' ' + step01_motif_enrichment_analysis_dir
+                print(cmd)
+                subprocess.call(cmd,shell=True)
+
 
     #######################################################################################
     ##If users choose to open the ChromVAR to perform the motif deviation score calculation
@@ -562,12 +730,6 @@ def main(argv=None):
         if not os.path.exists(step02_motif_deviation_score_generation_dir):
             os.makedirs(step02_motif_deviation_score_generation_dir)
 
-
-        ipt_R_script = input_required_scripts_dir + '/utils_motif_analysis/chromVAR_analysis.R'
-        print(ipt_R_script)
-        ipt_peak_tn5_fl = args.acr_Tn5_file
-        ipt_acr_fl = args.acr_file
-        ipt_meta_fl = args.meta_file
 
         BSgenome_name_str = args.BSgenome_name
 
@@ -599,18 +761,44 @@ def main(argv=None):
 
         ipt_jasmotif_mtx_fl = args.jasmotif_matrix
 
-        cmd = 'Rscript ' + ipt_R_script + \
-              ' ' + core_number_run + \
-              ' ' + ipt_peak_tn5_fl + \
-              ' ' + ipt_acr_fl + \
-              ' ' + ipt_meta_fl + \
-              ' ' + ipt_jasmotif_mtx_fl + \
-              ' ' + step02_motif_deviation_score_generation_dir + \
-              ' ' + ipt_load_BSgenome_config_fl + \
-              ' ' + ipt_load_GCBias_config_fl + \
-              ' ' + ipt_load_matchmotif_config_fl
-        print(cmd)
-        subprocess.call(cmd,shell=True)
+
+        ##updating 070425
+        if args.soc_object_fl is None:
+
+            ipt_R_script = input_required_scripts_dir + '/utils_motif_analysis/chromVAR_analysis.R'
+            ipt_peak_tn5_fl = args.acr_Tn5_file
+            ipt_acr_fl = args.acr_file
+            ipt_meta_fl = args.meta_file
+
+            cmd = 'Rscript ' + ipt_R_script + \
+                  ' ' + core_number_run + \
+                  ' ' + ipt_peak_tn5_fl + \
+                  ' ' + ipt_acr_fl + \
+                  ' ' + ipt_meta_fl + \
+                  ' ' + ipt_jasmotif_mtx_fl + \
+                  ' ' + step02_motif_deviation_score_generation_dir + \
+                  ' ' + ipt_load_BSgenome_config_fl + \
+                  ' ' + ipt_load_GCBias_config_fl + \
+                  ' ' + ipt_load_matchmotif_config_fl
+            print(cmd)
+            subprocess.call(cmd, shell=True)
+
+        else:
+
+            ipt_soc_obj_fl = args.soc_object_fl
+            ipt_R_script = input_required_scripts_dir + '/utils_motif_analysis/chromVAR_analysis_use_object.R'
+
+            cmd = 'Rscript ' + ipt_R_script + \
+                  ' ' + core_number_run + \
+                  ' ' + ipt_soc_obj_fl + \
+                  ' ' + ipt_jasmotif_mtx_fl + \
+                  ' ' + step02_motif_deviation_score_generation_dir + \
+                  ' ' + ipt_load_BSgenome_config_fl + \
+                  ' ' + ipt_load_GCBias_config_fl + \
+                  ' ' + ipt_load_matchmotif_config_fl
+            print(cmd)
+            subprocess.call(cmd,shell=True)
+
 
 
         ##updating 042425
@@ -622,19 +810,42 @@ def main(argv=None):
 
             print('- open conduct smooth for the motif deviation score')
 
-            motif_smooth_script = input_required_scripts_dir + '/utils_motif_analysis/smooth_motif_deviation.R'
 
-            ipt_target_cluster_nm = args.celltype_cluster_col_name
 
-            cmd = 'Rscript ' + motif_smooth_script + \
-                  ' ' + ipt_meta_fl + \
-                  ' ' + ipt_motif_deviation_score_fl + \
-                  ' ' + ipt_svd_obj_fl + \
-                  ' ' + sample_prefix_final + \
-                  ' ' + ipt_target_cluster_nm + \
-                  ' ' + step02_motif_deviation_score_generation_dir
-            print(cmd)
-            subprocess.call(cmd, shell=True)
+            ##Updating 070425
+            if args.soc_object_fl is None:
+
+                if args.celltype_cluster_col_name is not None:
+                    ipt_target_cluster_nm = args.celltype_cluster_col_name
+                else:
+                    ipt_target_cluster_nm = 'cell_identity'
+                ipt_meta_fl = args.meta_file
+
+                motif_smooth_script = input_required_scripts_dir + '/utils_motif_analysis/smooth_motif_deviation.R'
+
+                cmd = 'Rscript ' + motif_smooth_script + \
+                      ' ' + ipt_meta_fl + \
+                      ' ' + ipt_motif_deviation_score_fl + \
+                      ' ' + ipt_svd_obj_fl + \
+                      ' ' + sample_prefix_final + \
+                      ' ' + ipt_target_cluster_nm + \
+                      ' ' + step02_motif_deviation_score_generation_dir
+                print(cmd)
+                subprocess.call(cmd, shell=True)
+
+            else:
+                ipt_soc_obj_fl = args.soc_object_fl
+
+                motif_smooth_script = input_required_scripts_dir + '/utils_motif_analysis/smooth_motif_deviation_use_object.R'
+
+                cmd = 'Rscript ' + motif_smooth_script + \
+                      ' ' + ipt_soc_obj_fl + \
+                      ' ' + ipt_motif_deviation_score_fl + \
+                      ' ' + sample_prefix_final + \
+                      ' ' + step02_motif_deviation_score_generation_dir
+                print(cmd)
+                subprocess.call(cmd, shell=True)
+
 
 
 
