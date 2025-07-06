@@ -7,7 +7,7 @@ import subprocess
 import os
 import re
 
-
+##updating 070525 we will use the object
 
 def get_parsed_args():
 
@@ -27,6 +27,11 @@ def get_parsed_args():
 
     #parser.add_argument("-ct_colnm", dest='celltype_cluster_col_name',
     #                    help='Define the cluster column name of the meta file.')
+
+    ##updating 070525
+    ##if we provide the soc object file we will not provide the other required files
+    parser.add_argument("-soc_obj", dest='soc_object_fl',
+                        help='Provide an object obtained from the motif analysis step.')
 
 
     ##############
@@ -116,25 +121,28 @@ def main(argv=None):
 
         final_run_category = args.category_run
 
-    if args.meta_file is None:
-        print('Cannot find the meat file, please provide it')
-        return
-    else:
-        try:
-            file = open(args.meta_file, 'r')  ##check if the file is not the right file
-        except IOError:
-            print('There was an error opening the meta file!')
-            return
+    ##updating 070525
+    if args.soc_object_fl is None:
 
-    if args.soc_obj_svd_fl is None:
-        print('Cannot find a object storing the svd file, please provide it')
-        return
-    else:
-        try:
-            file = open(args.soc_obj_svd_fl, 'r')  ##check if the file is not the right file
-        except IOError:
-            print('There was an error opening the object storing the svd file!')
+        if args.meta_file is None:
+            print('Cannot find the meat file, please provide it')
             return
+        else:
+            try:
+                file = open(args.meta_file, 'r')  ##check if the file is not the right file
+            except IOError:
+                print('There was an error opening the meta file!')
+                return
+
+        if args.soc_obj_svd_fl is None:
+            print('Cannot find a object storing the svd file, please provide it')
+            return
+        else:
+            try:
+                file = open(args.soc_obj_svd_fl, 'r')  ##check if the file is not the right file
+            except IOError:
+                print('There was an error opening the object storing the svd file!')
+                return
 
 
     ##we will build a file to store all the information as the configure file
@@ -167,15 +175,19 @@ def main(argv=None):
 
         store_final_parameter_line_list.append('openGN <- ' + '\'' + 'yes' + '\'')
 
-        if args.soc_obj_gene_acc_fl is None:
-            print('Cannot find an object storing the gene accessibility, please provide it')
-            return
-        else:
-            try:
-                file = open(args.soc_obj_gene_acc_fl, 'r')  ##check if the file is not the right file
-            except IOError:
-                print('There was an error opening the object storing the gene accessibility file!')
+        ##updating 070525
+        if args.soc_object_fl is None:
+
+            if args.soc_obj_gene_acc_fl is None:
+                print('Cannot find an object storing the gene accessibility, please provide it')
                 return
+            else:
+                try:
+                    file = open(args.soc_obj_gene_acc_fl, 'r')  ##check if the file is not the right file
+                except IOError:
+                    print('There was an error opening the object storing the gene accessibility file!')
+                    return
+
     else:
         store_final_parameter_line_list.append('openGN <- ' + '\'' + 'no' + '\'')
 
@@ -183,25 +195,28 @@ def main(argv=None):
 
         store_final_parameter_line_list.append('openTF <- ' + '\'' + 'yes' + '\'')
 
-        if args.TF_list_file is None:
-            print('Cannot find a TF list file, please provide it')
-            return
-        else:
-            try:
-                file = open(args.TF_list_file, 'r')  ##check if the file is not the right file
-            except IOError:
-                print('There was an error opening the TF list file!')
-                return
+        ##updating 070525
+        if args.soc_object_fl is None:
 
-        if args.soc_obj_gene_acc_fl is None:
-            print('Cannot find an object storing the gene accessibility, please provide it')
-            return
-        else:
-            try:
-                file = open(args.soc_obj_gene_acc_fl, 'r')  ##check if the file is not the right file
-            except IOError:
-                print('There was an error opening the object storing the gene accessibility file!')
+            if args.TF_list_file is None:
+                print('Cannot find a TF list file, please provide it')
                 return
+            else:
+                try:
+                    file = open(args.TF_list_file, 'r')  ##check if the file is not the right file
+                except IOError:
+                    print('There was an error opening the TF list file!')
+                    return
+
+            if args.soc_obj_gene_acc_fl is None:
+                print('Cannot find an object storing the gene accessibility, please provide it')
+                return
+            else:
+                try:
+                    file = open(args.soc_obj_gene_acc_fl, 'r')  ##check if the file is not the right file
+                except IOError:
+                    print('There was an error opening the object storing the gene accessibility file!')
+                    return
     else:
         store_final_parameter_line_list.append('openTF <- ' + '\'' + 'no' + '\'')
 
@@ -209,15 +224,18 @@ def main(argv=None):
 
         store_final_parameter_line_list.append('openMT <- ' + '\'' + 'yes' + '\'')
 
-        if args.motif_deviation_file is None:
-            print('Cannot find a motif deviation file, please provide it')
-            return
-        else:
-            try:
-                file = open(args.motif_deviation_file, 'r')  ##check if the file is not the right file
-            except IOError:
-                print('There was an error opening the motif deviation file!')
+        ##updating 070525
+        if args.soc_object_fl is None:
+
+            if args.motif_deviation_file is None:
+                print('Cannot find a motif deviation file, please provide it')
                 return
+            else:
+                try:
+                    file = open(args.motif_deviation_file, 'r')  ##check if the file is not the right file
+                except IOError:
+                    print('There was an error opening the motif deviation file!')
+                    return
 
     else:
         store_final_parameter_line_list.append('openMT <- ' + '\'' + 'no' + '\'')
@@ -226,15 +244,18 @@ def main(argv=None):
 
         store_final_parameter_line_list.append('openACR <- ' + '\'' + 'yes' + '\'')
 
-        if args.peak_sparse_file is None:
-            print('Cannot find a peak sparse file, please provide it')
-            return
-        else:
-            try:
-                file = open(args.peak_sparse_file, 'r')  ##check if the file is not the right file
-            except IOError:
-                print('There was an error opening the peak sparse file!')
+        ##updating 070525
+        if args.soc_object_fl is None:
+
+            if args.peak_sparse_file is None:
+                print('Cannot find a peak sparse file, please provide it')
                 return
+            else:
+                try:
+                    file = open(args.peak_sparse_file, 'r')  ##check if the file is not the right file
+                except IOError:
+                    print('There was an error opening the peak sparse file!')
+                    return
 
     else:
         store_final_parameter_line_list.append('openACR <- ' + '\'' + 'no' + '\'')
@@ -296,102 +317,200 @@ def main(argv=None):
 
         input_TF_fl = args.TF_list_file
 
-        ipt_script = input_required_scripts_dir + '/utils_trajectory/build_TF_acc.R'
-        ipt_gene_acc_rds_fl =  args.soc_obj_gene_acc_fl
+        ##updating 070525
+        if args.soc_object_fl is None:
 
-        cmd = 'Rscript ' + ipt_script + \
-              ' ' + ipt_gene_acc_rds_fl + \
-              ' ' + input_TF_fl + \
-              ' ' + step01_prepare_sparse_fl_dir
-        print(cmd)
-        subprocess.call(cmd,shell=True)
+            ipt_script = input_required_scripts_dir + '/utils_trajectory/build_TF_acc.R'
+            ipt_gene_acc_rds_fl =  args.soc_obj_gene_acc_fl
+
+            cmd = 'Rscript ' + ipt_script + \
+                  ' ' + ipt_gene_acc_rds_fl + \
+                  ' ' + input_TF_fl + \
+                  ' ' + step01_prepare_sparse_fl_dir
+            print(cmd)
+            subprocess.call(cmd,shell=True)
+
+        else:
+
+            ipt_script = input_required_scripts_dir + '/utils_trajectory/build_TF_acc_use_object.R'
+            ipt_object_fl = args.soc_object_fl
+
+            cmd = 'Rscript ' + ipt_script + \
+                  ' ' + ipt_object_fl + \
+                  ' ' + input_TF_fl + \
+                  ' ' + step01_prepare_sparse_fl_dir
+            print(cmd)
+            subprocess.call(cmd, shell=True)
+
+
 
     if 'ACR' in final_run_category_list:
 
         print('- open prepare peak mtx')
 
-        ipt_script = input_required_scripts_dir + '/utils_trajectory/transfer_to_mtx.R'
-        ipt_peak_sparse_fl = args.peak_sparse_file
+        ##updating 070525
+        if args.soc_object_fl is None:
 
-        cmd = 'Rscript ' + ipt_script + \
-              ' ' + ipt_peak_sparse_fl + \
-              ' ' + step01_prepare_sparse_fl_dir + \
-              ' ' + 'peak_sparse.mtx'
-        print(cmd)
-        subprocess.call(cmd, shell=True)
+            ipt_script = input_required_scripts_dir + '/utils_trajectory/transfer_to_mtx.R'
+            ipt_peak_sparse_fl = args.peak_sparse_file
+
+            cmd = 'Rscript ' + ipt_script + \
+                  ' ' + ipt_peak_sparse_fl + \
+                  ' ' + step01_prepare_sparse_fl_dir + \
+                  ' ' + 'peak_sparse.mtx'
+            print(cmd)
+            subprocess.call(cmd, shell=True)
+
+        else:
+
+            ipt_script = input_required_scripts_dir + '/utils_trajectory/transfer_to_mtx_use_object.R'
+            ipt_object_fl = args.soc_object_fl
+
+            cmd = 'Rscript ' + ipt_script + \
+                  ' ' + ipt_object_fl + \
+                  ' ' + step01_prepare_sparse_fl_dir + \
+                  ' ' + 'peak_sparse.mtx'
+            print(cmd)
+            subprocess.call(cmd, shell=True)
+
 
     step02_running_trajectory_analysis_dir = output_dir + '/step02_running_trajectory_analysis_dir'
     if not os.path.exists(step02_running_trajectory_analysis_dir):
         os.makedirs(step02_running_trajectory_analysis_dir)
 
-    ipt_script = input_required_scripts_dir + '/utils_trajectory/pseudotime.R'
+    ##updating 070525
+    if args.soc_object_fl is None:
 
-    target_config_fl = output_dir + '/temp_defined_parameters.config'
+        ipt_script = input_required_scripts_dir + '/utils_trajectory/pseudotime.R'
 
-    if 'TF' in final_run_category_list:
-        target_tf_acc_threeCol_fl = step01_prepare_sparse_fl_dir + '/TF.acc.rds'
+        target_config_fl = output_dir + '/temp_defined_parameters.config'
+
+        if 'TF' in final_run_category_list:
+            target_tf_acc_threeCol_fl = step01_prepare_sparse_fl_dir + '/TF.acc.rds'
+        else:
+            target_tf_acc_threeCol_fl = 'na'
+
+        if 'Motif' in final_run_category_list:
+            target_motif_fl = args.motif_deviation_file
+        else:
+            target_motif_fl = 'na'
+
+
+        target_meta_fl = args.meta_file
+        target_svd_obj_fl = args.soc_obj_svd_fl
+
+        if 'ACR' in final_run_category_list:
+            target_peak_mtx_rds_fl = step01_prepare_sparse_fl_dir + '/' + 'peak_sparse.mtx' + '.rds'
+        else:
+            target_peak_mtx_rds_fl = 'na'
+
+        if 'Gene' in final_run_category_list:
+            target_allgene_acc_threCol_fl = args.soc_obj_gene_acc_fl
+        else:
+            target_allgene_acc_threCol_fl = 'na'
+
+
+
+        ##step02_s1_sub_open_provided_reduced_meta_fl we will allow it to be the file path
+        ##or 'na'
+        step02_s1_sub_open_provided_reduced_meta_fl = 'na'
+        input_target_gene_list_fl = 'na'
+
+
+        ##we will design scripts to plot with the color
+        ##Or we will add the color column besides the option 5 generate the final UMAP plot with the color column
+        ##Or it will automatically generate several colors
+
+        step02_s1_sub_target_cluster_col = 'cell_identity'
+        step02_s1_sub_target_cluster_color = 'celltype_color'
+        step02_s1_sub_plot_top_ACR_num = Top_ACR_number_plot_final
+        step02_s1_sub_open_equal_sample_ctnum = open_equal_cell_number_final
+
+
+        cmd = 'Rscript ' + ipt_script + \
+              ' ' + target_peak_mtx_rds_fl + \
+              ' ' + target_motif_fl + \
+              ' ' + target_allgene_acc_threCol_fl + \
+              ' ' + target_tf_acc_threeCol_fl + \
+              ' ' + target_meta_fl + \
+              ' ' + target_svd_obj_fl + \
+              ' ' + prefix_name_final + \
+              ' ' + target_config_fl + \
+              ' ' + core_number_run + \
+              ' ' + step02_running_trajectory_analysis_dir + \
+              ' ' + step02_s1_sub_target_cluster_col + \
+              ' ' + step02_s1_sub_target_cluster_color + \
+              ' ' + input_target_gene_list_fl + \
+              ' ' + step02_s1_sub_plot_top_ACR_num + \
+              ' ' + step02_s1_sub_open_equal_sample_ctnum + \
+              ' ' + step02_s1_sub_open_provided_reduced_meta_fl
+        print(cmd)
+        subprocess.call(cmd, shell=True)
+
     else:
-        target_tf_acc_threeCol_fl = 'na'
 
-    if 'Motif' in final_run_category_list:
-        target_motif_fl = args.motif_deviation_file
-    else:
-        target_motif_fl = 'na'
+        ##we will build an object R script to call the pesodutime
+        ipt_script = input_required_scripts_dir + '/utils_trajectory/pseudotime_use_object.R'
 
+        target_config_fl = output_dir + '/temp_defined_parameters.config'
 
-    target_meta_fl = args.meta_file
-    target_svd_obj_fl = args.soc_obj_svd_fl
+        if 'TF' in final_run_category_list:
+            target_tf_acc_threeCol_fl = step01_prepare_sparse_fl_dir + '/TF.acc.rds'
+        else:
+            target_tf_acc_threeCol_fl = 'na'
 
-    if 'ACR' in final_run_category_list:
-        target_peak_mtx_rds_fl = step01_prepare_sparse_fl_dir + '/' + 'peak_sparse.mtx' + '.rds'
-    else:
-        target_peak_mtx_rds_fl = 'na'
+        if 'Motif' in final_run_category_list:
+            target_motif_fl = 'yes'
+        else:
+            target_motif_fl = 'na'
 
-    if 'Gene' in final_run_category_list:
-        target_allgene_acc_threCol_fl = args.soc_obj_gene_acc_fl
-    else:
-        target_allgene_acc_threCol_fl = 'na'
+        #target_meta_fl = args.meta_file
+        #target_svd_obj_fl = args.soc_obj_svd_fl
 
+        if 'ACR' in final_run_category_list:
+            target_peak_mtx_rds_fl = step01_prepare_sparse_fl_dir + '/' + 'peak_sparse.mtx' + '.rds'
+        else:
+            target_peak_mtx_rds_fl = 'na'
 
+        if 'Gene' in final_run_category_list:
+            target_allgene_acc_threCol_fl = 'yes'
+        else:
+            target_allgene_acc_threCol_fl = 'na'
 
-    ##step02_s1_sub_open_provided_reduced_meta_fl we will allow it to be the file path
-    ##or 'na'
-    step02_s1_sub_open_provided_reduced_meta_fl = 'na'
-    input_target_gene_list_fl = 'na'
+        ##step02_s1_sub_open_provided_reduced_meta_fl we will allow it to be the file path
+        ##or 'na'
+        step02_s1_sub_open_provided_reduced_meta_fl = 'na'
+        input_target_gene_list_fl = 'na'
 
+        ##we will design scripts to plot with the color
+        ##Or we will add the color column besides the option 5 generate the final UMAP plot with the color column
+        ##Or it will automatically generate several colors
 
-    ##we will design scripts to plot with the color
-    ##Or we will add the color column besides the option 5 generate the final UMAP plot with the color column
-    ##Or it will automatically generate several colors
+        step02_s1_sub_target_cluster_col = 'cell_identity'
+        step02_s1_sub_target_cluster_color = 'celltype_color'
+        step02_s1_sub_plot_top_ACR_num = Top_ACR_number_plot_final
+        step02_s1_sub_open_equal_sample_ctnum = open_equal_cell_number_final
 
-    step02_s1_sub_target_cluster_col = 'cell_identity'
-    step02_s1_sub_target_cluster_color = 'celltype_color'
-    step02_s1_sub_plot_top_ACR_num = Top_ACR_number_plot_final
-    step02_s1_sub_open_equal_sample_ctnum = open_equal_cell_number_final
+        ipt_object_fl = args.soc_object_fl
 
-
-    cmd = 'Rscript ' + ipt_script + \
-          ' ' + target_peak_mtx_rds_fl + \
-          ' ' + target_motif_fl + \
-          ' ' + target_allgene_acc_threCol_fl + \
-          ' ' + target_tf_acc_threeCol_fl + \
-          ' ' + target_meta_fl + \
-          ' ' + target_svd_obj_fl + \
-          ' ' + prefix_name_final + \
-          ' ' + target_config_fl + \
-          ' ' + core_number_run + \
-          ' ' + step02_running_trajectory_analysis_dir + \
-          ' ' + step02_s1_sub_target_cluster_col + \
-          ' ' + step02_s1_sub_target_cluster_color + \
-          ' ' + input_target_gene_list_fl + \
-          ' ' + step02_s1_sub_plot_top_ACR_num + \
-          ' ' + step02_s1_sub_open_equal_sample_ctnum + \
-          ' ' + step02_s1_sub_open_provided_reduced_meta_fl
-    print(cmd)
-    subprocess.call(cmd, shell=True)
-
-
-
+        cmd = 'Rscript ' + ipt_script + \
+              ' ' + target_peak_mtx_rds_fl + \
+              ' ' + target_motif_fl + \
+              ' ' + target_allgene_acc_threCol_fl + \
+              ' ' + target_tf_acc_threeCol_fl + \
+              ' ' + ipt_object_fl + \
+              ' ' + prefix_name_final + \
+              ' ' + target_config_fl + \
+              ' ' + core_number_run + \
+              ' ' + step02_running_trajectory_analysis_dir + \
+              ' ' + step02_s1_sub_target_cluster_col + \
+              ' ' + step02_s1_sub_target_cluster_color + \
+              ' ' + input_target_gene_list_fl + \
+              ' ' + step02_s1_sub_plot_top_ACR_num + \
+              ' ' + step02_s1_sub_open_equal_sample_ctnum + \
+              ' ' + step02_s1_sub_open_provided_reduced_meta_fl
+        print(cmd)
+        subprocess.call(cmd, shell=True)
 
 
 
