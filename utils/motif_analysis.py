@@ -113,7 +113,9 @@ def get_parsed_args():
                                                                                                'Default: yes')
 
 
-
+    ##updating 070625
+    parser.add_argument("-soc_obj_svd", dest='soc_object_svd_fl',
+                        help='Provide an object obtained from the peak calling or diff peak calling step.')
 
 
 
@@ -416,8 +418,21 @@ def main(argv=None):
 
 
                 if args.soc_object_fl is None:
-                    print('Cannot find soc object file from clustering step, please provide it')
-                    return
+
+
+                    ##updating 070625
+                    if args.soc_object_svd_fl is None:
+                        print('Cannot find soc object svd file from clustering step, please provide it')
+                        return
+
+                    else:
+
+                        try:
+                            file = open(args.soc_object_svd_fl, 'r')  ##check if the file is not the right file
+                        except IOError:
+                            print('There was an error opening the soc object svd file from clustering step!')
+                            return
+
                 else:
                     try:
                         file = open(args.soc_object_fl, 'r')  ##check if the file is not the right file
@@ -804,16 +819,14 @@ def main(argv=None):
         ##updating 042425
         if open_smooth_motif_dev_score_final == 'yes':
 
-            ipt_svd_obj_fl = args.soc_object_fl
-
             ipt_motif_deviation_score_fl = step02_motif_deviation_score_generation_dir + '/' + 'motif.deviations.txt'
 
             print('- open conduct smooth for the motif deviation score')
 
-
-
             ##Updating 070425
             if args.soc_object_fl is None:
+
+                ipt_svd_obj_fl = args.soc_object_svd_fl
 
                 if args.celltype_cluster_col_name is not None:
                     ipt_target_cluster_nm = args.celltype_cluster_col_name
