@@ -381,18 +381,24 @@ value less than 0.001 (<strong>-threshold 0.001</strong>).</p>
 <p><strong>Inputs</strong> (Required):<br />
 1. <strong>-script_dir</strong> (A script directory downloaded from
 GitHub: Socrates2/utils/input_other_required_scripts_dir)<br />
-2. <strong>-tn5_fl</strong> (The
+2. <strong>-soc_obj</strong> (The <strong>*.atac.soc.rds</strong> object
+obtained from the <strong>“Save final peak to an output object”</strong>
+step in <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/peak_call_per_celltype.html">7.
+Call Peaks per Cell Type</a>)<br />
+3. <strong>-tn5_fl</strong> (The
 <strong>opt_tn5_mq10_sorted.bed</strong> obtained from <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html">4.
 Prepare gene accessibility</a> step which records the coordinates of
 each Tn5 insertions per cell)<br />
-3. <strong>-peak_fl</strong> (A peak BED file obtained from
+4. <strong>-peak_fl</strong> (Optional if <code>-soc_obj</code> is used.
+A peak BED file obtained from
 <strong>s3_open_filter_peak_final_dir</strong> of <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/peak_call_per_celltype.html">7.
 Call peak per cell type</a>)<br />
-4. <strong>-meta_fl</strong> (A final meta file with cell identities
-being annotated)<br />
-5. <strong>-ct_colnm</strong> (A column name in the metadata file
-specifying the cell identity. If users have already executed Option 5:
-Generate the final UMAP plot with labeled cell identities under <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/annotate_cell_identity.html">6.
+5. <strong>-meta_fl</strong> (Optional if <code>-soc_obj</code> is used.
+A final meta file with cell identities being annotated)<br />
+6. <strong>-ct_colnm</strong> (Optional if <code>-soc_obj</code> is
+used. A column name in the metadata file specifying the cell identity.
+If users have already executed Option 5: Generate the final UMAP plot
+with labeled cell identities under <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/annotate_cell_identity.html">6.
 Annotate cell identity</a>, the value should be <strong>-ct_colnm
 cell_identity</strong>.)</p>
 <p><strong>Overall parameters</strong> (Optional):<br />
@@ -428,14 +434,14 @@ information using the <code>-ct_colnm</code> parameter.</p>
 <pre class="bash"><code>python Socrates2/utils/diff_peak_calling.py
 -script_dir Socrates2/utils/input_other_required_scripts_dir
 -o output_dir
--peak_fl opt_final.*.bed
+-soc_obj /Path/to/*.atac.soc.rds
 -tn5_fl opt_tn5_mq10_sorted.bed
--meta_fl final_meta.txt
--ct_colnm cell_identity
 -core 20</code></pre>
 <p><strong>Outputs</strong><br />
 1.
-output_dir/s2_open_diff_peak_call_final_dir/<strong>opt.all_ACRs.classified.bed</strong><br />
+s2_open_diff_peak_call_final_dir/<strong>opt.all_ACRs.classified.bed</strong><br />
+2.
+s2_open_diff_peak_call_final_dir/<strong>*.atac.soc.rds</strong><br />
 </p>
 </div>
 <div id="option-2-call-group-specific-acrs" class="section level3">
@@ -449,24 +455,27 @@ cell type. For example, if users have treatment and control groups, it
 can be used to detect ACRs that exhibit significantly higher or lower
 chromatin accessibility in the treatment group compared to the
 control.</p>
+<p>The input for <code>-soc_obj</code> can be obtained either from the
+<strong>“Save final peak to an output object”</strong> step in <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/peak_call_per_celltype.html">7.
+Call Peaks per Cell Type</a>, or from <strong>Option 1: Call
+Cell-Type-Specific ACRs</strong>, specifically from the file located at
+<code>s2_open_diff_peak_call_final_dir/*.atac.soc.rds</code>.</p>
 <p><strong>Running</strong>:<br />
 </p>
 <pre class="bash"><code>python Socrates2/utils/diff_peak_calling.py
 -script_dir Socrates2/utils/input_other_required_scripts_dir
 -o output_dir
+-s1_open_prepare no
 -s2_open_diff_ct_peak no
 -s3_open_diff_gp_peak yes
--peak_fl opt_final.*.bed
--tn5_fl opt_tn5_mq10_sorted.bed
--meta_fl final_meta.txt
--ct_colnm cell_identity
+-soc_obj output_dir/s2_open_diff_peak_call_final_dir/*.atac.soc.rds
 -gp_colnm treatment_group
 -core 20</code></pre>
 <p><strong>Outputs</strong><br />
 1.
-output_dir/s3_open_diff_group_peak_final_dir/<em>/<strong>opt.all_ACRs.classified.bed</strong><br />
+s3_open_diff_group_peak_final_dir/<strong>opt.all_ACRs.celltype.group.classified.bed</strong><br />
 2.
-output_dir/s3_open_diff_group_peak_final_dir/</em>/<strong>opt.*.cts.ACRs.bed</strong><br />
+s3_open_diff_group_peak_final_dir/<strong>*.atac.soc.rds</strong><br />
 </p>
 </div>
 </div>

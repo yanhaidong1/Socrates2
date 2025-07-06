@@ -376,18 +376,25 @@ significant variation across pseudotime, with false discovery rates (FDR
 <li><p><strong><code>-script_dir</code></strong><br />
 Path to the script directory downloaded from GitHub:<br />
 <code>Socrates2/utils/input_other_required_scripts_dir</code></p></li>
+<li><p><strong><code>-soc_obj</code></strong><br />
+(The <strong>*.atac.soc.rds</strong> object obtained from the
+<strong>“Motif deviation score”</strong> step in<br />
+<a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/motif_analysis.html">9.
+Motif analysis</a>)</p></li>
 <li><p><strong><code>-meta_fl</code></strong><br />
-Metadata file containing at least the cell names and their corresponding
-identity attributes. Cell identities can be annotated in <em>Option 5:
-generate the final UMAP plot with labeled cell identities</em> in <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/annotate_cell_identity.html">Step
+Optional if <code>-soc_obj</code> is used. Metadata file containing at
+least the cell names and their corresponding identity attributes. Cell
+identities can be annotated in <em>Option 5: generate the final UMAP
+plot with labeled cell identities</em> in <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/annotate_cell_identity.html">Step
 5: Annotate Cell Identity</a>. If you wish to use a custom metadata
 file, please ensure it includes a <code>cell_identity</code> column
 specifying the cell type for each cell, and a
 <code>celltype_color</code> column indicating the corresponding color
 for each cell type.</p></li>
 <li><p><strong><code>-soc_obj_svd</code></strong><br />
-Path to the RDS object (<code>*.atac.soc.rds</code>) containing the
-dimension reduction results. This file is generated during <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/clustering.html">Step
+Optional if <code>-soc_obj</code> is used. Path to the RDS object
+(<code>*.atac.soc.rds</code>) containing the dimension reduction
+results. This file is generated during <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/clustering.html">Step
 3: Clustering</a>.</p></li>
 <li><p><strong><code>-celltype_path</code></strong><br />
 A string that defines the progression of cell types along a
@@ -408,10 +415,11 @@ include in the trajectory analysis. By default, all four features are
 analyzed. If users prefer to analyze a subset, they must specify at
 least one feature.</p></li>
 <li><p><strong><code>-soc_obj_gene_acc</code></strong><br />
-If the <strong>Gene</strong> or <strong>TF</strong> feature is selected,
-users must provide an RDS object containing gene accessibility data.
-This file (<code>*.atac.soc.rds</code>) is generated in the
-<em>Calculate gene accessibility</em> step of <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html">Step
+Optional if <code>-soc_obj</code> is used. If the <strong>Gene</strong>
+or <strong>TF</strong> feature is selected, users must provide an RDS
+object containing gene accessibility data. This file
+(<code>*.atac.soc.rds</code>) is generated in the <em>Calculate gene
+accessibility</em> step of <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html">Step
 4: Prepare Gene Accessibility</a>.</p></li>
 <li><p><strong><code>-TF_fl</code></strong><br />
 If the <strong>TF</strong> feature is selected, users must provide a
@@ -419,15 +427,16 @@ transcription factor gene list file, which can be downloaded from the <a href="h
 should contain three columns: <code>TF_ID</code>, <code>Gene_ID</code>,
 and <code>Family</code>.</p></li>
 <li><p><strong><code>-motif_dev_fl</code></strong><br />
-If the <strong>Motif</strong> feature is selected, users must provide an
-smoothed motif deviation file. This file
-(<code>*.smoothed_motifs.txt</code>) is generated in the <em>Motif
-deviation score</em> step of <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/motif_analysis.html">Step
+Optional if <code>-soc_obj</code> is used. If the <strong>Motif</strong>
+feature is selected, users must provide an smoothed motif deviation
+file. This file (<code>*.smoothed_motifs.txt</code>) is generated in the
+<em>Motif deviation score</em> step of <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/motif_analysis.html">Step
 9: Motif analysis</a>.</p></li>
 <li><p><strong><code>-ACR_sparse_fl</code></strong><br />
-If the <strong>ACR</strong> feature is selected, users must provide an
-ACR sparse file with Tn5 integration site. This file
-(<code>opt_peak_sorted.sparse</code>) is generated during <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/find_diff_markers.html">Step
+Optional if <code>-soc_obj</code> is used. If the <strong>ACR</strong>
+feature is selected, users must provide an ACR sparse file with Tn5
+integration site. This file (<code>opt_peak_sorted.sparse</code>) is
+generated during <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/find_diff_markers.html">Step
 8: Identify cell-type-specific peak</a>.</p></li>
 <li><p><strong><code>-core</code></strong><br />
 Number of cores to use for parallel analysis (Default:
@@ -442,11 +451,15 @@ Set to <code>yes</code> to enforce equal cell numbers across all cell
 types included in the trajectory analysis.</p></li>
 </ol>
 <p><strong>Outputs</strong><br />
-1. <em>.trajectory.txt<br />
-2. </em>.(Genes|TFs|Mt|ACR)_pt_sorted.txt<br />
-3. <em>.(Genes|TFs|Mt|ACR).diffTestsQVALs.txt<br />
-4. </em>.trajectory(Genes|TFs|Mt|ACR).pdf<br />
-5. *_PTplot.pdf<br />
+1.
+step02_running_trajectory_analysis_dir/<strong>*.trajectory.txt</strong><br />
+2.
+step02_running_trajectory_analysis_dir/***.(Genes|TFs|Mt|ACR)_pt_sorted.txt<strong><br />
+3.
+step02_running_trajectory_analysis_dir/</strong>*.(Genes|TFs|Mt|ACR).diffTestsQVALs.txt<strong><br />
+4.
+step02_running_trajectory_analysis_dir/</strong>*.trajectory(Genes|TFs|Mt|ACR).pdf<strong><br />
+5. step02_running_trajectory_analysis_dir/</strong>*_PTplot.pdf**<br />
 </p>
 </div>
 <div id="option-1-perform-analysis-for-all-features-gene-tf-motif-or-acr" class="section level3">
@@ -458,13 +471,10 @@ Motif, or ACR)</strong>:</h3>
 -open_motif_enrich yes
 -script_dir Socrates2/utils/input_other_required_scripts_dir
 -o output_dir
--meta_fl /Path/to/*.annotated_cell_identity.meta.txt
--soc_obj_svd /Path/to/*.atac.soc.rds
+-soc_obj /Path/to/*.atac.soc.rds
 -celltype_path celltype1,celltype2,celltype3
--soc_obj_gene_acc /Path/to/*.atac.soc.rds
 -TF_fl /Path/to/*_TF_list.txt
--motif_dev_fl /Path/to/*.smoothed_motifs.txt
--ACR_sparse_fl /Path/to/opt_peak_sorted.sparse</code></pre>
+-core 10</code></pre>
 </div>
 <div id="option-2-perform-analysis-for-gene-feature" class="section level3">
 <h3><strong>Option 2: Perform analysis for Gene feature</strong>:</h3>
@@ -474,11 +484,10 @@ Motif, or ACR)</strong>:</h3>
 -open_motif_enrich yes
 -script_dir Socrates2/utils/input_other_required_scripts_dir
 -o output_dir
--meta_fl /Path/to/*.annotated_cell_identity.meta.txt
--soc_obj_svd /Path/to/*.atac.soc.rds
+-soc_obj /Path/to/*.atac.soc.rds
 -celltype_path celltype1,celltype2,celltype3
--soc_obj_gene_acc /Path/to/*.atac.soc.rds
--feature Gene</code></pre>
+-feature Gene
+-core 10</code></pre>
 </div>
 <div id="option-3-perform-analysis-for-tf-feature" class="section level3">
 <h3><strong>Option 3: Perform analysis for TF feature</strong>:</h3>
@@ -488,12 +497,11 @@ Motif, or ACR)</strong>:</h3>
 -open_motif_enrich yes
 -script_dir Socrates2/utils/input_other_required_scripts_dir
 -o output_dir
--meta_fl /Path/to/*.annotated_cell_identity.meta.txt
--soc_obj_svd /Path/to/*.atac.soc.rds
+-soc_obj /Path/to/*.atac.soc.rds
 -celltype_path celltype1,celltype2,celltype3
--soc_obj_gene_acc /Path/to/*.atac.soc.rds
 -TF_fl /Path/to/*_TF_list.txt
--feature TF</code></pre>
+-feature TF
+-core 10</code></pre>
 </div>
 <div id="option-4-perform-analysis-for-motif-feature" class="section level3">
 <h3><strong>Option 4: Perform analysis for Motif feature</strong>:</h3>
@@ -503,11 +511,10 @@ Motif, or ACR)</strong>:</h3>
 -open_motif_enrich yes
 -script_dir Socrates2/utils/input_other_required_scripts_dir
 -o output_dir
--meta_fl /Path/to/*.annotated_cell_identity.meta.txt
--soc_obj_svd /Path/to/*.atac.soc.rds
+-soc_obj /Path/to/*.atac.soc.rds
 -celltype_path celltype1,celltype2,celltype3
--motif_dev_fl /Path/to/*.smoothed_motifs.txt
--feature Motif</code></pre>
+-feature Motif
+-core 10</code></pre>
 </div>
 <div id="option-5-perform-analysis-for-acr-feature" class="section level3">
 <h3><strong>Option 5: Perform analysis for ACR feature</strong>:</h3>
@@ -517,11 +524,10 @@ Motif, or ACR)</strong>:</h3>
 -open_motif_enrich yes
 -script_dir Socrates2/utils/input_other_required_scripts_dir
 -o output_dir
--meta_fl /Path/to/*.annotated_cell_identity.meta.txt
--soc_obj_svd /Path/to/*.atac.soc.rds
+-soc_obj /Path/to/*.atac.soc.rds
 -celltype_path celltype1,celltype2,celltype3
--ACR_sparse_fl /Path/to/opt_peak_sorted.sparse
--feature ACR</code></pre>
+-feature ACR
+-core 10</code></pre>
 </div>
 </div>
 

@@ -392,6 +392,9 @@ criterion: corrected <em>p</em> values &lt; 0.01, fold-change of the top
 enriched TF motif in cell type-specific peaks for all cell types should
 be over 1, and beta (motif enrichment score) &gt; 0.05 or beta &gt;
 0.</p>
+<div id="motif-enrichment-analysis" class="section level3">
+<h3>Motif enrichment analysis</h3>
+</div>
 <div id="inputs-required" class="section level3">
 <h3><strong>Inputs</strong> (Required):</h3>
 <ol style="list-style-type: decimal">
@@ -406,15 +409,23 @@ Path to the genome FASTA file.</p></li>
 Path to the motif file in MEME format (recommended). Motif files can be
 downloaded from the JASPAR database:<br />
 <a href="https://jaspar.elixir.no/">https://jaspar.elixir.no/</a></p></li>
+<li><p><strong><code>-soc_obj</code></strong><br />
+(The <strong>*.atac.soc.rds</strong> object obtained from the
+<strong>“Option 1: Call cell-type-specific ACRs”</strong> Or
+<strong>“Option 2: Call group-specific ACRs”</strong> step in<br />
+<a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/call_diff_peaks.html">8.
+Call diff peaks</a>)</p></li>
 <li><p><strong><code>-acr_fl</code></strong><br />
-Accessible Chromatin Region (ACR) file, generated from<br />
+Optional if <code>-soc_obj</code> is used. Accessible Chromatin Region
+(ACR) file, generated from<br />
 <code>s3_open_filter_peak_final_dir/opt_final.*Peaks.bed</code>. This is
 created during<br />
 <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/peak_call_per_celltype.html">Step
 6: Call peak per cell type</a></p></li>
 <li><p><strong><code>-meta_fl</code></strong><br />
-Metadata file containing at least the cell names and their corresponding
-identity attributes. Cell identities can be annotated in<br />
+Optional if <code>-soc_obj</code> is used. Metadata file containing at
+least the cell names and their corresponding identity attributes. Cell
+identities can be annotated in<br />
 <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/annotate_cell_identity.html">Step
 5: Annotate Cell Identity</a></p></li>
 <li><p><strong><code>-tn5_fl</code></strong><br />
@@ -425,8 +436,8 @@ BAM</a> step</p></li>
 <li><p><strong><code>-o output_dir</code></strong><br />
 Output directory (e.g., <code>mkdir output_dir</code>)</p></li>
 <li><p><strong><code>-ct_colnm</code></strong><br />
-Column name in the metadata file representing the annotated cell type
-attribute</p></li>
+Optional if <code>-soc_obj</code> is used. Column name in the metadata
+file representing the annotated cell type attribute.</p></li>
 </ol>
 </div>
 <div id="optional-parameters" class="section level3">
@@ -463,7 +474,9 @@ Cutoff for the number of cells per group during downsampling (Default:
 <p><strong>Outputs</strong><br />
 </p>
 <ol style="list-style-type: decimal">
-<li>output_dir/step01_motif_enrichment_analysis_dir/open_enrichment_test_final_dir/opt_motif_enrichment_cluster.txt<br />
+<li>step01_motif_enrichment_analysis_dir/open_enrichment_test_final_dir/opt_motif_enrichment_cluster.txt<br />
+</li>
+<li>step01_motif_enrichment_analysis_dir/<strong>*.atac.soc.rds</strong><br />
 </li>
 </ol>
 <p><strong>Running</strong>:<br />
@@ -474,15 +487,12 @@ Cutoff for the number of cells per group during downsampling (Default:
 -o output_dir
 -genome_fl Socrates2/raw_input_data/gene.fa
 -motif_fl Socrates2/raw_input_data/motif_enrichment_test_dir/opt_combine_meme_pwm.txt
--acr_fl Socrates2/raw_input_data/motif_enrichment_test_dir/opt_final.Peaks.bed
--meta_fl Socrates2/raw_input_data/motif_enrichment_test_dir/opt_meta_ScAClass_predicted_cell_identity.txt
+-soc_obj /Path/to/*.atac.soc.rds
 -tn5_fl Socrates2/raw_input_data/opt_tn5_mq10_sorted.bed
--ct_colnm ScAClass_clust \
 -core 10</code></pre>
 </div>
-</div>
-<div id="build-bsgenome-package-in-r" class="section level2">
-<h2>Build BSgenome package in R</h2>
+<div id="build-bsgenome-package-in-r" class="section level3">
+<h3>Build BSgenome package in R</h3>
 <p>Before calculating motif deviation scores, the
 <strong>BSgenome</strong> package must be installed, and the parameter
 <code>-open_build_BSgenome yes</code> should be enabled. <strong>If
@@ -546,8 +556,8 @@ is successfully built in R and can be loaded using
 <code>library(riceV7)</code>.<br />
 </p>
 </div>
-<div id="motif-deviation-score" class="section level2">
-<h2>Motif deviation score</h2>
+<div id="motif-deviation-score" class="section level3">
+<h3>Motif deviation score</h3>
 <p><strong>Motif deviation scores</strong> serve as a powerful metric to
 quantify the variability in chromatin accessibility at transcription
 factor binding motifs across individual cells. These scores are
@@ -569,22 +579,29 @@ Enables the calculation of motif deviation scores.</p></li>
 <li><p><strong><code>-script_dir</code></strong><br />
 Path to the script directory, which should be downloaded from
 GitHub: <code>Socrates2/utils/input_other_required_scripts_dir</code>.</p></li>
+<li><p><strong><code>-soc_obj</code></strong><br />
+(The <strong>*.atac.soc.rds</strong> object obtained from the
+<strong>“Motif enrichment analysis”</strong> step in<br />
+<a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/motif_analysis.html">9.
+Motif analysis</a>)</p></li>
 <li><p><strong><code>-acr_fl</code></strong><br />
-Path to the ACR (Accessible Chromatin Region) file, generated from
+Optional if <code>-soc_obj</code> is used. Path to the ACR (Accessible
+Chromatin Region) file, generated from
 <code>s3_open_filter_peak_final_dir/opt_final.*Peaks.bed</code>.<br />
 This file is produced during <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/peak_call_per_celltype.html">Step
 6: Call peak per cell type</a>.</p></li>
 <li><p><strong><code>-meta_fl</code></strong><br />
-Metadata file containing at least the cell names and their corresponding
-identity annotations.<br />
+Optional if <code>-soc_obj</code> is used. Metadata file containing at
+least the cell names and their corresponding identity annotations.<br />
 These annotations should be prepared in [Step 5: Annotate Cell
 Identity]<br />
 (<a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/annotate_cell_identity.html" class="uri">http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/annotate_cell_identity.html</a>).</p></li>
 <li><p><strong><code>-acr_Tn5_fl</code></strong><br />
-ACR file containing Tn5 insertion site counts per cell.<br />
+Optional if <code>-soc_obj</code> is used. ACR file containing Tn5
+insertion site counts per cell.<br />
 This file is generated during the <strong>Motif enrichment</strong> step
 and can be found at:<br />
-<code>output_dir/open_prepare_data_enrichment_final_dir/opt_peak_output_sorted.sparse</code>.</p></li>
+<code>open_prepare_data_enrichment_final_dir/opt_peak_output_sorted.sparse</code>.</p></li>
 <li><p><strong><code>-jasmotifmtx</code></strong><br />
 A motif matrix file generated from the JASPAR database, downloadable
 from Socrates2.</p></li>
@@ -600,17 +617,19 @@ Set cores we will use for the parallele analysis. (Default:
 <code>1</code>)</p></li>
 <li><p><strong><code>-open_smooth_dev_score</code></strong> Smooth the
 deviation score. (Default: <code>yes</code>)</p></li>
-<li><p><strong><code>-soc_obj</code></strong> Required if
+<li><p><strong><code>-soc_obj_svd</code></strong> Required if
 <strong>-open_smooth_dev_score</strong> is set to yes.<br />
-Provide the object file (*.atac.soc.rds) generated during the <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/clustering.html">Clustering</a>
-step)</p></li>
+Provide the object file (*.atac.soc.rds) generated during the <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/clustering.html">3.
+Clustering</a> step)</p></li>
 </ol>
 <p><strong>Outputs</strong><br />
 </p>
 <ol style="list-style-type: decimal">
-<li>output_dir/step02_motif_deviation_score_generation_dir/motif.deviations.txt<br />
+<li>step02_motif_deviation_score_generation_dir/<strong>motif.deviations.txt</strong><br />
 </li>
-<li>output_dir/step02_motif_deviation_score_generation_dir/output.smoothed_motifs.txt<br />
+<li>step02_motif_deviation_score_generation_dir/<strong>*.smoothed_motifs.txt</strong><br />
+</li>
+<li>step02_motif_deviation_score_generation_dir/<strong>*.atac.soc.rds</strong><br />
 </li>
 </ol>
 <p><strong>Running</strong>:<br />
@@ -619,13 +638,11 @@ step)</p></li>
 -open_motif_DevScore yes
 -script_dir Socrates2/utils/input_other_required_scripts_dir
 -o output_dir
--acr_fl Socrates2/raw_input_data/motif_enrichment_test_dir/opt_final.Peaks.bed
--acr_Tn5_fl output_dir/open_prepare_data_enrichment_final_dir/opt_peak_output_sorted.sparse
--meta_fl Socrates2/raw_input_data/motif_enrichment_test_dir/opt_meta_ScAClass_predicted_cell_identity.txt
--tn5_fl Socrates2/raw_input_data/opt_tn5_mq10_sorted.bed
+-BSgenome riceV7
 -jasmotifmtx Socrates2/input_required_data/JASPAR2022_Arabidopsis_motif.rds
 -soc_obj /Path/to/*.atac.soc.rds
 -core 10</code></pre>
+</div>
 </div>
 
 
