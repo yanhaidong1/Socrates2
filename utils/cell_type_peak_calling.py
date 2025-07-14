@@ -5,6 +5,7 @@
 ##this script is to directly run MACS2 based on previous developed bed files
 ##and save the dtemp files to run MACS2 for different threshold
 
+##updating 071425 we will set an option to remove the pt or mt
 ##updating 062925 we will change the meta and ct colnm into the obj
 ##updating 062425 we will filter peaks excess the range of Gmfai
 ##updating 110524 we will introduce a new function to prepare the big wig file
@@ -46,8 +47,7 @@ def get_parsed_args():
 
     parser.add_argument("-script_dir", dest = 'required_script_dir', help = 'Users must provide the required script dir provided by GitHub.')
 
-    #parser.add_argument("-ct_colnm", dest='celltype_cluster_col_name',
-    #                    help='Define the cluster column name of the meta file.')
+
 
     ##optional parameters
     parser.add_argument("-s1_open_tn5", dest = 's1_open_prepare_tn5_file', help = 'Run the step 01 to prepare the tn5 file per cell type.'
@@ -67,6 +67,10 @@ def get_parsed_args():
                                                                                       'Default: no')
 
     parser.add_argument("-final_peak_fl" , dest = 'final_peak_file', help = 'Specify the final peak file after deciding which peak file is suitable for the peak calling.')
+
+    ##updating 071425
+    parser.add_argument("-organelle_chr_name", dest = 'organelle_chromosome_name', help = 'Users must specify the chromosome names of organelles within the genome FASTA file. The names should be separated by commas. For example: -organelle_chr_name ChrPt,ChrMt.')
+
 
 
 
@@ -248,6 +252,12 @@ def main(argv=None):
         core_number_run = args.core_number
     else:
         core_number_run = '1'
+
+    ##updating 071425
+    if args.organelle_chromosome_name is None:
+        organelle_chromosome_name_final = 'ChrMt,ChrPt'
+    else:
+        organelle_chromosome_name_final = args.organelle_chromosome_name
 
 
 
@@ -487,9 +497,26 @@ def main(argv=None):
                 print('Please use *.atac.soc.rds file without changing the file name')
                 return
 
+
+        ##updating 071425
+        ##modify the peak to make sure there is no pt mt
+        store_final_line_list = []
+        organelle_chromosome_name_final_list = organelle_chromosome_name_final.split(',')
+        with open (ipt_final_peak_fl,'r') as ipt:
+            for eachline in ipt:
+                eachline = eachline.strip('\n')
+                col = eachline.strip().split('\t')
+                chrnm = col[0]
+                if chrnm not in organelle_chromosome_name_final_list:
+                    store_final_line_list.append(eachline)
+
+        with open (output_dir + '/temp_peak_no_organelle.txt','w+') as opt:
+            for eachline in store_final_line_list:
+                opt.write(eachline + '\n')
+
         cmd = 'Rscript ' + utils_cell_type_peak_calling_dir + '/save_object.R' + \
               ' ' + ipt_soc_obj_fl + \
-              ' ' + ipt_final_peak_fl + \
+              ' ' + output_dir + '/temp_peak_no_organelle.txt' + \
               ' ' + output_dir + \
               ' ' + input_prefix
         print(cmd)
