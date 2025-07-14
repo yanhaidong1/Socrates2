@@ -2,6 +2,8 @@
 
 ##this script we will make the peak sparse file for each organ with using the parallele
 
+##updating 071425 debug do not replace chr if there is only chr
+
 ##this script is to call peaks for each lib
 import re
 import glob
@@ -86,7 +88,14 @@ def prepare_peak_acc (input_peak_tn5_fl,input_final_peak_fl,input_output_dir):
         for eachline in ipt:
             eachline = eachline.strip('\n')
             col = eachline.strip().split()
-            new_peak = col[0].replace('chr','')
+
+            ##updating 071425
+            peak_list = col[0].split('_')
+            chrnm = peak_list[0]
+            if re.match('chr\d+',chrnm):
+                new_peak = col[0]
+            else:
+                new_peak = col[0].replace('chr','')
             acrloc = '\t'.join(new_peak.split('_'))
             store_all_acr_dic[acrloc] = new_peak
 
