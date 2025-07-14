@@ -129,8 +129,14 @@ def prepare_peak_acc (input_peak_tn5_fl,input_final_peak_fl,input_output_dir):
         eachline = eachline.strip('\n')
         col = eachline.strip().split()
 
-        acrlocnospace = col[0]
-        acrlocnospace = acrlocnospace.replace('chr','')
+        ##updating 071425
+        peak_list = col[0].split('_')
+        chrnm = peak_list[0]
+        if re.match('chr\d+', chrnm):
+            acrlocnospace = col[0]
+        else:
+            acrlocnospace = col[0]
+            acrlocnospace = acrlocnospace.replace('chr','')
 
         if acrlocnospace in store_final_peak_dic:
 
