@@ -415,29 +415,34 @@ file to an object. Default: no)<br />
 6. <strong>-final_peak_fl</strong> (Provide the final peak BED file if
 you have selected an appropriate peak file from
 <code>s3_open_filter_peak_final_dir/opt_final.*Peaks.fx.sorted.bed</code>.)<br />
-7. <strong>-core</strong> (Set cores we will use for the parallele
+7. <strong>-organelle_chr_name</strong> (Specify the names of organelle
+chromosomes in the genome FASTA file. Peaks located on these chromosomes
+will be excluded from the final peak file. Multiple names should be
+separated by commas. For example: <code>-organelle_chr_name</code>
+ChrPt,ChrMt.)<br />
+8. <strong>-core</strong> (Set cores we will use for the parallele
 analysis. Default: 1)<br />
-8. <strong>-ct_colnm</strong> (A column name in the metadata file
+9. <strong>-ct_colnm</strong> (A column name in the metadata file
 specifying the cell identity. If users have already executed Option 5:
 Generate the final UMAP plot with labeled cell identities under <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/annotate_cell_identity.html">6.
-Annotate cell identity</a>, the value should be <strong>-ct_colnm
-cell_identity</strong>.)<br />
-9. <strong>-umapp_fl</strong> (Provide the unmappable file that will
+Annotate cell identity</a>, the value should be
+<code>-ct_colnm cell_identity</code>.)<br />
+10. <strong>-umapp_fl</strong> (Provide the unmappable file that will
 help build the imputated region. Default: None)<br />
-10. <strong>-p_or_q</strong> (Provide to use p value or q value using
+11. <strong>-p_or_q</strong> (Provide to use p value or q value using
 MACS2. Default: pval). <strong>-cutoff</strong> (Provide an exact cutoff
 for either pvalue or qvalue. Default: 0.05)<br />
-11. <strong>-SLOCAL</strong> (Provide a parameter setting of SLOCAL
+12. <strong>-SLOCAL</strong> (Provide a parameter setting of SLOCAL
 within MACS2 to adjust bp count for small local region. Default:
 75)<br />
-12. <strong>-LLOCAL</strong> (Provide a parameter setting of SLOCAL
+13. <strong>-LLOCAL</strong> (Provide a parameter setting of SLOCAL
 within MACS2 to adjust bp count for large local region. Default:
 500)<br />
-13. <strong>-max_gap</strong> (Provide a parameter setting of max_gap
+14. <strong>-max_gap</strong> (Provide a parameter setting of max_gap
 within MACS2 to decide whether the nearby peaks will be merged. If the
 distance between two nearby peaks is smaller than <code>max-gap</code>
 then they will be merged as one. Default: 10)<br />
-14. <strong>-FDR</strong> (Provide a FDR string to return all the peak
+15. <strong>-FDR</strong> (Provide a FDR string to return all the peak
 files with all defined FDR values with performing peak filtration.
 Default: 0.05,0.01,0,005,0.001)<br />
 </p>
