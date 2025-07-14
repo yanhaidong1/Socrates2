@@ -605,9 +605,23 @@ def main(argv=None):
 
         input_cell_annot_fl = args.cell_annot_identity_file
 
+        ##updating 071425
+        ##add _ for the cell type with space
+        store_final_line_list = []
+        with open (input_cell_annot_fl,'r') as ipt:
+            for eachline in ipt:
+                eachline = eachline.strip('\n')
+                col = eachline.strip().split('\t')
+                celltype_nm = col[1].replace(' ','_')
+                final_line = col[0] + '\t' + celltype_nm
+                store_final_line_list.append(final_line)
+        with open (open_add_cell_annot_identity_final_dir + '/temp_modi_cell_annot.txt','w+') as opt:
+            for eachline in store_final_line_list:
+                opt.write(eachline + '\n')
+
         cmd = 'Rscript ' + plot_UMAP_script + \
               ' ' + input_soc_obj_fl + \
-              ' ' + input_cell_annot_fl + \
+              ' ' + open_add_cell_annot_identity_final_dir + '/temp_modi_cell_annot.txt' + \
               ' ' + open_add_cell_annot_identity_final_dir + \
               ' ' + dot_size_num_final + \
               ' ' + input_prefix
