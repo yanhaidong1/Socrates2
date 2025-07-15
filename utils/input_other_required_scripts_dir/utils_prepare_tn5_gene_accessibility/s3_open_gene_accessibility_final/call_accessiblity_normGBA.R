@@ -40,30 +40,47 @@ message(" - loading data ...")
   
 soc_obj <- readRDS(input_soc_obj_fl)
 
-a <- soc_obj$gene_Tn5
-b <- soc_obj$meta
-g <- soc_obj$gene_bed
+if ("gene_Tn5_mtx" %in% names(soc_obj) == TRUE){
+  message ('the soc object contains the sparse matrix of gene Tn5 data')
+  a <- soc_obj$gene_Tn5_mtx
+  b <- soc_obj$meta
+  a <- a[,colnames(a) %in% rownames(b)]
+  b <- b[colnames(a),]
+}else{
+  
+  a <- soc_obj$gene_Tn5
+  b <- soc_obj$meta
+  g <- soc_obj$gene_bed
+  
+  #a <- read.table(input,stringsAsFactors = T)
+  #b <- read.table(meta)
+  #g <- read.table(gene)
+  
+  
+  ##updating 071525
+  ##we will check if soc obj has gene_Tn5_mtx
+  
+  ##process
+  ##filter out genes without meeting the requirements of length
+  a <- sparseMatrix(i=as.numeric(a$V1),
+                    j=as.numeric(a$V2),
+                    x=as.numeric(a$V3),
+                    dimnames=list(levels(a$V1),levels(a$V2)))
+  a <- a[,colnames(a) %in% rownames(b)]
+  b <- b[colnames(a),]
+  rownames(g) <- g$V4
+  g <- g[rownames(a),]
+  g$gene.len <- g$V3 - g$V2
+  g <- subset(g, g$gene.len > 100)
+  a <- a[rownames(g),]
 
-#a <- read.table(input,stringsAsFactors = T)
-#b <- read.table(meta)
-#g <- read.table(gene)
+}
 
-##process
-##filter out genes without meeting the requirements of length
-a <- sparseMatrix(i=as.numeric(a$V1),
-                  j=as.numeric(a$V2),
-                  x=as.numeric(a$V3),
-                  dimnames=list(levels(a$V1),levels(a$V2)))
-a <- a[,colnames(a) %in% rownames(b)]
-b <- b[colnames(a),]
-rownames(g) <- g$V4
-g <- g[rownames(a),]
-g$gene.len <- g$V3 - g$V2
-g <- subset(g, g$gene.len > 100)
-a <- a[rownames(g),]
   
 ##save the sparseMatrix
 #saveRDS(a,paste0(output_dir,'/temp_mtx.rds'))
+
+
 
 #}
   
