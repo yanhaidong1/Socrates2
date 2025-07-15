@@ -23,16 +23,7 @@ and much more!
 
 ## Installation
 
-`Socates` requires R v4.0.0 or greater. 
 
-```
-# download the devtools package if not currently installed
-install.packages("devtools")
-library(devtools)
-
-# install
-devtools::install_github("yanhaidong1/Socrates2", ref="main")
-```
 
 
 
