@@ -1,3 +1,4 @@
+##updating 071625 we will set an cutoff for the genes with FDR < 0.05 cutoff
 ##updating 051425 we will set an option to decide which matrix will be loaded 
 ##udpating 071223 we will change the color of each traj
 ##updating 071023 we will open the traject genes anlaysis add the beta for the lm
@@ -932,6 +933,7 @@ sigPseudo2 <- function(obj, meta, type="ACRs", threads=1){
     # run anova per gene
     #x <- 1
     ##use the multiple threads to have analyses
+    ##note the use would be the 0 or 1 to match the binomial test
     outs <- mclapply(seq(1:nrow(use)), function(x){
         if((x%%1000)==0){message("   ~ iterated over ",x," gene/peak/motifs ...")}
         if(type=="ACRs"){
@@ -1364,6 +1366,12 @@ plotTargetGN <- function(obj, pt, collect_targetGN_set_opt_dir,cluster=1, prefix
   if(!is.null(tests)){
     message(" - filter by differential testing ...")
     tests <- subset(tests, tests$qval < FDR)
+    
+    ##updating 071625
+    if (nrow(tests) > 10000) {
+      tests <- tests[order(tests$FDR), ][1:10000, ]
+    }
+    
     binary <- binary[rownames(binary) %in% rownames(tests),]
   }
   
