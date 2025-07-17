@@ -169,8 +169,10 @@ if (ncol(temp_peak_dt) == 3){
   temp_peak_dt$V4 <- paste0(temp_peak_dt$V1,'_',temp_peak_dt$V2,'_',temp_peak_dt$V3)
   
   ##updating 031123 we will make sure there is no chr
-  rownames(a) <- gsub('chr','',rownames(a))
-
+  #rownames(a) <- gsub('chr','',rownames(a))
+  rownames(a) <- gsub('chrChr','Chr',rownames(a))
+  rownames(a) <- gsub('chrchr','chr',rownames(a))
+  
   ##updating 030823
   ##we need to make sure the peaks match between two sets
   ##there are peaks missing as we downsample cells so in the peak sparse files, there are some peaks are lost just like 100 peaks
@@ -185,7 +187,9 @@ if (ncol(temp_peak_dt) == 3){
   ##if the temp_peak_dt has 4 col
   if (ncol(temp_peak_dt) == 4){
     
-    rownames(a) <- gsub('chr','',rownames(a))
+    #rownames(a) <- gsub('chr','',rownames(a))
+    rownames(a) <- gsub('chrChr','Chr',rownames(a))
+    rownames(a) <- gsub('chrchr','chr',rownames(a))
     
     intersect_ids <- intersect(rownames(a),temp_peak_dt$V4)
     temp_peak_dt <- temp_peak_dt[temp_peak_dt$V4 %in% intersect_ids,]
