@@ -1369,7 +1369,7 @@ plotTargetGN <- function(obj, pt, collect_targetGN_set_opt_dir,cluster=1, prefix
     
     ##updating 071625
     if (nrow(tests) > 10000) {
-      tests <- tests[order(tests$FDR), ][1:10000, ]
+      tests <- tests[order(tests$qval), ][1:10000, ]
     }
     
     binary <- binary[rownames(binary) %in% rownames(tests),]
