@@ -560,26 +560,26 @@ Prepare gene accessibility</a>)<br />
 specified)<br />
 8. <strong>-organ</strong> (A organ name needs to be specified)</p>
 <p><strong>Optional parameters:</strong><br />
-9. <strong>-open_low_mem yes|no</strong> (Users could use the low mem to
+1. <strong>-open_low_mem yes|no</strong> (Users could use the low mem to
 perform the classification by selecting the top variant features of the
 training dataset. Default: no)<br />
-10. <strong>-top_ft_num 5000</strong> (Once the low mem open, users
-could set a top variant ft number. Default: 5000)<br />
-11. <strong>-clust_soc_obj Path/to/clustering_soc_fl</strong> (The
+2. <strong>-top_ft_num 5000</strong> (Once the low mem open, users could
+set a top variant ft number. Default: 5000)<br />
+3. <strong>-clust_soc_obj Path/to/clustering_soc_fl</strong> (The
 <strong>*.atac.soc.rds</strong> object obtained from the <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/clustering.html">Clustering</a>
 step)<br />
-12. <strong>-PC_str 50</strong> (Provide a PC number string used for the
+4. <strong>-PC_str 50</strong> (Provide a PC number string used for the
 embeddings. Default: 50)<br />
-13. <strong>-Rd_type SVD</strong> (Provide a reduction type. Default:
+5. <strong>-Rd_type SVD</strong> (Provide a reduction type. Default:
 SVD)<br />
-14. <strong>-ML_method SVM</strong> (Provide a machine learning method.
+6. <strong>-ML_method SVM</strong> (Provide a machine learning method.
 ScAClass provides Random Forest/RF and Support Vector Machine/SVM.
 Default: SVM)<br />
-15. <strong>-SVM_kernel rbf</strong> (SVM method provides ‘linear’,
+7. <strong>-SVM_kernel rbf</strong> (SVM method provides ‘linear’,
 ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’ in sklearn. Default: rbf)<br />
-16. <strong>-open_smote yes</strong> (Smote will impute data enabling
+8. <strong>-open_smote yes</strong> (Smote will impute data enabling
 data balance manner. Default: yes)<br />
-17. <strong>-running_steps All</strong> (Provide running steps to check
+9. <strong>-running_steps All</strong> (Provide running steps to check
 whether we will run the specific steps. Default: All)<br />
 </p>
 <p><strong>Outputs:</strong><br />
@@ -615,6 +615,12 @@ Find diff markers</a> step)<br />
 columns without a header. The first column represents the gene ID, while
 the second column lists the corresponding GO IDs, separated by
 tabs.)<br />
+</p>
+<p><strong>Optional parameters:</strong><br />
+1. <strong>-log2fc_cutoff 0.25</strong> (Set a log2 fold-change cutoff
+to filter the gene list. Genes with a log2 fold change greater than 0.25
+per cell type will be included in the cell type–specific GO enrichment
+analysis. Default: 0.25)<br />
 </p>
 <p><strong>Outputs:</strong><br />
 1. output_denovo_genes_GO_enrich.txt<br />
