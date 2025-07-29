@@ -1121,14 +1121,20 @@ plotTrajHM <- function(obj, pt, cluster=1, prefix="temp", threads=1, top=30000, 
     pdf(paste0(output_dir,'/',prefix,".trajectoryACR.pdf"), width=10, height=10)
     heatmap.2(fit, trace="none", col=cols, Colv=NA, Rowv=NA, dendrogram="none",
               scale="none", labRow = NA, labCol=NA, useRaster=T, 
-              ylab=paste("ACRs", paste0("(n=",nrow(fit),")"), sep=" "))
+              ylab=paste("ACRs", paste0("(n=",nrow(fit),")"), sep=" "),
+              key = TRUE,                # show color key (legend bar)
+              key.title = '',      # title for the legend
+              key.xlab = "ACR chromatin accessibility",      # x-axis label for legend
+              keysize = 1,            # size of the legend bar
+              density.info = "none"
+    )
     dev.off()
     
     ##add the legend bar plot
-    pdf(paste0(output_dir,'/',prefix,".trajectoryACR_lb.pdf"), width=5, height=5)
-    plot.new()
-    add.color.bar(0.1, cols,lwd=10, title=NULL, lims=c(-1,1),prompt=F,x=0.3,y=0.5,outline=TRUE,digits = 1)
-    dev.off()
+    #pdf(paste0(output_dir,'/',prefix,".trajectoryACR_lb.pdf"), width=5, height=5)
+    #plot.new()
+    #add.color.bar(0.1, cols,lwd=10, title=NULL, lims=c(-1,1),prompt=F,x=0.3,y=0.5,outline=TRUE,digits = 1)
+    #dev.off()
     
     
     # return
@@ -1181,7 +1187,7 @@ plotTrajMT <- function(obj, pt, cluster=1, prefix="temp", threads=1, tests=NULL,
     fit <- fit[order(row.o, decreasing=F),]
     write.table(fit, file=paste0(output_dir,'/',prefix,".Mt_pt_sorted.txt"), quote=F, row.names=T, col.names=T, sep="\t")
     
-    
+    fit <- as.matrix(fit)
     
     # plot
     message(" - plotting cell trajectory ...")
@@ -1190,14 +1196,20 @@ plotTrajMT <- function(obj, pt, cluster=1, prefix="temp", threads=1, tests=NULL,
     pdf(paste0(output_dir,'/',prefix,".trajectoryMT.pdf"), width=10, height=10)
     heatmap.2(fit, trace="none", col=cols, Colv=NA, Rowv=NA, dendrogram="none",
               scale="none", labRow = NA, labCol=NA, useRaster=T,
-              ylab=paste("Motifs", paste0("(n=",nrow(fit),")"), sep=" "))
+              ylab=paste("Motifs", paste0("(n=",nrow(fit),")"), sep=" "),
+              key = TRUE,                # show color key (legend bar)
+              key.title = '',      # title for the legend
+              key.xlab = "Motif deviation scores",      # x-axis label for legend
+              keysize = 1,            # size of the legend bar
+              density.info = "none")
     dev.off()
     
     ##add the legend bar plot
-    pdf(paste0(output_dir,'/',prefix,".trajectoryMT_lb.pdf"), width=5, height=5)
-    plot.new()
-    add.color.bar(0.1, cols,lwd=10, title=NULL, lims=c(-1,1),prompt=F,x=0.3,y=0.5,outline=TRUE,digits = 1)
-    dev.off()
+    ##do not add the bar as we already have in the heatmap.2
+    #pdf(paste0(output_dir,'/',prefix,".trajectoryMT_lb.pdf"), width=5, height=5)
+    #plot.new()
+    #add.color.bar(0.1, cols,lwd=10, title=NULL, lims=c(-1,1),prompt=F,x=0.3,y=0.5,outline=TRUE,digits = 1)
+    #dev.off()
     
     
     # return
@@ -1352,15 +1364,21 @@ plotTrajTF <- function(obj, pt, cluster=1, prefix="temp", threads=1, tests=NULL,
     pdf(paste0(output_dir,'/',prefix,".trajectoryTF.pdf"), width=10, height=10)
     heatmap.2(fit, trace="none", col=cols, Colv=NA, Rowv=NA, dendrogram="none",
               scale="none", labRow = NA, labCol=NA, useRaster=T,
-              ylab=paste("TFs", paste0("(n=",nrow(fit),")"), sep=" "))
+              ylab=paste("TFs", paste0("(n=",nrow(fit),")"), sep=" "),
+              key = TRUE,                # show color key (legend bar)
+              key.title = '',      # title for the legend
+              key.xlab = "TF gene accessibility",      # x-axis label for legend
+              keysize = 1,            # size of the legend bar
+              density.info = "none"
+    )
     
     ##create a small plot to create a legend bar
     dev.off()
     
-    pdf(paste0(output_dir,'/',prefix,".trajectoryTF_lb.pdf"), width=5, height=5)
-    plot.new()
-    add.color.bar(0.1, cols,lwd=10, title=NULL, lims=c(0,1),prompt=F,x=0.3,y=0.5,outline=TRUE,digits = 1)
-    dev.off()
+    #pdf(paste0(output_dir,'/',prefix,".trajectoryTF_lb.pdf"), width=5, height=5)
+    #plot.new()
+    #add.color.bar(0.1, cols,lwd=10, title=NULL, lims=c(0,1),prompt=F,x=0.3,y=0.5,outline=TRUE,digits = 1)
+    #dev.off()
     
     
     # return
@@ -1514,13 +1532,19 @@ plotTargetGN <- function(obj, pt, collect_targetGN_set_opt_dir,cluster=1, prefix
   pdf(paste0(collect_targetGN_set_opt_dir,'/',prefix,".trajectoryGene.pdf"), width=10, height=10)
   heatmap.2(fit, trace="none", col=cols, Colv=NA, Rowv=NA, dendrogram="none",
             scale="none", labRow = NA, labCol=NA, useRaster=T,
-            ylab=paste("Genes", paste0("(n=",nrow(fit),")"), sep=" "))
+            ylab=paste("Genes", paste0("(n=",nrow(fit),")"), sep=" "),
+            key = TRUE,                # show color key (legend bar)
+            key.title = '',      # title for the legend
+            key.xlab = "Gene accessibility",      # x-axis label for legend
+            keysize = 1,            # size of the legend bar
+            density.info = "none"
+  )
   dev.off()
   
-  pdf(paste0(collect_targetGN_set_opt_dir,'/',prefix,".trajectoryGene_lb.pdf"), width=5, height=5)
-  plot.new()
-  add.color.bar(0.1, cols,lwd=10, title=NULL, lims=c(0,1),prompt=F,x=0.3,y=0.5,outline=TRUE,digits = 1)
-  dev.off()
+  #pdf(paste0(collect_targetGN_set_opt_dir,'/',prefix,".trajectoryGene_lb.pdf"), width=5, height=5)
+  #plot.new()
+  #add.color.bar(0.1, cols,lwd=10, title=NULL, lims=c(0,1),prompt=F,x=0.3,y=0.5,outline=TRUE,digits = 1)
+  #dev.off()
   
   # return
   return(fit)
