@@ -707,6 +707,38 @@ plotPT     <- function(meta,output_dir, prefix,subsetCluster=NULL, t.id="traject
     # plot trajectory values
     points(test.2[,c(umap1)], test.2[,c(umap2)], col=cols[cut(test.2[,c(t.id)], breaks=101)], pch=16, cex=cex)
     
+    ##updating 072925 add the legend bar
+    usr <- par("usr")
+    xleft  <- usr[2] - 0.3 * diff(usr[1:2])  # 30% from right edge
+    xright <- usr[2] - 0.05 * diff(usr[1:2]) # 5% from right edge
+    ybottom <- usr[3] + 0.05 * diff(usr[3:4])
+    ytop    <- ybottom + 0.02 * diff(usr[3:4])
+    
+    # Draw the gradient bar using rect()
+    n <- length(cols)
+    x_seq <- seq(xleft, xright, length.out = n + 1)
+    for (i in 1:n) {
+      rect(xleft = x_seq[i], xright = x_seq[i + 1],
+           ybottom = ybottom, ytop = ytop,
+           col = cols[i], border = NA)
+    }
+    
+    # Add axis ticks
+    axis_labels <- c(0, 25, 50, 75, 100)
+    axis_positions <- xleft + (axis_labels / 100) * (xright - xleft)
+    text(x = axis_positions,
+         y = ybottom - 0.01 * diff(usr[3:4]),
+         labels = axis_labels,
+         cex = 0.8, xpd = NA)
+    
+    # Optional: label for the color bar
+    text(x = (xleft + xright) / 2, y = ytop + 0.01 * diff(usr[3:4]),
+         labels = "Pseudotime", cex = 0.9, font = 2, xpd = NA)
+    ##################
+    
+    
+    
+    
     # add arrow
     if(addArrow){
         test.2 <- test.2[c(umap1, umap2, t.id)]
@@ -741,7 +773,11 @@ plotPT     <- function(meta,output_dir, prefix,subsetCluster=NULL, t.id="traject
     ##check if target_cluster_color in the test.2
     if (length(intersect(colnames(test.2),target_cluster_color)) == 0){
       cols <- colorRampPalette(brewer.pal(12,"Paired")[1:10])(length(unique(test.2[,target_cluster_col])))
-      colv <- cols[factor(test.2[,target_cluster_col])]
+      
+      cluster_colors <- setNames(cols, LC)  # named vector: cluster → color
+      
+      #colv <- cols[factor(test.2[,target_cluster_col])]
+      colv <- cluster_colors[as.character(test.2[[target_cluster_col]])]
       
       plot(test.2[,c(umap1)], test.2[,c(umap2)], col=colv, pch=16,
            xlim=range(meta[,umap1]), ylim=range(meta[,c(umap2)]),
@@ -749,26 +785,44 @@ plotPT     <- function(meta,output_dir, prefix,subsetCluster=NULL, t.id="traject
       
       ##updating 111722 we will close it since it overlaps with the figure
       ##updating 072825 we will open it 
-      #legend("topleft", legend=sort(unique(as.character(test.2[[target_cluster_col]]))), 
-      #       col=colv)
-      legend("topleft", legend=sort(unique(as.character(test.2[[target_cluster_col]]))),
-             fill=cols)
+      #legend("topleft", legend=sort(unique(as.character(test.2[[target_cluster_col]]))),
+      #       fill=cols)
+      
+      legend("topleft",
+             legend = LC,
+             fill = cluster_colors[LC],
+             border = NA,
+             bty = "n")
+      
+      
       
     }else{
-    
+      
+      #########
+      test.2[[target_cluster_col]] <- as.character(test.2[[target_cluster_col]])
+      test.2[[target_cluster_color]] <- as.character(test.2[[target_cluster_color]])
+      #########
+      
       plot(test.2[,c(umap1)], test.2[,c(umap2)], col=as.character(test.2[[target_cluster_color]]), pch=16,
            xlim=range(meta[,umap1]), ylim=range(meta[,c(umap2)]),
            cex=cex, xlab=xlab, ylab=ylab, bty=bty)
       
       ##updating 111722 we will close it since it overlaps with the figure
       ##updating 072825 we will open it 
-      cluster_labels <- sort(unique(as.character(test.2[[target_cluster_col]])))
-      cluster_colors <- sapply(cluster_labels, function(cl) {
+      #cluster_labels <- sort(unique(as.character(test.2[[target_cluster_col]])))
+      
+      
+      cluster_colors <- sapply(LC, function(cl) {
         test.2[test.2[[target_cluster_col]] == cl, target_cluster_color][1]
       })
       
-      legend("topleft", legend=sort(unique(as.character(test.2[[target_cluster_col]]))), 
-             fill=cluster_colors)
+      #legend("topleft", legend=sort(unique(as.character(test.2[[target_cluster_col]]))), 
+      #       fill=cluster_colors)
+      legend("topleft",
+             legend = LC,
+             fill = cluster_colors,
+             border = NA,
+             bty = "n")
       
     
     }
