@@ -1,3 +1,4 @@
+##updating 072825 we will set an option to plot umap if there is no color provided
 ##updating 071625 we will set an cutoff for the genes with FDR < 0.05 cutoff
 ##updating 051425 we will set an option to decide which matrix will be loaded 
 ##udpating 071223 we will change the color of each traj
@@ -735,13 +736,42 @@ plotPT     <- function(meta,output_dir, prefix,subsetCluster=NULL, t.id="traject
     #     xlim=range(meta[,umap1]), ylim=range(meta[,c(umap2)]),
     #     cex=cex, xlab=xlab, ylab=ylab, bty=bty)
     ##updating 111722 change the sub_cluster_color to target_cluster_col
-    plot(test.2[,c(umap1)], test.2[,c(umap2)], col=as.character(test.2[[target_cluster_color]]), pch=16,
-         xlim=range(meta[,umap1]), ylim=range(meta[,c(umap2)]),
-         cex=cex, xlab=xlab, ylab=ylab, bty=bty)
     
-    ##updating 111722 we will close it since it overlaps with the figure
-    #legend("topright", legend=sort(unique(as.character(test.2[[target_cluster_col]]))), 
-    #       col=as.character(test.2[[target_cluster_color]])[factor(sort(unique(as.character(test.2[[target_cluster_col]]))),levels=sort(unique(as.character(test.2[[target_cluster_col]]))))])
+    ##updating 072825
+    ##check if target_cluster_color in the test.2
+    if (length(intersect(colnames(test.2),target_cluster_color)) == 0){
+      cols <- colorRampPalette(brewer.pal(12,"Paired")[1:10])(length(unique(test.2[,target_cluster_col])))
+      colv <- cols[factor(test.2[,target_cluster_col])]
+      
+      plot(test.2[,c(umap1)], test.2[,c(umap2)], col=colv, pch=16,
+           xlim=range(meta[,umap1]), ylim=range(meta[,c(umap2)]),
+           cex=cex, xlab=xlab, ylab=ylab, bty=bty)
+      
+      ##updating 111722 we will close it since it overlaps with the figure
+      ##updating 072825 we will open it 
+      #legend("topleft", legend=sort(unique(as.character(test.2[[target_cluster_col]]))), 
+      #       col=colv)
+      legend("topleft", legend=sort(unique(as.character(test.2[[target_cluster_col]]))),
+             fill=cols)
+      
+    }else{
+    
+      plot(test.2[,c(umap1)], test.2[,c(umap2)], col=as.character(test.2[[target_cluster_color]]), pch=16,
+           xlim=range(meta[,umap1]), ylim=range(meta[,c(umap2)]),
+           cex=cex, xlab=xlab, ylab=ylab, bty=bty)
+      
+      ##updating 111722 we will close it since it overlaps with the figure
+      ##updating 072825 we will open it 
+      cluster_labels <- sort(unique(as.character(test.2[[target_cluster_col]])))
+      cluster_colors <- sapply(cluster_labels, function(cl) {
+        test.2[test.2[[target_cluster_col]] == cl, target_cluster_color][1]
+      })
+      
+      legend("topleft", legend=sort(unique(as.character(test.2[[target_cluster_col]]))), 
+             fill=cluster_colors)
+      
+    
+    }
     
     #legend("topright", legend=sort(unique(as.character(test.2$celltypeID))), 
     #       col=as.character(test.2$subcluster_color)[factor(sort(unique(as.character(test.2$celltypeID))),levels=sort(unique(as.character(test.2$celltypeID))))])
