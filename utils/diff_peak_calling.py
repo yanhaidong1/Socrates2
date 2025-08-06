@@ -5,6 +5,7 @@
 ##it has two step
 ##step01 prepare the peak sparse file
 ##step02 make the DAR analysis
+##updating 080525 make a cpm peak file
 ##updating 051925 step03 find the diff peak among diff groups
 ##updating 063025 we will use the object to
 ##updating 070125 we will set the object for the different group comparing
@@ -355,6 +356,28 @@ def main(argv=None):
 
         ##final output for the next step is storing
         ##opt_prepare_peak_acc_dir/
+
+        plot_getPerM_script = input_required_scripts_dir + '/utils_diff_peak_calling_python/s1_getPerM_celltypes.R'
+        ipt_peak_sparse_fl = s1_open_prepare_peak_tn5_final_dir + '/opt_peak_sparse_sorted_dir/opt_peak_sorted.sparse'
+        if args.soc_object_fl is not None:
+            input_meta_fl = s1_open_prepare_peak_tn5_final_dir + '/temp_unmodi_update_meta.txt'
+        else:
+            input_meta_fl = args.meta_file
+
+        ##updating 080625
+        ##we will prepare the CPM of peak sparse file
+        opt_peaks_celltype_CPM_dir = s1_open_prepare_peak_tn5_final_dir + '/opt_peaks_celltype_CPM_dir'
+        if not os.path.exists(opt_peaks_celltype_CPM_dir):
+            os.makedirs(opt_peaks_celltype_CPM_dir)
+
+        cmd = 'Rscript ' + plot_getPerM_script + \
+              ' ' + ipt_peak_sparse_fl + \
+              ' ' + input_meta_fl + \
+              ' ' + output_dir + '/temp_defined_parameters.config' + \
+              ' ' + opt_peaks_celltype_CPM_dir
+        print(cmd)
+        subprocess.call(cmd, shell=True)
+
 
     if s2_open_diff_peak_call_final == 'yes':
 
