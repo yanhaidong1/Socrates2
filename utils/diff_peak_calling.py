@@ -131,47 +131,50 @@ def main(argv=None):
 
             s1_open_prepare_peak_tn5_final = 'yes'
 
-            ##updating 063025
-            ##if users provide the soc from the last step
-            if args.soc_object_fl is not None:
-                print('Use object from the last step as the input file')
-                try:
-                    file = open(args.soc_object_fl, 'r')  ##check if the file is not the right file
-                except IOError:
-                    print('There was an error opening the object file!')
-                    return
-                use_soc_object_as_ipt = 'yes'
-            else:
-                use_soc_object_as_ipt = 'no'
-
-            if use_soc_object_as_ipt == 'no':
-
-                print('Do not use object from the last step as the input file and please provide the peak file as input')
-
-                if args.peak_file is None:
-                    print('Cannot find the peak file, please provide it')
-                    return
-                else:
-                    try:
-                        file = open(args.peak_file, 'r')  ##check if the file is not the right file
-                    except IOError:
-                        print('There was an error opening the peak file!')
-                        return
-
-            if args.tn5_bed_file is None:
-                print('Cannot find the tn5 file, please provide it')
-                return
-            else:
-                try:
-                    file = open(args.tn5_bed_file, 'r')  ##check if the file is not the right file
-                except IOError:
-                    print('There was an error opening the tn5 file!')
-                    return
-
         else:
             s1_open_prepare_peak_tn5_final = 'no'
             print(
                 'Users choose to close the peak preparation, please use \'-s1_open_prepare yes\' to open this step')
+
+    if s1_open_prepare_peak_tn5_final == 'yes':
+
+        ##updating 063025
+        ##if users provide the soc from the last step
+        if args.soc_object_fl is not None:
+            print('Use object from the last step as the input file')
+            try:
+                file = open(args.soc_object_fl, 'r')  ##check if the file is not the right file
+            except IOError:
+                print('There was an error opening the object file!')
+                return
+            use_soc_object_as_ipt = 'yes'
+        else:
+            use_soc_object_as_ipt = 'no'
+
+        if use_soc_object_as_ipt == 'no':
+
+            print('Do not use object from the last step as the input file and please provide the peak file as input')
+
+            if args.peak_file is None:
+                print('Cannot find the peak file, please provide it')
+                return
+            else:
+                try:
+                    file = open(args.peak_file, 'r')  ##check if the file is not the right file
+                except IOError:
+                    print('There was an error opening the peak file!')
+                    return
+
+        if args.tn5_bed_file is None:
+            print('Cannot find the tn5 file, please provide it')
+            return
+        else:
+            try:
+                file = open(args.tn5_bed_file, 'r')  ##check if the file is not the right file
+            except IOError:
+                print('There was an error opening the tn5 file!')
+                return
+
 
 
     if args.s2_open_diff_peak_call is None:
@@ -184,38 +187,39 @@ def main(argv=None):
 
             s2_open_diff_peak_call_final = 'yes'
 
-            ##updating 063025
-            if args.soc_object_fl is not None:
-                print('Use object from the last step as the input file')
-                try:
-                    file = open(args.soc_object_fl, 'r')  ##check if the file is not the right file
-                except IOError:
-                    print('There was an error opening the object file!')
-                    return
-                use_soc_object_as_ipt = 'yes'
-            else:
-                use_soc_object_as_ipt = 'no'
-
-            if use_soc_object_as_ipt == 'no':
-
-                print(
-                    'Do not use object from the last step as the input file and please provide the meta file as input')
-
-                if args.meta_file is None:
-                    print('Cannot find the meta file, please provide it')
-                    return
-                else:
-                    try:
-                        file = open(args.meta_file, 'r')  ##check if the file is not the right file
-                    except IOError:
-                        print('There was an error opening the meta file!')
-                        return
-
-
         else:
 
             s2_open_diff_peak_call_final = 'no'
             print('Users choose to close the open diff peak calling, please use \'-s2_open_diff_peak yes\' to open this step')
+
+    if s2_open_diff_peak_call_final == 'yes':
+        ##updating 063025
+        if args.soc_object_fl is not None:
+            print('Use object from the last step as the input file')
+            try:
+                file = open(args.soc_object_fl, 'r')  ##check if the file is not the right file
+            except IOError:
+                print('There was an error opening the object file!')
+                return
+            use_soc_object_as_ipt = 'yes'
+        else:
+            use_soc_object_as_ipt = 'no'
+
+        if use_soc_object_as_ipt == 'no':
+
+            print(
+                'Do not use object from the last step as the input file and please provide the meta file as input')
+
+            if args.meta_file is None:
+                print('Cannot find the meta file, please provide it')
+                return
+            else:
+                try:
+                    file = open(args.meta_file, 'r')  ##check if the file is not the right file
+                except IOError:
+                    print('There was an error opening the meta file!')
+                    return
+
 
 
     ##updating 051925
