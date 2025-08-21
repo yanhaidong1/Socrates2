@@ -3,11 +3,14 @@ library(GENESPACE)
 
 args <- commandArgs(TRUE)
 workding_dir <- as.character(args[1])
-ipt_path2mcscanx <- as.character(args[2])
+#ipt_path2mcscanx <- as.character(args[2])
+
+#gpar <- init_genespace(
+#  wd = workding_dir,
+#  path2mcscanx = ipt_path2mcscanx)
 
 gpar <- init_genespace(
-  wd = workding_dir,
-  path2mcscanx = ipt_path2mcscanx)
+  wd = workding_dir)
 
 
 gpar$shellCalls$orthofinder <- 'orthofinder'
