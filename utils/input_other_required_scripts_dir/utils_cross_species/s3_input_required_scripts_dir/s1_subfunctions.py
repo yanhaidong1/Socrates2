@@ -800,6 +800,27 @@ def subfunction_add_species_specific_one_under_non_syntenic_regions (ipt_final_s
             opt.write(eachline + '\n')
 
 
+    ##updating 082125
+    ##we will modify this output to make a final results output
+    store_final_line_list = []
+    first_line = spe1_prefix + '_ACR' + '\t' + spe1_prefix + '_celltype' + '\t' + spe2_prefix + '_blasted_region' + '\t' + spe2_prefix + '_ACR' + '\t' + spe2_prefix + '_celltype' + '\t' + 'Syntenic_regionID'
+    store_final_line_list.append(first_line)
+    count = 0
+    with open (opt_dir + '/opt_' + spe1_prefix + '_' + spe2_prefix + '_addCelltype_SynRegion_addDirFlt_addRegFlt_addspe2DirFlt_addspe2CT_addSpeSpec.txt','r') as ipt:
+        for eachline in ipt:
+            eachline = eachline.strip('\n')
+            col = eachline.strip().split()
+            count += 1
+            if count != 1:
+                final_line =  col[1] + '\t' + col[4] + '\t' + col[2] + '\t' + col[3] + '\t' + col[-1] + '\t' +  col[7]
+                store_final_line_list.append(final_line)
+
+    with open (opt_dir + '/opt_' + spe1_prefix + '_' + spe2_prefix + '_syntenic_ACR.txt','w+') as opt:
+        for eachline in store_final_line_list:
+            opt.write(eachline + '\n')
+
+
+
 
 ##updating 121123
 def subfunction_check_not_shared_statistic_different_enrich_for_nonsyntenic_region (ipt_sharednotsharedCate_celltype_fl,opt_dir,spe1_prefix,spe2_prefix):
