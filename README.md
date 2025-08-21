@@ -48,6 +48,7 @@ and much more!
 
 [10. Trajectory analysis](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/trajectory_analysis.html)
 
+[11. Cross_species analysis](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/cross_species_analysis.html)
 
 
 
