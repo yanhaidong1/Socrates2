@@ -35,7 +35,7 @@ def get_parsed_args():
 
     parser.add_argument("-peptide_dir", dest = 'peptide_directory',help = 'Users must provide the peptide dir that includes the protein sequences.')
 
-    parser.add_argument("-path2mcscanx", dest = 'path2mcscanx_path',help = 'Users must provide a ptah to path2mcscanx.')
+    #parser.add_argument("-path2mcscanx", dest = 'path2mcscanx_path',help = 'Users must provide a ptah to path2mcscanx.')
 
     parser.add_argument("-ref_spe", dest = 'reference_species', help = 'Users must specify which species need to be considered as the reference species.')
 
@@ -130,9 +130,9 @@ def main(argv=None):
                 print("Directory is empty, please make sure this directory contains the protein fasta files")
 
 
-        if args.path2mcscanx_path is None:
-            print ('Cannot find the path of mcscanx, please provide it')
-            return
+        #if args.path2mcscanx_path is None:
+        #    print ('Cannot find the path of mcscanx, please provide it')
+        #    return
 
         if args.reference_species is None:
             print('Cannot find the reference species symbol, please provide it')
@@ -223,7 +223,7 @@ def main(argv=None):
 
         ipt_bed_dir = args.bed_directory
         ipt_peptide_dir = args.peptide_directory
-        ipt_path2mcscanx = args.path2mcscanx_path
+        #ipt_path2mcscanx = args.path2mcscanx_path
 
 
         cmd = 'cp -r ' + ipt_bed_dir + ' ' + working_dir + '/' + 'bed'
@@ -237,8 +237,7 @@ def main(argv=None):
         ipt_genespace_R_script = input_required_scripts_dir + '/utils_cross_species/run_GENESPACE.R'
 
         cmd = 'Rscript ' + ipt_genespace_R_script + \
-              ' ' + working_dir + \
-              ' ' + ipt_path2mcscanx
+              ' ' + working_dir
         print(cmd)
         subprocess.call(cmd,shell=True)
 
