@@ -1,0 +1,24 @@
+library(GENESPACE)
+
+
+args <- commandArgs(TRUE)
+workding_dir <- as.character(args[1])
+ipt_path2mcscanx <- as.character(args[2])
+
+gpar <- init_genespace(
+  wd = workding_dir,
+  path2mcscanx = ipt_path2mcscanx)
+
+
+gpar$shellCalls$orthofinder <- 'orthofinder'
+
+
+gpar <- run_genespace(gsParam = gpar)
+
+
+
+#gpar <- init_genespace(
+#  wd = "/public2/home/yanhaidong/working_dir/jinyarong/ACRs/Pm10",
+#  path2mcscanx = "/public2/home/yanhaidong/software/MCScanX-master/")
+#gpar <- run_genespace(gsParam = gpar)
+
