@@ -196,6 +196,8 @@ def step01_species_compare_add_cate (input_rice_to_allspe_blast_dir,
                                                                      spe1_prefix,spe2_prefix, store_rice_to_maize_dir)
 
 
+
+
 ########
 ##step02
 def step02_summarize_overview (input_output_dir):
@@ -273,5 +275,5 @@ if step01 == 'yes':
                                     input_all_syntenic_genes_all_os_ACRs_dir,
                                     input_output_dir, s0_s1_target_spe1, s0_s1_target_spe2_str)
 
-if step02 == 'yes':
-    step02_summarize_overview(input_output_dir)
+#if step02 == 'yes':
+#    step02_summarize_overview(input_output_dir)
