@@ -28,12 +28,12 @@ def subfunction_summarize_overview (ipt_final_summary_fl, input_output_dir,spe1_
 
             if count != 1:
 
-                spe1_ACR = col[1]
+                spe1_ACR = col[0]
                 spe2_region = col[2]
-                spe1_celltype = col[4]
+                spe1_celltype = col[1]
                 spe2_ACR = col[3]
-                spe2_celltype = col[-1]
-                syn_region_id = col[7]
+                spe2_celltype = col[4]
+                syn_region_id = col[5]
 
                 if syn_region_id != 'none':
 
@@ -75,6 +75,7 @@ def subfunction_summarize_overview (ipt_final_summary_fl, input_output_dir,spe1_
 
                         store_spes_ACR_dic[spe1_ACR] = ACR_cate
 
+    store_temp_variable_ACR_dic = {}
     store_final_line_list = []
     count = 0
     with open (ipt_final_summary_fl,'r') as ipt:
@@ -83,8 +84,8 @@ def subfunction_summarize_overview (ipt_final_summary_fl, input_output_dir,spe1_
             col = eachline.strip().split('\t')
             count += 1
             if count != 1:
-                spe1_ACR = col[1]
-                syn_region_id = col[7]
+                spe1_ACR = col[0]
+                syn_region_id = col[5]
 
                 if syn_region_id != 'none':
 
@@ -112,13 +113,69 @@ def subfunction_summarize_overview (ipt_final_summary_fl, input_output_dir,spe1_
                     final_line = eachline + '\t' + final_cate
                     store_final_line_list.append(final_line)
 
+                ##updating 082225
+                all_col = final_line.strip().split()
+                ACR_cate_infor = all_col[-2]
+                if ACR_cate_infor == 'variable_ACR':
+                    blasted_region_ACRinfor = col[2] + '__' + col[3]
+                    if spe1_ACR in store_temp_variable_ACR_dic:
+                        store_temp_variable_ACR_dic[spe1_ACR][blasted_region_ACRinfor] = 1
+                    else:
+                        store_temp_variable_ACR_dic[spe1_ACR] = {}
+                        store_temp_variable_ACR_dic[spe1_ACR][blasted_region_ACRinfor] = 1
+
+
             else:
                 first_line = eachline + '\t' + spe1_prefix + '_ACRcate1' + '\t' + spe1_prefix + '_ACRcate2'
                 store_final_line_list.append(first_line)
 
+
+    ##updating 082225
+    ##delete the varialble ACR line if the ACR already has blasted to ACR
+    store_target_spe1ACR_blastedregion_dic = {}
+    for eachspe1_ACR in store_temp_variable_ACR_dic:
+        blasted_region_ACRinfor_dic = store_temp_variable_ACR_dic[eachspe1_ACR]
+
+
+        blasted_count = 0
+        for eachregionACR in blasted_region_ACRinfor_dic:
+
+            mt = re.match('(.+)__(.+)',eachregionACR)
+            ACRinfor = mt.group(2)
+            blastedregion = mt.group(1)
+
+            if ACRinfor != 'none':
+                blasted_count += 1
+
+                target_spe1_ACR_blastedregion = eachspe1_ACR + '__' + blastedregion
+                store_target_spe1ACR_blastedregion_dic[target_spe1_ACR_blastedregion] = 1
+
+        if blasted_count == 0:
+
+            for eachregionACR in blasted_region_ACRinfor_dic:
+                mt = re.match('(.+)__(.+)', eachregionACR)
+                blastedregion = mt.group(1)
+                target_spe1_ACR_blastedregion = eachspe1_ACR + '__' + blastedregion
+
+                store_target_spe1ACR_blastedregion_dic[target_spe1_ACR_blastedregion] = 1
+
+    store_final_line_final_list = []
+    for eachline in store_final_line_list:
+        col = eachline.strip().split('\t')
+        spe1ACR_blastedregion = col[0] + '__' + col[2]
+        ACRcate = col[6]
+        if ACRcate != 'variable_ACR':
+            store_final_line_final_list.append(eachline)
+        else:
+            if spe1ACR_blastedregion in store_target_spe1ACR_blastedregion_dic:
+                store_final_line_final_list.append(eachline)
+
+
     with open (input_output_dir + '/opt_' + spe1_prefix + '_' + spe2_prefix + '.syntenic.txt','w+') as opt:
-        for eachline in store_final_line_list:
+        for eachline in store_final_line_final_list:
             opt.write(eachline + '\n')
+
+    ##plot the comparison
 
 
 
