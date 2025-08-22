@@ -168,8 +168,13 @@ def subfunction_summarize_overview (ipt_final_summary_fl, input_output_dir,spe1_
             store_final_line_final_list.append(eachline)
         else:
             if spe1ACR_blastedregion in store_target_spe1ACR_blastedregion_dic:
-                store_final_line_final_list.append(eachline)
 
+                blastACR = col[3]
+                if blastACR == 'none':
+                    store_final_line_final_list.append(eachline)
+                else:
+                    final_line = col[0] + '\t' + col[1] + '\t' + col[2] + '\t' + col[3] + '\t' + col[4] + '\t' + col[5] + '\t' + 'shared_ACR' + '\t' + col[7]
+                    store_final_line_final_list.append(final_line)
 
     with open (input_output_dir + '/opt_' + spe1_prefix + '_' + spe2_prefix + '.syntenic.txt','w+') as opt:
         for eachline in store_final_line_final_list:
