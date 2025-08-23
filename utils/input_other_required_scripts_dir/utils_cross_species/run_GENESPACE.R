@@ -15,6 +15,7 @@ gpar <- init_genespace(
 
 gpar$shellCalls$orthofinder <- 'orthofinder'
 
+gpar$shellCalls$mcscanx_h <- 'MCScanX_h'
 
 gpar <- run_genespace(gsParam = gpar)
 
