@@ -74,8 +74,8 @@ def subfunction_check_syntenic_blocks (ipt_spe1_all_os_ACRs_fl, ipt_spe2_os_ACRs
                 gene_col = eachgeneline.split('_')
                 gene_st = gene_col[1]
                 gene_ed = gene_col[2]
-                store_location_list.append(int(gene_st))
-                store_location_list.append(int(gene_ed))
+                store_location_list.append(int(float(gene_st)))
+                store_location_list.append(int(float(gene_ed)))
                 gene_chr = gene_col[0]
 
             store_location_list.sort()
@@ -190,8 +190,8 @@ def subfunction_build_syntenic_bed (ipt_spe1_all_os_ACRs_fl,input_spe1_H3K27me3_
                 gene_col = eachgeneline.split('_')
                 gene_st = gene_col[1]
                 gene_ed = gene_col[2]
-                store_location_list.append(int(gene_st))
-                store_location_list.append(int(gene_ed))
+                store_location_list.append(int(float(gene_st)))
+                store_location_list.append(int(float(gene_ed)))
                 gene_chr = gene_col[0]
 
             store_location_list.sort()
@@ -219,8 +219,8 @@ def subfunction_build_syntenic_bed (ipt_spe1_all_os_ACRs_fl,input_spe1_H3K27me3_
                 gene_ed = gene_col[2]
                 gene_chr = gene_col[0]
 
-                store_location_list.append(int(gene_st))
-                store_location_list.append(int(gene_ed))
+                store_location_list.append(int(float(gene_st)))
+                store_location_list.append(int(float(gene_ed)))
 
             store_location_list.sort()
 
