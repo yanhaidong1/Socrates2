@@ -10,7 +10,6 @@ import numpy as np
 import os.path
 import scipy.stats as stats
 
-
 def subfunction_summarize_overview (ipt_final_summary_fl, input_output_dir,spe1_prefix,spe2_prefix,ipt_plot_script_R_fl):
 
 
@@ -98,12 +97,176 @@ def subfunction_summarize_overview (ipt_final_summary_fl, input_output_dir,spe1_
                         if spe1_ACR in store_shared_ACR_dic:
                             cate = store_shared_ACR_dic[spe1_ACR]
                             final_cate = 'shared_ACR' + '\t' +  cate
-                        if spe1_ACR in store_var_ACR_dic:
-                            cate = store_var_ACR_dic[spe1_ACR]
-                            final_cate = 'variable_ACR' + '\t' + cate
-                        if spe1_ACR in store_spes_ACR_dic:
-                            cate = store_spes_ACR_dic[spe1_ACR]
-                            final_cate = 'speciesspec_ACR' + '\t' + cate
+                        if spe1_ACR not in store_shared_ACR_dic:
+                            if spe1_ACR in store_var_ACR_dic:
+                                cate = store_var_ACR_dic[spe1_ACR]
+                                final_cate = 'variable_ACR' + '\t' + cate
+                        if spe1_ACR not in store_shared_ACR_dic:
+                            if spe1_ACR not in store_var_ACR_dic:
+                                if spe1_ACR in store_spes_ACR_dic:
+
+                                    cate = store_spes_ACR_dic[spe1_ACR]
+                                    final_cate = 'speciesspec_ACR' + '\t' + cate
+
+                    final_line = eachline + '\t' + final_cate
+                    store_final_line_list.append(final_line)
+
+                else:
+                    final_cate = 'na' + '\t' + 'na'
+                    final_line = eachline + '\t' + final_cate
+                    store_final_line_list.append(final_line)
+
+                ##updating 082225
+                all_col = final_line.strip().split()
+                ACR_cate_infor = all_col[-2]
+                if ACR_cate_infor == 'variable_ACR':
+                    blasted_region_ACRinfor = col[2] + '__' + col[3]
+                    if spe1_ACR in store_temp_variable_ACR_dic:
+                        store_temp_variable_ACR_dic[spe1_ACR][blasted_region_ACRinfor] = 1
+                    else:
+                        store_temp_variable_ACR_dic[spe1_ACR] = {}
+                        store_temp_variable_ACR_dic[spe1_ACR][blasted_region_ACRinfor] = 1
+
+
+            else:
+                first_line = eachline + '\t' + spe1_prefix + '_ACRcate1' + '\t' + spe1_prefix + '_ACRcate2'
+                store_final_line_list.append(first_line)
+
+
+    ##updating 082325
+    ##we will update the cate
+    store_final_line_final_list = []
+    count = 0
+    for eachline in store_final_line_list:
+        col = eachline.strip().split('\t')
+        count += 1
+        if count != 1:
+            spe1ACRcate1 = col[6]
+            spe2_ACR = col[3]
+            if spe1ACRcate1 == 'shared_ACR':
+                if spe2_ACR != 'none':
+                    store_final_line_final_list.append(eachline)
+            else:
+                store_final_line_final_list.append(eachline)
+        else:
+            store_final_line_final_list.append(eachline)
+
+
+
+
+
+    with open (input_output_dir + '/opt_' + spe1_prefix + '_' + spe2_prefix + '.syntenic.txt','w+') as opt:
+        for eachline in store_final_line_final_list:
+            opt.write(eachline + '\n')
+
+    ##plot the comparison
+    cmd = 'Rscript ' + ipt_plot_script_R_fl + \
+          ' ' + input_output_dir + '/opt_' + spe1_prefix + '_' + spe2_prefix + '.syntenic.txt' + \
+          ' ' + input_output_dir + \
+          ' ' + spe1_prefix + \
+          ' ' + spe2_prefix
+    print(cmd)
+    subprocess.call(cmd,shell=True)
+
+
+
+def subfunction_summarize_overview_ori (ipt_final_summary_fl, input_output_dir,spe1_prefix,spe2_prefix,ipt_plot_script_R_fl):
+
+
+    ##eight groups
+    store_shared_ACR_dic = {}
+    store_var_ACR_dic = {}
+    store_spes_ACR_dic = {}
+
+    count = 0
+    with open(ipt_final_summary_fl, 'r') as ipt:
+        for eachline in ipt:
+            eachline = eachline.strip('\n')
+            col = eachline.strip().split('\t')
+            count += 1
+
+            if count != 1:
+
+                spe1_ACR = col[0]
+                spe2_region = col[2]
+                spe1_celltype = col[1]
+                spe2_ACR = col[3]
+                spe2_celltype = col[4]
+                syn_region_id = col[5]
+
+                if syn_region_id != 'none':
+
+                    if spe2_region != 'none':
+
+                        ##for the shared ACR
+                        if spe2_ACR != 'none':
+
+                            ACR_cate = 'na'
+
+                            if spe1_celltype == 'broadly_accessible' and spe2_celltype == 'broadly_accessible':
+                                ACR_cate = 'bACRbACR'
+                            if spe1_celltype != 'broadly_accessible' and spe2_celltype != 'broadly_accessible':
+                                ACR_cate = 'ctACRctACR'
+                            if spe1_celltype == 'broadly_accessible' and spe2_celltype != 'broadly_accessible':
+                                ACR_cate = 'bACRctACR'
+                            if spe1_celltype != 'broadly_accessible' and spe2_celltype == 'broadly_accessible':
+                                ACR_cate = 'ctACRbACR'
+
+                            store_shared_ACR_dic[spe1_ACR] = ACR_cate
+
+                        ##for the variable ACR
+                        else:
+
+                            if spe1_celltype == 'broadly_accessible':
+                                ACR_cate = 'bACR'
+                            else:
+                                ACR_cate = 'ctACR'
+
+                            store_var_ACR_dic[spe1_ACR] = ACR_cate
+
+                    else:
+
+                        ##for the species specific ACR
+                        if spe1_celltype == 'broadly_accessible':
+                            ACR_cate = 'bACR'
+                        else:
+                            ACR_cate = 'ctACR'
+
+                        store_spes_ACR_dic[spe1_ACR] = ACR_cate
+
+    store_temp_variable_ACR_dic = {}
+    store_final_line_list = []
+    count = 0
+    with open (ipt_final_summary_fl,'r') as ipt:
+        for eachline in ipt:
+            eachline = eachline.strip('\n')
+            col = eachline.strip().split('\t')
+            count += 1
+            if count != 1:
+                spe1_ACR = col[0]
+                syn_region_id = col[5]
+
+                if syn_region_id != 'none':
+
+                    if ',' in syn_region_id:
+
+                        final_cate = 'na' + '\t' + 'na'
+
+                    else:
+                        final_cate = 'wrong'
+                        if spe1_ACR in store_shared_ACR_dic:
+                            cate = store_shared_ACR_dic[spe1_ACR]
+                            final_cate = 'shared_ACR' + '\t' +  cate
+                        if spe1_ACR not in store_shared_ACR_dic:
+                            if spe1_ACR in store_var_ACR_dic:
+                                cate = store_var_ACR_dic[spe1_ACR]
+                                final_cate = 'variable_ACR' + '\t' + cate
+                        if spe1_ACR not in store_shared_ACR_dic:
+                            if spe1_ACR not in store_var_ACR_dic:
+                                if spe1_ACR in store_spes_ACR_dic:
+
+                                    cate = store_spes_ACR_dic[spe1_ACR]
+                                    final_cate = 'speciesspec_ACR' + '\t' + cate
 
                     final_line = eachline + '\t' + final_cate
                     store_final_line_list.append(final_line)
@@ -192,6 +355,50 @@ def subfunction_summarize_overview (ipt_final_summary_fl, input_output_dir,spe1_
 
 
 
+
+
+
+def subfunction_summarize_overview_backup (ipt_final_summary_fl, input_output_dir,spe1_prefix,spe2_prefix,ipt_plot_script_R_fl):
+
+
+    ##we will first decide whether the spe1 is belong to which category
+    ##the priority is shared ACR and then variable acr and spespc ACR
+    store_spe1ACR_otherinfor_dic = {}
+    store_allline_outofsynregion_line = []
+    count = 0
+    with open (ipt_final_summary_fl,'r') as ipt:
+        for eachline in ipt:
+            eachline = eachline.strip('\n')
+            col = eachline.strip().split('\t')
+            count += 1
+            if count != 1:
+                spe2_blastedregion = col[2]
+
+                if spe2_blastedregion != 'none':
+
+                    spe1_ACR = col[0]
+
+                    spe1_acr_spe2_blastedregion = spe1_ACR + '__' + spe2_blastedregion
+
+                    if spe1_ACR in store_spe1ACR_otherinfor_dic:
+                        store_spe1ACR_otherinfor_dic[spe1_ACR][spe1_acr_spe2_blastedregion] = {'spe1_celltype':col[1],
+                                                                                               'spe2_acr':col[3],
+                                                                                               'spe2_celltype':col[4],
+                                                                                               'synregionID':col[5]}
+                    else:
+                        store_spe1ACR_otherinfor_dic[spe1_ACR] = {}
+                        store_spe1ACR_otherinfor_dic[spe1_ACR][spe1_acr_spe2_blastedregion] = {'spe1_celltype': col[1],
+                                                                                               'spe2_acr': col[3],
+                                                                                               'spe2_celltype': col[4],
+                                                                                               'synregionID': col[5]}
+
+                else:
+                    store_allline_outofsynregion_line.append(eachline)
+
+    ##compare eachACR
+    #for eachspe1_ACR in store_spe1ACR_otherinfor_dic:
+
+    #    spe1_acr_spe2_blastedregion_dic = store_spe1ACR_otherinfor_dic[eachspe1_ACR]
 
 
 
