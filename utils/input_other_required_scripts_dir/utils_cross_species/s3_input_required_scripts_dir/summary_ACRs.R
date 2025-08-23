@@ -46,18 +46,18 @@ aggregate_one_cate_dt <- aggregate(fml2, data = ipt_dt, sum)
 ###########
 ##pie chart
 myPalette <- brewer.pal(10, "Set3") 
-generate_pie <- function(dt) {
-  #df <- read.delim(dt,header = FALSE)
-  colnames(dt) <- c('fam','number')
-  pct <- round(dt$number/sum(dt$number)*100)
-  lbls <- paste(dt$fam,pct)
-  lbls <- paste(lbls,"%",sep="") 
-  #p_pie <- pie(dt$number,labels = lbls,col=myPalette,cex=4,border="white",edges = 200, radius = 1) ##25 13
-  par(mar=c(3,18,3,15)) 
-  return(pie(dt$number,labels = lbls,col=myPalette,cex=2,border="white",edges = 200, radius = 1) )
-}
+
 pdf(paste0(output_dir,'/opt_synACR_ratio_piechart_',spe1,'_',spe2,'.pdf'),width = 10,height = 10)
-generate_pie(aggregate_one_cate_dt)
+dt <- aggregate_one_cate_dt
+colnames(dt) <- c('fam','number')
+pct <- round(dt$number/sum(dt$number)*100)
+lbls <- paste(dt$fam,pct)
+lbls <- paste(lbls,"%",sep="") 
+#p_pie <- pie(dt$number,labels = lbls,col=myPalette,cex=4,border="white",edges = 200, radius = 1) ##25 13
+par(mar=c(3,18,3,15)) 
+total_n <- sum(dt$number)
+pie(dt$number,labels = lbls,col=myPalette,cex=2,border="white",edges = 200, radius = 1)
+text(0, -1.5, paste0("n = ", total_n), cex = 2, font = 2)  
 dev.off()
 
 ##########
