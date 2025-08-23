@@ -9,13 +9,19 @@ workding_dir <- as.character(args[1])
 #  wd = workding_dir,
 #  path2mcscanx = ipt_path2mcscanx)
 
-gpar <- init_genespace(
-  wd = workding_dir)
+##it does not work for not specifing the path2mcscanx
+#gpar <- init_genespace(
+#  wd = workding_dir)
 
+
+
+gpar <- init_genespace(
+  wd = workding_dir,
+  path2mcscanx = file.path(Sys.getenv("CONDA_PREFIX"), "bin"))
 
 gpar$shellCalls$orthofinder <- 'orthofinder'
 
-gpar$shellCalls$mcscanx_h <- 'MCScanX_h'
+#gpar$shellCalls$mcscanx_h <- 'MCScanX_h'
 
 gpar <- run_genespace(gsParam = gpar)
 
