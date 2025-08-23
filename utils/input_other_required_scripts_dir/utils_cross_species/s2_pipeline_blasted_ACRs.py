@@ -38,6 +38,11 @@ input_core_num = sys.argv[4]
 
 input_output_dir = sys.argv[5]
 
+##updating 082325
+input_spe1 = sys.argv[6]
+
+input_spe2 = sys.argv[7]
+
 open_step01 = 'yes'
 
 open_step02 = 'yes'
@@ -210,7 +215,7 @@ def step03_merge_flt_res (input_output_dir,input_ct_acr_dir,s2_target_spe1_str,s
 
         ##updating 053142
         if s2_target_spe1_str == 'Os':
-            new_ct_spe1_str = 'rice'
+            new_ct_spe1_str = 'Os'
         else:
             new_ct_spe1_str = s2_target_spe1_str
 
@@ -226,10 +231,10 @@ def step03_merge_flt_res (input_output_dir,input_ct_acr_dir,s2_target_spe1_str,s
 
 
 def pipeline_analysis (input_ct_acr_dir,input_syntenic_region_fl,input_all_spe_genome_dir,input_output_dir,
-                       input_core_num,open_step01,open_step02):
+                       input_core_num,open_step01,open_step02,input_spe1,input_spe2):
 
-    target_spe1_str = 'Pg'
-    target_spe2_str_list = ['Zm','Pm','Uf','Sb']
+    target_spe1_str = input_spe1
+    target_spe2_str_list = [input_spe2]
 
     if open_step01 == 'yes':
 
@@ -387,7 +392,7 @@ def pipeline_analysis (input_ct_acr_dir,input_syntenic_region_fl,input_all_spe_g
 
 
 pipeline_analysis (input_ct_acr_dir,input_syntenic_region_fl,input_all_spe_genome_dir,input_output_dir,
-                       input_core_num,open_step01,open_step02)
+                       input_core_num,open_step01,open_step02,input_spe1,input_spe2)
 
 
 
