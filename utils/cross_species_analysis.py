@@ -10,6 +10,7 @@ import re
 
 ##need to install GENESPACE in R and orthofinder in the environment
 
+##updating 082325 we will use the gff other than the bed
 ##updating 070525 we will use the object
 
 
@@ -31,7 +32,9 @@ def get_parsed_args():
     parser.add_argument("-script_dir", dest='required_script_dir',
                         help='Users must provide the required script dir provided by GitHub.')
 
-    parser.add_argument("-bed_dir", dest = 'bed_directory',help = 'Users must provide the bed dir that includes the coordinates of genes.')
+    #parser.add_argument("-bed_dir", dest = 'bed_directory',help = 'Users must provide the bed dir that includes the coordinates of genes.')
+    parser.add_argument('-gene_gff_dir', dest='gene_gff_directory',
+                        help='This directory contains the gene gff files for all species.')
 
     parser.add_argument("-peptide_dir", dest = 'peptide_directory',help = 'Users must provide the peptide dir that includes the protein sequences.')
 
@@ -55,8 +58,8 @@ def get_parsed_args():
 
     #########
     ##step 03
-    parser.add_argument('-gene_gff_dir', dest='gene_gff_directory',
-                        help='This directory contains the gene gff files for all species.')
+    #parser.add_argument('-gene_gff_dir', dest='gene_gff_directory',
+    #                    help='This directory contains the gene gff files for all species.')
 
     parser.add_argument('-s3_open_summary', dest='s3_open_summary_ACR_syn',
                         help='Run the step 03 to summarize ACR to the syntenic regions.'
@@ -106,16 +109,26 @@ def main(argv=None):
 
     if s1_open_prepare_syn_fl_final == 'yes':
 
-        if args.bed_directory is None:
-            print('Cannot find required bed dir, please provide the dir in \'-bed_dir\' !')
+        #if args.bed_directory is None:
+        #    print('Cannot find required bed dir, please provide the dir in \'-bed_dir\' !')
+        #    return
+        #else:
+        #    if not os.path.exists(args.bed_directory):
+        #        print("Bed directory does not exist, please provide it")
+        #        return
+
+        #    elif not os.listdir(args.bed_directory):
+        #        print("Directory is empty, please make sure this directory contains the gene coordinate files")
+        if args.gene_gff_directory is None:
+            print('Cannot find required genome fasta directory, please provide the dir in \'-genome_fa_dir\' !')
             return
         else:
-            if not os.path.exists(args.bed_directory):
-                print("Bed directory does not exist, please provide it")
+            if not os.path.exists(args.gene_gff_directory):
+                print("peptide directory does not exist, please provide it")
                 return
 
-            elif not os.listdir(args.bed_directory):
-                print("Directory is empty, please make sure this directory contains the gene coordinate files")
+            elif not os.listdir(args.gene_gff_directory):
+                print("Directory is empty, please make sure this dir")
 
 
         if args.peptide_directory is None:
@@ -221,14 +234,41 @@ def main(argv=None):
         if not os.path.exists(working_dir):
             os.makedirs(working_dir)
 
-        ipt_bed_dir = args.bed_directory
+        ipt_gene_gff_dir = args.gene_gff_directory
+
         ipt_peptide_dir = args.peptide_directory
-        #ipt_path2mcscanx = args.path2mcscanx_path
 
+        ##modif the gff to save them to the bed
+        opt_bed_dir = working_dir + '/bed'
+        if not os.path.exists(opt_bed_dir):
+            os.makedirs(opt_bed_dir)
 
-        cmd = 'cp -r ' + ipt_bed_dir + ' ' + working_dir + '/' + 'bed'
-        print(cmd)
-        subprocess.call(cmd,shell=True)
+        all_fl_list = glob.glob(ipt_gene_gff_dir + '/*')
+        for eachfl in all_fl_list:
+            mt = re.match('.+/(.+)',eachfl)
+            flnm = mt.group(1)
+            mt = re.match('(.+)_gene\.gff',flnm)
+            spenm = mt.group(1)
+            store_final_line_list = []
+            with open (eachfl,'r') as ipt:
+                for eachline in ipt:
+                    eachline = eachline.strip('\n')
+                    if not eachline.startswith('#'):
+                        col = eachline.strip().split()
+                        if col[2] == 'gene':
+                            chrnm = col[0]
+                            st = col[3]
+                            ed = col[4]
+                            geneID = col[0] + '_' + col[3] + '_' + col[4]
+                            final_line = chrnm + '\t' + st + '\t' + ed + '\t' + geneID
+                            store_final_line_list.append(final_line)
+            with open (opt_bed_dir + '/' + spenm + '.bed','w+') as opt:
+                for eachline in store_final_line_list:
+                    opt.write(eachline + '\n')
+
+        #cmd = 'cp -r ' + ipt_bed_dir + ' ' + working_dir + '/' + 'bed'
+        #print(cmd)
+        #subprocess.call(cmd,shell=True)
 
         cmd = 'cp -r ' + ipt_peptide_dir + ' ' + working_dir + '/' + 'peptide'
         print(cmd)
@@ -400,6 +440,7 @@ def main(argv=None):
             ipt_config_fl = opt_dir + '/temp_config.txt'
 
             cmd = 'python ' + ipt_script_fl + \
+                  ' ' + input_required_scripts_dir + \
                   ' ' + ipt_spe1_syn_gene_acr_fl + \
                   ' ' + ipt_collect_all_syn_acrs_dir + \
                   ' ' + ipt_cell_type_dir + \
