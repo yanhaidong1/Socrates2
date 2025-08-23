@@ -21,40 +21,40 @@ from s3_input_required_scripts_dir import s0_subfunctions
 
 
 ##########################
-#input_required_scripts_dir = sys.argv[1]
+input_required_scripts_dir = sys.argv[1]
 ##input_required_scripts_concise
 
 ########
 ##step00
-input_spe1_syntenic_genes_all_os_ACRs_fl = sys.argv[1]
+input_spe1_syntenic_genes_all_os_ACRs_fl = sys.argv[2]
 ##/public2/home/yanhaidong/working_dir/yanhaidong/Pearlmillet_scATACseq/05_cross_species_072125/01_pipeline_blasted_ACRs_072125/output_dir_072925/store_results_for_next_step_dir/ipt_Pg.syntenic_genes.ACR.bed
 
-input_all_syntenic_regions_os_acrs_dir = sys.argv[2]
+input_all_syntenic_regions_os_acrs_dir = sys.argv[3]
 ##/public2/home/yanhaidong/working_dir/yanhaidong/Pearlmillet_scATACseq/05_cross_species_072125/01_pipeline_blasted_ACRs_072125/output_dir_072925/store_results_for_next_step_dir/collect_all_syntenic_regions_acrs_dir
 
-input_all_celltype_acr_dir = sys.argv[3]
+input_all_celltype_acr_dir = sys.argv[4]
 ##/scratch/hy17471/rice_altlas_scATAC_seq_042021/resources/store_all_ct_acr_Pablo_110723/final_collect_celltype_acr_dir_111623
 
 ##this is also used in the step01
-input_all_spe_gene_gff_dir = sys.argv[4]
+input_all_spe_gene_gff_dir = sys.argv[5]
 ##/scratch/hy17471/rice_altlas_scATAC_seq_042021/resources/store_all_five_species_gene_gff_111623
 
 ########
 ##step01
-input_rice_to_allspe_blast_dir = sys.argv[5]
+input_rice_to_allspe_blast_dir = sys.argv[6]
 ##/public2/home/yanhaidong/working_dir/yanhaidong/Pearlmillet_scATACseq/05_cross_species_072125/01_pipeline_blasted_ACRs_072125/output_dir_072925/store_results_for_next_step_dir/collect_output_dir_Pg_to_allspe_blast_dir
 
 ##/scratch/hy17471/rice_altlas_scATAC_seq_042021/resources/store_five_species_Pablo_syntenic_block_092223/collect_rice_to_allspe_blast_dir_112023
 
-input_rice_to_allspe_blast_record_riceID_dir = sys.argv[6]
+input_rice_to_allspe_blast_record_riceID_dir = sys.argv[7]
 ##/public2/home/yanhaidong/working_dir/yanhaidong/Pearlmillet_scATACseq/05_cross_species_072125/01_pipeline_blasted_ACRs_072125/output_dir_072925/store_results_for_next_step_dir/collect_output_dir_Pg_to_allspe_blast_record_PgID_dir
 
-input_all_syntenic_genes_all_os_ACRs_dir = sys.argv[7]
+input_all_syntenic_genes_all_os_ACRs_dir = sys.argv[8]
 ##/public2/home/yanhaidong/working_dir/yanhaidong/Pearlmillet_scATACseq/05_cross_species_072125/01_pipeline_blasted_ACRs_072125/output_dir_072925/store_results_for_next_step_dir/collect_all_other_spe_syntenic_genes_all_os_ACRs_dir
 
-input_configure_fl = sys.argv[8]
+input_configure_fl = sys.argv[9]
 
-input_output_dir = sys.argv[9]
+input_output_dir = sys.argv[10]
 
 
 ########
@@ -200,13 +200,12 @@ def step01_species_compare_add_cate (input_rice_to_allspe_blast_dir,
 
 ########
 ##step02
-def step02_summarize_overview (input_output_dir):
-
+def step02_summarize_overview (input_output_dir,input_required_scripts_dir):
 
     ##calculate the number of syntenic regions
-    step02_summarize_overview_dir = input_output_dir + '/step02_summarize_overview_dir'
-    if not os.path.exists(step02_summarize_overview_dir):
-        os.makedirs(step02_summarize_overview_dir)
+    step02_data_summary = input_output_dir + '/step02_data_summary'
+    if not os.path.exists(step02_data_summary):
+        os.makedirs(step02_data_summary)
 
     all_spe_pair_dir_list = glob.glob(input_output_dir + '/step01_species_compare_add_cate_dir/*')
 
@@ -218,9 +217,13 @@ def step02_summarize_overview (input_output_dir):
         spe1nm = mt.group(1)
         spe2nm = mt.group(2)
 
-        ipt_fl = eachspedir + '/opt_' + spe1nm + '_' + spe2nm + '_addCelltype_SynRegion_addDirFlt_addRegFlt_addspe2DirFlt_addspe2CT_addSpeSpec.txt'
+        #ipt_fl = eachspedir + '/opt_' + spe1nm + '_' + spe2nm + '_addCelltype_SynRegion_addDirFlt_addRegFlt_addspe2DirFlt_addspe2CT_addSpeSpec.txt'
+        ipt_fl = eachspedir + '/opt_' + spe1nm + '_' + spe2nm + '_syntenic_ACR.txt'
+        ##opt_Pg_Pm_syntenic_ACR.txt
 
-        s2_subfunctions.subfunction_summarize_overview(ipt_fl, step02_summarize_overview_dir, spe1nm, spe2nm)
+        ipt_plot_R_script_fl =input_required_scripts_dir + '/utils_cross_species/s3_input_required_scripts_dir/summary_ACRs.R'
+
+        s2_subfunctions.subfunction_summarize_overview(ipt_fl, step02_data_summary, spe1nm, spe2nm,ipt_plot_R_script_fl)
 
 
 
@@ -275,5 +278,5 @@ if step01 == 'yes':
                                     input_all_syntenic_genes_all_os_ACRs_dir,
                                     input_output_dir, s0_s1_target_spe1, s0_s1_target_spe2_str)
 
-#if step02 == 'yes':
-#    step02_summarize_overview(input_output_dir)
+if step02 == 'yes':
+    step02_summarize_overview(input_output_dir,input_required_scripts_dir)
