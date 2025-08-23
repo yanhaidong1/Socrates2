@@ -75,8 +75,8 @@ def s1_subfunction_build_ACR_in_syn_region (spe1_ACR_fl,spe2_ACR_fl,input_synten
             spe1_syntenic_gene_ed = store_target_synR_spe1_gene_dic[eachsyntenicID][eachgene]['ed']
             chr = spe1_syntenic_gene_chr
 
-            all_loc_list.append(int(spe1_syntenic_gene_st))
-            all_loc_list.append(int(spe1_syntenic_gene_ed))
+            all_loc_list.append(int(float(spe1_syntenic_gene_st)))
+            all_loc_list.append(int(float(spe1_syntenic_gene_ed)))
 
         max_loc = max(all_loc_list)
         min_loc = min(all_loc_list)
@@ -112,8 +112,8 @@ def s1_subfunction_build_ACR_in_syn_region (spe1_ACR_fl,spe2_ACR_fl,input_synten
             spe2_syntenic_gene_ed = store_target_synR_spe2_gene_dic[eachsyntenicID][eachgene]['ed']
             chr = spe2_syntenic_gene_chr
 
-            all_loc_list.append(int(spe2_syntenic_gene_st))
-            all_loc_list.append(int(spe2_syntenic_gene_ed))
+            all_loc_list.append(int(float(spe2_syntenic_gene_st)))
+            all_loc_list.append(int(float(spe2_syntenic_gene_ed)))
 
 
         ##Here we consider all the gene body information
