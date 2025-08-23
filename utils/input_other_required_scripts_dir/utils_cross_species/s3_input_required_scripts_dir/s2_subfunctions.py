@@ -11,7 +11,7 @@ import os.path
 import scipy.stats as stats
 
 
-def subfunction_summarize_overview (ipt_final_summary_fl, input_output_dir,spe1_prefix,spe2_prefix):
+def subfunction_summarize_overview (ipt_final_summary_fl, input_output_dir,spe1_prefix,spe2_prefix,ipt_plot_script_R_fl):
 
 
     ##eight groups
@@ -181,7 +181,13 @@ def subfunction_summarize_overview (ipt_final_summary_fl, input_output_dir,spe1_
             opt.write(eachline + '\n')
 
     ##plot the comparison
-
+    cmd = 'Rscript ' + ipt_plot_script_R_fl + \
+          ' ' + input_output_dir + '/opt_' + spe1_prefix + '_' + spe2_prefix + '.syntenic.txt' + \
+          ' ' + input_output_dir + \
+          ' ' + spe1_prefix + \
+          ' ' + spe2_prefix
+    print(cmd)
+    subprocess.call(cmd,shell=True)
 
 
 
