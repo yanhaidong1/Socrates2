@@ -228,7 +228,6 @@ def main(argv=None):
 
 
 
-
         cmd = 'cp -r ' + ipt_bed_dir + ' ' + working_dir + '/' + 'bed'
         print(cmd)
         subprocess.call(cmd,shell=True)
@@ -342,12 +341,15 @@ def main(argv=None):
             ipt_genome_fasta_dir = args.genome_fasta_dir
             ipt_core_num = args.core_number
 
+            ##updating 082325 directly add the spe1 and spe2 information
             cmd = 'python ' + ipt_pipeline_blast_ACR_script + \
                   ' ' + ipt_cell_type_dir + \
                   ' ' + eachsynfl + \
                   ' ' + ipt_genome_fasta_dir + \
                   ' ' + ipt_core_num + \
-                  ' ' + opt_dir
+                  ' ' + opt_dir + \
+                  ' ' + spe1 + \
+                  ' ' + spe2
             print(cmd)
             subprocess.call(cmd,shell=True)
 
