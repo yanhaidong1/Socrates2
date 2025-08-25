@@ -92,6 +92,11 @@ def main(argv=None):
     #    print('Please provide the name of column specifying the cell type identity in the meta file.')
     #    return
 
+    if args.core_number is not None:
+        core_number_run = args.core_number
+    else:
+        core_number_run = '1'
+
     input_required_scripts_dir = args.required_script_dir
 
     if args.s1_open_prepare_synhit_file is None:
@@ -339,7 +344,7 @@ def main(argv=None):
 
             ipt_cell_type_dir = args.cell_type_directory
             ipt_genome_fasta_dir = args.genome_fasta_dir
-            ipt_core_num = args.core_number
+            ipt_core_num = core_number_run
 
             ##updating 082325 directly add the spe1 and spe2 information
             cmd = 'python ' + ipt_pipeline_blast_ACR_script + \
