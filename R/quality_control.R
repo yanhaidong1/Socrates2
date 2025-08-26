@@ -1166,12 +1166,18 @@ isCell <- function(obj,
     meta <- obj$meta[shared,]
     ref.cor <- ref.cor[shared,]
     updated.meta <- cbind(meta, ref.cor)
+  
     nonrefs <- obj$meta[!rownames(obj$meta) %in% rownames(ref.cor),]
-    nonrefs$background <- NA
-    nonrefs$cellbulk <- NA
-    nonrefs$is_cell <- NA
-    updated <- rbind(updated.meta, nonrefs)
-
+    
+    if (dim(nonrefs)[1] != 0){
+      nonrefs$background <- NA
+      nonrefs$cellbulk <- NA
+      nonrefs$is_cell <- NA
+      updated <- rbind(updated.meta, nonrefs)
+    }else{
+      updated <- rbind(updated.meta)
+    }
+    
     # return
     obj$meta <- updated
     return(obj)
