@@ -39,14 +39,17 @@ plot_markers <- function(prefix,input_marker_gene_fl,input_soc_object,
   
   #markers <- read.delim(input_marker_gene_fl,row.names = 1)
   markers <- read.delim(input_marker_gene_fl)
-  row.names(markers) <- markers$geneID
+  #row.names(markers) <- markers$geneID
   
   ##merge the markers
   combine_dt_addzscore_addcomm <- merge(combine_dt_addzscore,markers,by.x = 'Gene',by.y = 'geneID')
   
   ##filter z score dt for the marker genes and top Var
   z.means <- input_z_score_dt[,mixedorder(colnames(input_z_score_dt))]
-  z.means <- z.means[rownames(z.means) %in% rownames(markers),]
+  #z.means <- z.means[rownames(z.means) %in% rownames(markers),]
+  z.means <- z.means[rownames(z.means) %in% markers$geneID,]
+  
+  
   markers <- markers[rownames(z.means),]
   
   ##do the clustering of z.means from markers
