@@ -32,10 +32,14 @@ plot.act.scores    <- function(df,output_dir,
                                lim=0.95){
   
   # prep data
-  df <- df[rownames(df) %in% colnames(acts),]
-  acts <- acts[,which(rownames(df) %in% colnames(acts))]
+  #df <- df[rownames(df) %in% colnames(acts),]
+  #acts <- acts[,which(rownames(df) %in% colnames(acts))]
   
-  acts <- acts[,rownames(df)]
+  #acts <- acts[,rownames(df)]
+  shared_ids <- intersect(rownames(df) ,colnames(acts))
+  df <- df[shared_ids,]
+  acts <- acts[,shared_ids]
+
   
   # reorder rows
   ##updating 102221 do not use the geneID to be the rownames
