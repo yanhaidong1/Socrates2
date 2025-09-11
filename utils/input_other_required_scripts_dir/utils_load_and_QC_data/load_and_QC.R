@@ -81,6 +81,7 @@ if (open_find_cells_step_final == 'yes'){
                        frip.z.thresh=frip_z_thresh_final,
                        prefix=out)
     }else{
+      message('users not choose to perform the knee plot')
       obj <- findCells_no_knee_plot_filter(obj, 
                        output_dir,
                        doplot=T,
@@ -137,7 +138,7 @@ if (open_find_cells_step_final == 'yes'){
                        frip.z.thresh=frip_z_thresh_final,
                        prefix=out)
     }else{
-      
+      message('users not choose to perform the knee plot')
       obj <- findCells_no_knee_plot_filter(obj, 
                        output_dir,
                        doplot=T,
@@ -173,7 +174,7 @@ if (open_is_cells_step_final == 'yes'){
   if (open_find_cells_step_final == 'yes'){
     
     message(" - filter cell by comparing background ...")
-    obj <- isCell(obj,
+    obj <- isCell(obj,output_dir,
                   num.test=num_test_val_final,
                   num.tn5=num_tn5_val_final,
                   num.ref=num_ref_val_final,
@@ -182,14 +183,16 @@ if (open_is_cells_step_final == 'yes'){
                   min.FRiP=0.2,
                   min.pTSS.z= -2,
                   min.FRiP.z= -2,
-                  verbose=F)
+                  verbose=F,
+                  prefix=out
+                  )
 
   }else{
     
     message(" - filter cell by comparing background ...")
     message(" - laod the findcell object ...")
     obj <- readRDS(paste0(output_dir,'/',out,'.findcell_obj.rds'))
-    obj <- isCell(obj,
+    obj <- isCell(obj,output_dir,
                   num.test=num_test_val_final,
                   num.tn5=num_tn5_val_final,
                   num.ref=num_ref_val_final,
@@ -198,7 +201,11 @@ if (open_is_cells_step_final == 'yes'){
                   min.FRiP=0.2,
                   min.pTSS.z= -2,
                   min.FRiP.z= -2,
-                  verbose=F)
+                  verbose=F,
+                  prefix=out
+                  )
+    
+    
   }
 }else{
   
