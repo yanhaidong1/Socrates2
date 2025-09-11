@@ -27,6 +27,8 @@
 #' @rdname loadBEDandGenomeData
 #' @export
 #'
+library(ggplot2)
+
 loadBEDandGenomeData <- function(bed, ann, sizes, attribute="Parent", verbose=T, is.fragment=F){
 
     # load hidden pre-check function
@@ -1000,7 +1002,7 @@ findCells_no_knee_plot_filter <- function(obj,
 #' @param verbose Default to False. Set to TRUE to progress messages.
 #' @export
 #'
-isCell <- function(obj,
+isCell <- function(obj,output_dir,
                    num.test=20000,
                    num.tn5=NULL,
                    num.ref=1000,
@@ -1009,7 +1011,8 @@ isCell <- function(obj,
                    min.FRiP=0.2,
                    min.pTSS.z= -2,
                    min.FRiP.z= -2,
-                   verbose=F){
+                   verbose=F,
+                   prefix=NULL){
 
     # hidden functions
     .RowVar <- function(x) {
@@ -1178,9 +1181,66 @@ isCell <- function(obj,
       updated <- rbind(updated.meta)
     }
     
-    # return
-    obj$meta <- updated
-    return(obj)
+    ##updating 082725
+    ##plot the figure
+    #ipt_meta_dt <- read.delim('opt_is_cell.txt')
+    #head(ipt_meta_dt)
+    df <- updated
+
+    # Make sure is_cell is treated as a factor
+    df$is_cell <- factor(df$is_cell)
+    
+    n.cells <- nrow(df[df$is_cell == '1',])
+    
+    # Plot
+    ##pdf(paste0(output_dir,'/',prefix,".QC_FIGURES.pdf"), width=12, height=4)}
+    pdf(paste0(output_dir,'/',prefix,".QC_FIGURES_isCell.pdf"),width = 7,height = 7)
+    p <- ggplot(df, aes(x = background, y = cellbulk)) +
+      geom_point(
+        aes(fill = is_cell), 
+        shape = 21,         # circle with border + fill
+        size = 3,
+        color = "black",    # border/frame color
+        stroke = 0.3          # thickness of the border
+      ) +
+      scale_fill_manual(
+        values = c("0" = "grey90", "1" = "black")
+      ) +
+      theme_minimal() +
+      theme(
+        panel.border = element_rect(color = "black", fill = NA, linewidth = 1), # frame
+        axis.text = element_text(color = "black"),    # x and y tick labels black
+        axis.title = element_text(color = "black"),   # axis titles black (optional)
+        axis.line = element_line(color = "black"),     # add axis lines (optional)
+        axis.ticks  = element_line(color = "black")
+      )+
+      labs(
+        x = "Background",     # new x-axis label
+        y = "Cell bulk"       # new y-axis label
+      ) + 
+      annotate(
+        "label",
+        x = max(as.numeric(df$background)),  # rightmost x
+        y = max(df$cellbulk),                        # topmost y
+        label = paste0("# cells = ", n.cells),
+        hjust = 1, vjust = 1,                        # align top-right
+        fill = "white",                              # label background color
+        color = "black",                             # text color
+        label.size = 1,                              # frame thickness
+        fontface = "bold"
+      )
+   print(p)
+   dev.off() 
+   
+   df <- df[df$is_cell == '1',]
+   dim(df)
+   updated <- df
+   
+   
+   # return
+   obj$meta <- updated
+   obj$meta.v3 <- updated
+   return(obj)
 }
 ###################################################################################################
 ###################################################################################################
