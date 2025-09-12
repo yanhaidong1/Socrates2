@@ -1084,7 +1084,12 @@ isCell <- function(obj,output_dir,
 
     # select bad cell reference
     bad.cells <- rownames(subset(obj$meta, obj$meta$qc_check==0 & obj$meta$total < background.cutoff))
-
+    ##check if the bad.cells is 0 we will use the qc_check == 0 
+    if (length(bad.cells) == 0){
+      bad.cells <- rownames(subset(obj$meta, obj$meta$qc_check==0))
+    }
+    
+    
     # construct references
     gg <- sparse_count_matrix[,colnames(sparse_count_matrix) %in% good.cells]
     bb <- sparse_count_matrix[,colnames(sparse_count_matrix) %in% bad.cells]
