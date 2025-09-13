@@ -1213,7 +1213,7 @@ isCell <- function(obj,output_dir,
       ) +
       theme_minimal() +
       theme(
-        panel.border = element_rect(color = "black", fill = NA, linewidth = 1), # frame
+        panel.border = element_rect(color = "black", fill = NA, size = 1), # frame
         axis.text = element_text(color = "black"),    # x and y tick labels black
         axis.title = element_text(color = "black"),   # axis titles black (optional)
         axis.line = element_line(color = "black"),     # add axis lines (optional)
