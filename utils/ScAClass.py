@@ -9,6 +9,7 @@ import subprocess
 import re
 import glob
 
+##updating 100325 we will close the organ and species name as we do not use them
 ##updating 062225 we will use the obj as the input for the ScAClass
 ##updating 110424 we will set the tissue and organ to be the reference
 ##updating 102224 we will split the training into different part to run the data to reduce the time by setting a low mem option
@@ -37,9 +38,9 @@ def get_parsed_args():
 
     parser.add_argument("-train_meta", dest='train_meta_file', help='Provide the meta file downloaded from ScAClass.')
 
-    parser.add_argument("-species", dest = 'species_name', help='Provide a species name. Currently, the ScAClass has rice, maize, etc.')
+    #parser.add_argument("-species", dest = 'species_name', help='Provide a species name. Currently, the ScAClass has rice, maize, etc.')
 
-    parser.add_argument("-organ", dest = 'organ_name', help = 'Provide a organ name.')
+    #parser.add_argument("-organ", dest = 'organ_name', help = 'Provide a organ name.')
 
     parser.add_argument("-unknown_mtx", dest='unknown_acc_matrix', help = "Provide a matrix with unknown cell identity.")
 
@@ -146,13 +147,13 @@ def main(argv=None):
 
 
 
-    if args.species_name is None:
-        print('Cannot find species name, please provide it')
-        return
+    #if args.species_name is None:
+    #    print('Cannot find species name, please provide it')
+    #    return
 
-    if args.organ_name is None:
-        print('Cannot find organ name, please provide it')
-        return
+    #if args.organ_name is None:
+    #    print('Cannot find organ name, please provide it')
+    #    return
 
 
     ###########################################
