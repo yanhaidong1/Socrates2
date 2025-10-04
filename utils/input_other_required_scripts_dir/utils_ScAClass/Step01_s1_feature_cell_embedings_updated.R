@@ -227,14 +227,25 @@ colnames(cellEmbeddings_ref_t) <- gsub('ref_','',colnames(cellEmbeddings_ref_t))
 
 ##udpating 063024 
 ##we will intersect with the meta file
+##updating 100425 we will update shared IDs
 dt <- read.delim(input_training_meta_fl,header=F)
 dt$V1 <- gsub(':','.',dt$V1)
 dt$V1 <- gsub('-','.',dt$V1)
 shared_IDs <- intersect(dt$V1,colnames(cellEmbeddings_ref_t))
-cellEmbeddings_ref_t <- cellEmbeddings_ref_t[,shared_IDs]
 
-write.csv(cellEmbeddings_ref_t,paste0(input_output_dir,'/opt_training_embeddings.csv'),quote = F)
+if ((length(shared_IDs)) != 0){
 
+  cellEmbeddings_ref_t <- cellEmbeddings_ref_t[,shared_IDs]
+  
+  write.csv(cellEmbeddings_ref_t,paste0(input_output_dir,'/opt_training_embeddings.csv'),quote = F)
+}else{
+  dt <- read.delim(input_training_meta_fl,header=F)
+  shared_IDs <- intersect(dt$V1,colnames(cellEmbeddings_ref_t))
+  cellEmbeddings_ref_t <- cellEmbeddings_ref_t[,shared_IDs]
+  
+  write.csv(cellEmbeddings_ref_t,paste0(input_output_dir,'/opt_training_embeddings.csv'),quote = F)
+  
+}
 
 
 

@@ -276,9 +276,26 @@ for (i in 1:total_row_num){
   dt$V1 <- gsub(':','.',dt$V1)
   dt$V1 <- gsub('-','.',dt$V1)
   shared_IDs <- intersect(dt$V1,colnames(cellEmbeddings_ref_t))
-  cellEmbeddings_ref_t <- cellEmbeddings_ref_t[,shared_IDs]
   
-  write.csv(cellEmbeddings_ref_t,paste0(opt_sub_dir,'/opt_training_embeddings.csv'),quote = F)
+  if ((length(shared_IDs)) != 0){
+    
+    cellEmbeddings_ref_t <- cellEmbeddings_ref_t[,shared_IDs]
+    
+    write.csv(cellEmbeddings_ref_t,paste0(input_output_dir,'/opt_training_embeddings.csv'),quote = F)
+  }else{
+    dt <- read.delim(input_training_meta_fl,header=F)
+    shared_IDs <- intersect(dt$V1,colnames(cellEmbeddings_ref_t))
+    cellEmbeddings_ref_t <- cellEmbeddings_ref_t[,shared_IDs]
+    
+    write.csv(cellEmbeddings_ref_t,paste0(input_output_dir,'/opt_training_embeddings.csv'),quote = F)
+    
+  }
+  
+  
+  
+  #cellEmbeddings_ref_t <- cellEmbeddings_ref_t[,shared_IDs]
+  
+  #write.csv(cellEmbeddings_ref_t,paste0(opt_sub_dir,'/opt_training_embeddings.csv'),quote = F)
   
 
   
