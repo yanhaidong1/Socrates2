@@ -71,7 +71,7 @@ def get_parsed_args():
                                                                   'Default: SVD.')
 
     parser.add_argument("-ML_method", dest='ML_method', help = 'Provide a machine learning method. ScAClass provides RF (Random Forest) and SVM (Support Vector Machine).'
-                                                               'Default: SVM.')
+                                                               'Default: svm.')
 
     parser.add_argument("-SVM_kernel", dest="SVM_kernel", help = 'SVM method provides ‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’ in sklearn.'
                                                                  'Default: rbf.')
@@ -328,6 +328,8 @@ def main(argv=None):
             mt = re.match('opt_PC(.+)_dir',PCdirnm)
             PCnum = mt.group(1)
 
+
+
             ##updating 102524
             if decide_use_low_mem == 'no':
 
@@ -337,19 +339,25 @@ def main(argv=None):
 
                 for eachctdir in all_celltype_dir_list:
 
-                    mt = re.match('.+/(.+)',eachctdir)
-                    dirnm = mt.group(1)
-                    mt = re.match('store_(.+)_dir',dirnm)
-                    organct = mt.group(1)
+                    ##updating 101225
+                    Machine_learning_method_list = Machine_learning_method.split(',')
+                    for eachmethod_str in Machine_learning_method_list:
 
-                    opt_celltype_res_fl = eachctdir + '/' + '/opt_annotate_' + Machine_learning_method + '.txt'
 
-                    with open (opt_celltype_res_fl,'r') as ipt:
-                        for eachline in ipt:
-                            eachline = eachline.strip('\n')
-                            col = eachline.strip().split()
-                            final_line = 'PC' + PCnum + '\t' + Machine_learning_method + '\t' + col[0] + '\t' + col[1]
-                            store_final_line_list.append(final_line)
+
+                        mt = re.match('.+/(.+)',eachctdir)
+                        dirnm = mt.group(1)
+                        mt = re.match('store_(.+)_dir',dirnm)
+                        organct = mt.group(1)
+
+                        opt_celltype_res_fl = eachctdir + '/' + '/opt_annotate_' + eachmethod_str + '.txt'
+
+                        with open (opt_celltype_res_fl,'r') as ipt:
+                            for eachline in ipt:
+                                eachline = eachline.strip('\n')
+                                col = eachline.strip().split()
+                                final_line = 'PC' + PCnum + '\t' + eachmethod_str + '\t' + col[0] + '\t' + col[1]
+                                store_final_line_list.append(final_line)
 
             ##udpating 102524
             else:
@@ -362,19 +370,23 @@ def main(argv=None):
 
                     for eachctdir in all_celltype_dir_list:
 
-                        mt = re.match('.+/(.+)', eachctdir)
-                        dirnm = mt.group(1)
-                        mt = re.match('store_(.+)_dir', dirnm)
-                        organct = mt.group(1)
+                        ##updating 101225
+                        Machine_learning_method_list = Machine_learning_method.split(',')
+                        for eachmethod_str in Machine_learning_method_list:
 
-                        opt_celltype_res_fl = eachctdir + '/' + '/opt_annotate_' + Machine_learning_method + '.txt'
+                            mt = re.match('.+/(.+)', eachctdir)
+                            dirnm = mt.group(1)
+                            mt = re.match('store_(.+)_dir', dirnm)
+                            organct = mt.group(1)
 
-                        with open(opt_celltype_res_fl, 'r') as ipt:
-                            for eachline in ipt:
-                                eachline = eachline.strip('\n')
-                                col = eachline.strip().split()
-                                final_line = 'PC' + PCnum + '\t' + Machine_learning_method + '\t' + col[0] + '\t' + col[1]
-                                store_final_line_list.append(final_line)
+                            opt_celltype_res_fl = eachctdir + '/' + '/opt_annotate_' + eachmethod_str + '.txt'
+
+                            with open(opt_celltype_res_fl, 'r') as ipt:
+                                for eachline in ipt:
+                                    eachline = eachline.strip('\n')
+                                    col = eachline.strip().split()
+                                    final_line = 'PC' + PCnum + '\t' + eachmethod_str + '\t' + col[0] + '\t' + col[1]
+                                    store_final_line_list.append(final_line)
 
         with open (Step03_prepare_outputs_dir + '/opt_all_cells_predict_for_each_OneVersusAll_celltype.txt','w+') as opt:
             for eachline in store_final_line_list:
