@@ -164,7 +164,7 @@ def update_prediction_by_cluster (input_clustering_fl,input_Rscript_fl,input_cel
                     final_line = eachline + '\t' + ScAClass + '\t' + ScAClass_clust
                     store_final_line_list.append(final_line)
                 else:
-                    final_line = eachline + '\t' + 'ScAClass' + '\t' + 'ScAClass_clust'
+                    final_line = eachline + '\t' + 'ScATACtor' + '\t' + 'ScATACtor_clust'
                     store_final_line_list.append(final_line)
 
         with open (input_output_dir + '/opt_' + eachmethod + '_meta_ScATACtor_predicted_cell_identity.txt','w+') as opt:
