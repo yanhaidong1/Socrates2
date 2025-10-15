@@ -362,7 +362,7 @@ display: none;
 <h2>Annotate cell identity</h2>
 <p>This pipeline helps annotate cell identity by visualizing marker
 genes using UMAP or DOT plot, and by performing reference-based
-annotation based on ScAClass function.</p>
+annotation based on ScATACtor function.</p>
 <div id="option-1-visualize-marker-genes" class="section level3">
 <h3>Option 1: visualize marker genes</h3>
 <div id="case-1-umap-visualization" class="section level4">
@@ -535,8 +535,8 @@ approach</p>
 approach</p>
 </div>
 </div>
-<div id="option-3-use-the-reference-based-annotation-scaclass" class="section level3">
-<h3>Option 3: use the reference-based annotation (ScAClass)</h3>
+<div id="option-3-use-the-reference-based-annotation-scatactor" class="section level3">
+<h3>Option 3: use the reference-based annotation (ScATACtor)</h3>
 <p>The reference-based method is to annotate cell identity using a
 pre-built gene by cell matrix with each cell identity has been
 annotated. Currently, this pipeline includes rice (nine organs: axillary
@@ -571,7 +571,7 @@ embeddings. Default: 50)<br />
 5. <strong>-Rd_type SVD</strong> (Provide a reduction type. Default:
 SVD)<br />
 6. <strong>-ML_method SVM</strong> (Provide a machine learning method.
-ScAClass provides Random Forest/RF and Support Vector Machine/SVM.
+ScATACtor provides Random Forest/RF and Support Vector Machine/SVM.
 Default: SVM)<br />
 7. <strong>-SVM_kernel rbf</strong> (SVM method provides ‘linear’,
 ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’ in sklearn. Default: rbf)<br />
@@ -581,10 +581,10 @@ data balance manner. Default: yes)<br />
 whether we will run the specific steps. Default: All)<br />
 </p>
 <p><strong>Outputs:</strong><br />
-1. opt_meta_ScAClass_predicted_cell_identity.txt<br />
+1. opt_meta_ScATACtor_predicted_cell_identity.txt<br />
 </p>
 <p><strong>Running</strong>:</p>
-<pre class="bash"><code>python Socrates2/utils/ScAClass.py  
+<pre class="bash"><code>python Socrates2/utils/ScATACtor.py  
 -d working_dir  
 -o output_dir  
 -script_dir Socrates2/utils/input_other_required_scripts_dir
