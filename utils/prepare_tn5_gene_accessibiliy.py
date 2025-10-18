@@ -7,6 +7,7 @@ import os
 import re
 import subprocess
 
+##updating 101825 we will add the defined an option for users to select the
 ##updating 031625 add the black list building
 ##updating 020325 add chr that not consider in the gene features
 ##updating 012325 add removing the black list step
@@ -81,6 +82,12 @@ def get_parsed_args():
 
     ##output from the step 01
     parser.add_argument("-tn5_fl", dest = 'tn5_file', help = 'Provide a tn5 insertion file obtained from the -open_procBAM step.')
+
+
+    ##updating 101825
+    parser.add_argument("-promoter_ext_size", dest = 'promoter_extended_size', help ='Users will define a range of using exact promoter extended size for calculating the gene chromatin accessibility. Default is 500 bp'
+                                                                                     'Default: 500')
+
 
 
     ##step 03
@@ -408,6 +415,12 @@ def main(argv=None):
         target_cluster_nm_final = 'LouvainClusters'
 
 
+    ##updating 101825
+    if args.promoter_extended_size is not None:
+        promoter_extended_size_final = args.promoter_extended_size
+    else:
+        promoter_extended_size_final = '500'
+
 
 
     ##updating 031625
@@ -599,7 +612,7 @@ def main(argv=None):
         s2_geneTn5.prepare_gene_tn5 (input_required_scripts_dir,input_tn5_bed_fl,s2_open_prepare_gene_tn5_final_dir,
                       input_gene_gff_fl,final_black_chr_str,input_genome_fai_fl,
                       input_soc_obj_fl,
-                      input_prefix,
+                      input_prefix,promoter_extended_size_final,
                       final_category_gff)
 
     if s3_open_gene_accessibility_final == 'yes':
