@@ -20,7 +20,10 @@ input_output_dir = sys.argv[4]
 target_nm = sys.argv[5] ##gene or mRNA since some gff contains the mRNA
 #prefix = sys.argv[5] ##riceMSUr7 or others
 
-def prepare_gene_bed_fl (input_gene_gff_fl,input_black_chr_str,input_genome_fai_fl,input_output_dir,target_nm):
+##updating 101825
+input_promoter_extended_size_final = sys.argv[6]
+
+def prepare_gene_bed_fl (input_gene_gff_fl,input_black_chr_str,input_genome_fai_fl,input_output_dir,target_nm,input_promoter_extended_size_final):
 
     input_black_chr_str_list = input_black_chr_str.split(',')
 
@@ -54,13 +57,13 @@ def prepare_gene_bed_fl (input_gene_gff_fl,input_black_chr_str,input_genome_fai_
                         if dir == '+':
                             real_end = end
 
-                            if (int(start) - 500) < 0:
+                            if (int(start) - int(input_promoter_extended_size_final)) < 0:
                                 real_start = '0'
                             else:
-                                real_start = str(int(start) - 500)
+                                real_start = str(int(start) - int(input_promoter_extended_size_final))
                         else:
                             real_start = start
-                            real_end = str(int(end) + 500)
+                            real_end = str(int(end) + int(input_promoter_extended_size_final))
 
                         annot_col = col[8].split(';')
 
@@ -107,7 +110,7 @@ def prepare_gene_bed_fl (input_gene_gff_fl,input_black_chr_str,input_genome_fai_
     #    for eachline in store_gene_annotation_bed_list:
     #        opt.write(eachline + '\n')
 
-    with open (input_output_dir + '/opt_genes_500bpTSS.bed','w+') as opt:
+    with open (input_output_dir + '/opt_genes_' + input_promoter_extended_size_final + 'bpTSS.bed','w+') as opt:
         for eachline in store_500TSS_bed_line_list:
             opt.write(eachline + '\n')
 
@@ -115,11 +118,11 @@ def prepare_gene_bed_fl (input_gene_gff_fl,input_black_chr_str,input_genome_fai_
     #cmd = 'sort -k1,1V -k2,2n ' + input_output_dir + '/opt_geneAnnotation.bed' + ' > ' +  input_output_dir + '/opt_geneAnnotation_sorted.bed'
     #subprocess.call(cmd,shell=True)
 
-    cmd = 'sort -k1,1V -k2,2n ' + input_output_dir + '/opt_genes_500bpTSS.bed > ' + input_output_dir + '/opt_genes_500bpTSS_sorted.bed'
+    cmd = 'sort -k1,1V -k2,2n ' + input_output_dir + '/opt_genes_' + input_promoter_extended_size_final + 'bpTSS.bed > ' + input_output_dir + '/opt_genes_' + input_promoter_extended_size_final + 'bpTSS_sorted.bed'
     print(cmd)
     subprocess.call(cmd,shell=True)
 
-    cmd = 'rm ' + input_output_dir + '/opt_genes_500bpTSS.bed'
+    cmd = 'rm ' + input_output_dir + '/opt_genes_' + input_promoter_extended_size_final + 'bpTSS.bed'
     print(cmd)
     subprocess.call(cmd,shell=True)
 
@@ -150,7 +153,7 @@ def prepare_gene_bed_fl (input_gene_gff_fl,input_black_chr_str,input_genome_fai_
     #                        else:
     #                            real_start = str(int(start) - 500)
     #                        real_end = str(int(end) + 2000)
-                        
+
                         ##updating 070821 do not consider the  Pt and Mt
     #                    if col[0] != 'ChrPt' and col[0] != 'ChrMt':
 
@@ -171,4 +174,4 @@ def prepare_gene_bed_fl (input_gene_gff_fl,input_black_chr_str,input_genome_fai_
     #cmd = 'sort -k1,1V -k2,2n ' + input_output_dir + '/opt_genes_2000up500down.bed > ' + input_output_dir + '/opt_genes_2000up500down_sorted.bed'
     #subprocess.call(cmd,shell=True)
 
-prepare_gene_bed_fl (input_gene_gff_fl,input_black_chr_str,input_genome_fai_fl,input_output_dir,target_nm)
+prepare_gene_bed_fl (input_gene_gff_fl,input_black_chr_str,input_genome_fai_fl,input_output_dir,target_nm,input_promoter_extended_size_final)

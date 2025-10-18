@@ -39,7 +39,7 @@ import subprocess
 #input_output_dir = sys.argv[8]
 
 def step01_prepare_gene_bed (input_other_required_scripts_dir,input_output_dir,
-                             input_gene_gff_fl,final_black_chr_str,input_genome_fai_fl,category):
+                             input_gene_gff_fl,final_black_chr_str,input_genome_fai_fl,category,promoter_extended_size_final):
 
     ##run the s1
     #store_s1_dir = input_output_dir + '/01_generate_gene_bed_fl_dir'
@@ -57,7 +57,8 @@ def step01_prepare_gene_bed (input_other_required_scripts_dir,input_output_dir,
           ' ' + final_black_chr_str + \
           ' ' + input_genome_fai_fl + \
           ' ' + store_s1_dir + \
-          ' ' + category
+          ' ' + category + \
+          ' ' + promoter_extended_size_final
     print(cmd)
     subprocess.call(cmd,shell=True)
 
@@ -82,7 +83,7 @@ def step02_prepare_genome_size (input_other_required_scripts_dir,input_genome_fl
     subprocess.call(cmd,shell=True)
 
 def step03_prepare_gene_sparse (input_other_required_scripts_dir,input_tn5_bed_fl,input_genome_fai_fl,
-                                input_output_dir):
+                                input_output_dir,promoter_extended_size_final):
 
     ##only step03 contain a gene sparse
     #step03_prepare_gene_sparse_dir = input_output_dir + '/step03_prepare_gene_sparse_dir'
@@ -104,7 +105,7 @@ def step03_prepare_gene_sparse (input_other_required_scripts_dir,input_tn5_bed_f
     ##updating 052025 change pl to py
     nbfastSparsetn5_pl_script = input_target_required_pipeline_scripts_dir + '/fastSparse.nonbinary.peak.py'
 
-    input_gene_bed_fl = input_output_dir + '/opt_genes_500bpTSS_sorted.bed'
+    input_gene_bed_fl = input_output_dir + '/opt_genes_' + promoter_extended_size_final + 'bpTSS_sorted.bed'
 
     cmd = 'python ' + prepare_sparse_script + \
           ' ' + input_tn5_bed_fl + \
@@ -151,25 +152,25 @@ def step04_save_to_soc_obj (input_other_required_scripts_dir,input_soc_obj_fl,in
 
 def prepare_gene_tn5 (input_other_required_scripts_dir,input_tn5_bed_fl,input_output_dir,
                       input_gene_gff_fl,final_black_chr_str,input_genome_fai_fl,
-                      input_soc_obj_fl,input_prefix,
+                      input_soc_obj_fl,input_prefix,promoter_extended_size_final,
                       category = 'gene'):
 
 
     input_final_scripts_dir = input_other_required_scripts_dir + '/utils_prepare_tn5_gene_accessibility/s2_open_prepare_gene_tn5_final'
 
     step01_prepare_gene_bed (input_final_scripts_dir,input_output_dir,
-                                 input_gene_gff_fl,final_black_chr_str,input_genome_fai_fl,category)
+                                 input_gene_gff_fl,final_black_chr_str,input_genome_fai_fl,category,promoter_extended_size_final)
 
     #step02_prepare_genome_size (input_final_scripts_dir,input_genome_fl,input_output_dir)
 
     step03_prepare_gene_sparse (input_final_scripts_dir,input_tn5_bed_fl,input_genome_fai_fl,
-                                input_output_dir)
+                                input_output_dir,promoter_extended_size_final)
 
 
 
     ##updating 010425
     input_gene_tn5_sparse_fl = input_output_dir + '/opt_gene_tn5.sparse'
-    input_gene_500bp_sorted_fl = input_output_dir + '/opt_genes_500bpTSS_sorted.bed'
+    input_gene_500bp_sorted_fl = input_output_dir + '/opt_genes_' + promoter_extended_size_final + 'bpTSS_sorted.bed'
     step04_save_to_soc_obj (input_other_required_scripts_dir,input_soc_obj_fl,input_gene_tn5_sparse_fl,input_gene_500bp_sorted_fl,input_prefix,input_output_dir)
 
 
