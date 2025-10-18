@@ -387,10 +387,14 @@ the features. Default: ChrPt,ChrMt)<br />
 <p><strong>Optional parameters</strong><br />
 1. -category (Set gene or transcript to be calculated. Default:
 gene.)<br />
+2. -promoter_ext_size (Specifies the extended range of the promoter
+region relative to the transcription start site. The extended promoter
+and gene body regions will be used to calculate gene chromatin
+accessibility. Default: 500)<br />
 </p>
 <p><strong>Outputs</strong>:<br />
 1. *.atac.soc.rds<br />
-2. opt_genes_500bpTSS_sorted.bed (temporary file)<br />
+2. opt_genes_*bpTSS_sorted.bed (temporary file)<br />
 3. opt_gene_tn5.sparse (temporary file)<br />
 </p>
 <p><strong>Running</strong>:<br />
