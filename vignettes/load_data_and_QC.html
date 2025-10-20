@@ -457,6 +457,21 @@ Default: output)<br />
 bins/windows, and each bin/window spans a specific size (bp). Default:
 500)<br />
 </p>
+<p><strong>parameters:</strong> when initiating
+<strong>-open_replicate_check</strong>:<br />
+1. <strong>-open_replicate_check yes|no</strong> (Enable or disable
+replication checking between two replicate samples. Default: no)<br />
+2. <strong>-rep_check_method IDR</strong> (Specify the method used for
+replication checking. (Default: IDR)<br />
+3. <strong>-rep1_obj prefix.findcell_obj.rds</strong> (Specify the
+object file obtained from the -open_find_cells step for one of the
+replicates. The file should follow the naming convention
+prefix.findcell_obj.rds.)<br />
+4. <strong>-rep2_obj prefix.findcell_obj.rds</strong> (Specify the
+object file obtained from the -open_find_cells step for the other
+replicate. The file should follow the naming convention
+prefix.findcell_obj.rds.)<br />
+</p>
 <p><strong>Outputs</strong><br />
 1. <strong>prefix.QC.rds</strong><br />
 2. <strong>prefix.QC_FIGURES.pdf</strong><br />
@@ -465,6 +480,9 @@ bins/windows, and each bin/window spans a specific size (bp). Default:
 5. <strong>prefix.raw_obj.rds</strong><br />
 6. <strong>prefix.findcell_obj.rds</strong><br />
 </p>
+<div id="step01-process-data" class="section level3">
+<h3>Step01: Process data</h3>
+</div>
 <div id="option-1-run-all-the-steps-at-once" class="section level3">
 <h3>Option 1: Run all the steps at once</h3>
 <p>A particularly useful metric of data quality can be estimated by
@@ -540,6 +558,21 @@ listed above to filter cell barcodes.</p>
 -open_build_obj no
 -open_find_cells no
 -open_is_cells yes</code></pre>
+</div>
+<div id="step02-check-replicate-consistency" class="section level3">
+<h3>Step02: Check replicate consistency</h3>
+<p>Here, we will perform replicate consistency analysis using the IDR
+(Irreproducible Discovery Rate) method. The IDR method is described in
+detail: <a href="https://github.com/nboley/idr" class="uri">https://github.com/nboley/idr</a>. The input data consist of
+two object files generated from the -open_find_cells step, typically
+named prefix.findcell_obj.rds for each replicate.</p>
+<p><strong>Running</strong>:</p>
+<pre class="bash"><code>python Socrates2/utils/load_and_QC_data.py
+-script_dir Socrates2/utils/input_other_required_scripts_dir
+-o output_dir
+-open_replicate_check yes
+-rep1_obj /Path/to/rep1/prefix.findcell_obj.rds
+-rep2_obj /Path/to/rep2/prefix.findcell_obj.rds</code></pre>
 </div>
 </div>
 
