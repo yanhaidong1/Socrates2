@@ -3,27 +3,12 @@
 
 
 
-`Socrates2` is an R and python package for analyzing Single-Cell Assay for Transposase Accessible Chromatin Sequencing (scATAC-seq) data. `Socrates2` takes the BAM file built from cellranger as the inputs to guild users to conduct a comprehensive scATAC-seq analysis. It updated several functions compared to the `Socrates` to help users obtain the smooth gene accessibility, annotate cell identity, conduct TF motif enrichment test, and perform trajectory analysis. 
+`Socrates2` is an R and python package for analyzing Single-Cell Assay for Transposase Accessible Chromatin Sequencing (scATAC-seq) data. `Socrates2` takes the BAM file built from cellranger as the inputs to guild users to conduct a comprehensive scATAC-seq analysis. It updated several functions compared to the `Socrates` to help users perform an end-to-end analysis. 
 
 
-
-
-Coming updates to `Socrates` will provides tool for several processing and analytical steps: 
-
-1. Clustering
-2. Batch effect removal 
-3. Cell-type annotation 
-4. Co-accessibility 
-5. Motif analysis 
-6. Gene accessibility 
-7. Pseudotime 
-8. scRNA-seq integration
-
-and much more!
 
 ## Installation
-
-
+For the installation manual, please refer to the scPlantReg platform: http://112.126.28.109:8150/pipeline.
 
 
 
