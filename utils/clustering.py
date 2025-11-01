@@ -79,6 +79,21 @@ def get_parsed_args():
     parser.add_argument('-prefix', dest = 'prefix_name', help = 'Specify a prefix name for the final output file.'
                                                                 'Default: output')
 
+
+    ##updating 110125
+    ##distribution of quality scores
+    parser.add_argument('-min_effect_FRiP', dest='min_effect_value_FRiP',
+                        help='If the mean FRiP of a given cluster is significantly lower (p < 0.05) than the average FRiP of all other clusters, and the difference between the other clusters and the given cluster exceeds the specified -min_effect_FRiP, the cluster will be flagged as a red flag.'
+                             'Default: 0.1')
+
+    parser.add_argument('-min_effect_TSS', dest='min_effect_value_TSS',
+                        help='If the mean TSS of a given cluster is significantly lower (p < 0.05) than the average TSS of all other clusters, and the difference between the other clusters and the given cluster exceeds the specified -min_effect_TSS, the cluster will be flagged as a red flag.'
+                             'Default: 0.1')
+
+    parser.add_argument('-max_effect_doublet', dest='max_effect_value_doublet',
+                        help='If the mean doublet score of a given cluster is significantly larger (p < 0.05) than the average doublet score of all other clusters, and the difference between the other clusters and the given cluster lowers the specified -max_effect_doublet, the cluster will be flagged as a red flag.'
+                             'Default: -3')
+
     ##parse of parameters
     args = parser.parse_args()
     return args
@@ -226,6 +241,29 @@ def main(argv=None):
 
     store_final_parameter_line_list.append('input_prefix <- ' + '\'' + prefix_name_final + '\'')
 
+    ##updating 110125
+    if args.min_effect_value_FRiP is not None:
+        min_effect_value_FRiP_final = args.min_effect_value_FRiP
+    else:
+        min_effect_value_FRiP_final = '0.1'
+
+    store_final_parameter_line_list.append('min_effect_value_FRiP <- ' + min_effect_value_FRiP_final)
+
+    if args.min_effect_value_TSS is not None:
+        min_effect_value_TSS_final = args.min_effect_value_TSS
+    else:
+        min_effect_value_TSS_final = '0.1'
+
+    store_final_parameter_line_list.append('min_effect_value_TSS <- ' + min_effect_value_TSS_final)
+
+    if args.max_effect_value_doublet is not None:
+        max_effect_value_doublet_final = args.max_effect_value_doublet
+    else:
+        max_effect_value_doublet_final = '-3'
+
+    store_final_parameter_line_list.append('max_effect_value_doublet <- ' + max_effect_value_doublet_final)
+
+
 
     ##we will firstly build up the parameter setting file
     with open(output_dir + '/temp_defined_parameters.config', 'w+') as opt:
@@ -254,6 +292,17 @@ def main(argv=None):
           ' ' + ipt_path_to_preload_R + \
           ' ' + ipt_config_fl + \
           ' ' + output_dir
+    print(cmd)
+    subprocess.call(cmd,shell=True)
+
+
+    ##updating 110125
+    ipt_script = input_required_scripts_dir + '/utils_clustering/clustering_plot_distribution.R'
+    cmd = 'Rscript ' + ipt_script + \
+          ' ' + output_dir + '/' + prefix_name_final + '.atac.soc.rds' + \
+          ' ' + output_dir + \
+          ' ' + prefix_name_final + \
+          ' ' + ipt_config_fl
     print(cmd)
     subprocess.call(cmd,shell=True)
 
