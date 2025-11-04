@@ -89,6 +89,12 @@ def process_bam (input_other_required_scripts_dir,input_bam_fl,input_output_dir,
     print(cmd)
     subprocess.call(cmd,shell=True)
 
+    ##updating 042325 use the python script other than the pl
+    #cmd = 'python ' + input_target_required_scripts_dir + '/fixBC.py ' + input_output_dir + '/temp_mq' + input_qual_val + '_rmpcr.bam | samtools view -bhS - > ' + input_output_dir + '/temp_fixBC_mq' + input_qual_val + '_rmpcr.bam'
+    #print(cmd)
+    #subprocess.call(cmd,shell=True)
+
+
     ##make Tn5 bed files
     current_directory = os.getcwd()
     cmd = 'cp ' + input_target_required_scripts_dir + '/perlSAM.pm ' + current_directory
@@ -99,6 +105,12 @@ def process_bam (input_other_required_scripts_dir,input_bam_fl,input_output_dir,
     cmd = 'perl ' + input_target_required_scripts_dir + '/makeTn5bed.pl ' + input_output_dir + '/temp_fixBC_mq' + input_qual_val + '_rmpcr.bam | sort -k1,1 -k2,2n - > ' + input_output_dir + '/opt_tn5_mq' + input_qual_val + '.bed'
     print(cmd)
     subprocess.call(cmd,shell=True)
+
+    ##udpating 042325 use the python script other than the pl
+    #cmd = 'python ' + input_target_required_scripts_dir + '/makeTn5bed_transfer.py ' + input_output_dir + '/temp_fixBC_mq' + input_qual_val + '_rmpcr.bam | sort -k1,1 -k2,2n - > ' + input_output_dir + '/opt_tn5_mq' + input_qual_val + '.bed'
+    #print(cmd)
+    #subprocess.call(cmd, shell=True)
+
 
     ##remove the temp files
     if remove_temp_file == 'yes':
@@ -111,9 +123,12 @@ def process_bam (input_other_required_scripts_dir,input_bam_fl,input_output_dir,
         print(cmd)
         subprocess.call(cmd,shell=True)
 
-        cmd = 'rm ' + current_directory + '/perlSAM.pm'
-        print(cmd)
-        subprocess.call(cmd,shell=True)
+        if os.path.exists(current_directory + '/perlSAM.pm'):
+            cmd = 'rm ' + current_directory + '/perlSAM.pm'
+            print(cmd)
+            subprocess.call(cmd, shell=True)
+
+ 
 
 def remove_black (ipt_tn5_fl,input_black_list_fl,opt_dir,remove_temp_file):
 
