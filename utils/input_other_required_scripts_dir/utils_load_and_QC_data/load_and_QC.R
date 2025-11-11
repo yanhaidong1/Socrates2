@@ -1,5 +1,6 @@
 # run Socrates on merged socrates object #
 
+##updating 111525 we will set an option if no reads in the Pt OR Mt we will not filter the organell
 ##updating 020125 add the max reads
 ##updating 100821 we will do Socrates from very beginning
 ##updating 100621 we will add the harmony 
@@ -57,6 +58,15 @@ if (open_build_object_final == 'yes'){
   write.table(meta_fl, file=paste0(output_dir,'/',out, ".raw_obj.metadata.txt"), quote=F, row.names=T, col.names=T, sep="\t")
 }
 
+##updating 111125
+##we will check if the raw meta file contain the organel
+total_ptmt <- sum(obj$ptmt)
+if (total_ptmt == 0){
+  message(" - We did not identify organelle reads and therefore will not perform the filtration step. ...")
+  filt.org_val = F
+}else{
+  filt.org_val = T
+}
 
 if (open_find_cells_step_final == 'yes'){
   
@@ -79,7 +89,8 @@ if (open_find_cells_step_final == 'yes'){
                        tss.z.thresh=tss_z_thresh_final,
                        frip.min.freq=frip_min_freq_final,
                        frip.z.thresh=frip_z_thresh_final,
-                       prefix=out)
+                       prefix=out,
+                       filt.org = filt.org_val)
     }else{
       message('users not choose to perform the knee plot')
       obj <- findCells_no_knee_plot_filter(obj, 
@@ -95,7 +106,8 @@ if (open_find_cells_step_final == 'yes'){
                        tss.z.thresh=tss_z_thresh_final,
                        frip.min.freq=frip_min_freq_final,
                        frip.z.thresh=frip_z_thresh_final,
-                       prefix=out)
+                       prefix=out,
+                       filt.org = filt.org_val)
       
     }
     
@@ -136,7 +148,8 @@ if (open_find_cells_step_final == 'yes'){
                        tss.z.thresh=tss_z_thresh_final,
                        frip.min.freq=frip_min_freq_final,
                        frip.z.thresh=frip_z_thresh_final,
-                       prefix=out)
+                       prefix=out,
+                       filt.org = filt.org_val)
     }else{
       message('users not choose to perform the knee plot')
       obj <- findCells_no_knee_plot_filter(obj, 
@@ -152,7 +165,8 @@ if (open_find_cells_step_final == 'yes'){
                        tss.z.thresh=tss_z_thresh_final,
                        frip.min.freq=frip_min_freq_final,
                        frip.z.thresh=frip_z_thresh_final,
-                       prefix=out)
+                       prefix=out,
+                       filt.org = filt.org_val)
       
     }
     
