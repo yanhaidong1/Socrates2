@@ -7,8 +7,10 @@ import os
 import subprocess
 import re
 
+##updating 101825 add an additional step to perform the IDR analysis
 ##updating 031925 add a step to not filter knee plot filtration
 ##this pipeline is to load the data and perform the QC
+
 
 def get_parsed_args():
 
@@ -126,6 +128,18 @@ def get_parsed_args():
                                                                   'Default: 500')
 
 
+    #################
+    ##updating 101825
+    parser.add_argument("-open_replicate_check", dest = 'open_replication_check', help = 'Help users to perform the IDR analysis to check the correspondence between two replicates.'
+                                                                        'Default: no')
+
+    parser.add_argument("-rep_check_method", dest = 'replication_check_method', help = 'provide a set of methods to check the correlation. It includes IDR and COR.'
+                                                                                       'Default: IDR')
+
+    parser.add_argument("-rep1_obj", dest = 'replication1_obj', help = 'Users need to provide the replication 1 object')
+    parser.add_argument("-rep2_obj", dest='replication2_obj', help='Users need to provide the replication 2 object')
+
+
     ##parse of parameters
     args = parser.parse_args()
     return args
@@ -149,308 +163,421 @@ def main(argv=None):
 
     input_required_scripts_dir = args.required_script_dir
 
-    store_final_parameter_line_list = []
-
-    ##set the open of big steps
-    if args.open_build_object is None:
-        open_build_object_final = 'yes'
-    else:
-        if args.open_build_object == 'yes':
-            open_build_object_final = 'yes'
-        else:
-            open_build_object_final = 'no'
-
-    if args.open_find_cells_step is None:
-        open_find_cells_step_final = 'yes'
-    else:
-        if args.open_find_cells_step == 'yes':
-            open_find_cells_step_final = 'yes'
-        else:
-            open_find_cells_step_final = 'no'
-
-    if args.open_is_cells_step is None:
-        open_is_cells_step_final = 'yes'
-    else:
-        if args.open_is_cells_step == 'yes':
-            open_is_cells_step_final = 'yes'
-        else:
-            open_is_cells_step_final = 'no'
-
-    ##set the required files
-    if open_build_object_final == 'yes':
-
-        if args.tn5_file is None:
-            print('Cannot find tn5 file, please provide it')
-            return
-        else:
-            try:
-                file = open(args.tn5_file, 'r')  ##check if the file is not the right file
-            except IOError:
-                print('There was an error opening the tn5 file!')
-                return
-
-        if args.gene_gff_file is None:
-            print('Cannot find gene gff file, please provide it')
-            return
-        else:
-            try:
-                file = open(args.gene_gff_file, 'r')  ##check if the file is not the right file
-            except IOError:
-                print('There was an error opening the gene gff file!')
-                return
-
-        if args.chrom_size_file is None:
-            print('Cannot find chromosome size file, please provide it')
-            return
-        else:
-            try:
-                file = open(args.chrom_size_file, 'r')  ##check if the file is not the right file
-            except IOError:
-                print('There was an error opening the chromosome size file!')
-                return
-
-
-    ##only if the build object do not open and find cells open we will provide the input object
-    #if open_build_object_final == 'no':
-
-    #    if open_find_cells_step_final == 'yes':
-
-    #        if args.input_raw_object is None:
-    #            print('Cannot find a raw built object file, please provide it')
-    #            return
-    #        else:
-    #            try:
-    #                file = open(args.input_raw_object, 'r')  ##check if the file is not the right file
-    #            except IOError:
-    #                print('There was an error opening the raw built object file!')
-    #                return
-
-    #    else:
-
-    #        if open_is_cells_step_final == 'yes':
-
-    #            if args.input_findcell_object is None:
-    #                print('Cannot find a find cell object file, please provide it')
-    #                return
-    #            else:
-    #                try:
-    #                    file = open(args.input_findcell_object, 'r')  ##check if the file is not the right file
-    #                except IOError:
-    #                    print('There was an error opening the find cell object file!')
-    #                    return
-
-
-    ##required parameters
-    if args.Pt_chrom_name is not None:
-        Pt_chrom_name_final = args.Pt_chrom_name
-    else:
-        print('Please provide the pt chromosome name')
-        return
-
-    if args.Mt_chrom_name is not None:
-        Mt_chrom_name_final = args.Mt_chrom_name
-    else:
-        print('Please provide the mt chromosome name')
-        return
-
-    store_final_parameter_line_list.append('Pt <- ' + '\'' + args.Pt_chrom_name + '\'')
-    store_final_parameter_line_list.append('Mt <- ' + '\'' + args.Mt_chrom_name + '\'')
-
     ##step01 parameters
     if args.prefix_name is not None:
         prefix = args.prefix_name
     else:
         prefix = 'output'
 
-    store_final_parameter_line_list.append('out <- ' + '\'' + prefix + '\'')
-
-
-    if args.macs2_shift is not None:
-        macs2_shift_final = args.macs2_shift
+    ##updating 101825
+    ##after the QC for the individual sample, we will perform the replication analysis
+    if args.open_replication_check is None:
+        open_replication_check_final = 'no'
     else:
-        macs2_shift_final = '-75'
-
-    store_final_parameter_line_list.append('macs2_shift_final <- ' + macs2_shift_final)
-
-    if args.macs2_extsize is not None:
-        macs2_extsize_final = args.macs2_extsize
-    else:
-        macs2_extsize_final = '150'
-
-    store_final_parameter_line_list.append('macs2_extsize_final <- ' + macs2_extsize_final)
-
-    if args.macs2_fdr is not None:
-        macs2_fdr_final = args.macs2_fdr
-    else:
-        macs2_fdr_final = '0.1'
-
-    store_final_parameter_line_list.append('macs2_fdr_final <- ' + macs2_fdr_final)
+        if args.open_replication_check == 'yes':
+            open_replication_check_final = 'yes'
 
 
-    if args.tss_window_size is not None:
-        tss_window_size_final = args.tss_window_size
-    else:
-        tss_window_size_final = '2000'
+            if args.replication1_obj is None:
+                print('Cannot find replication 1 object file, please provide it')
+                return
+            else:
+                try:
+                    file = open(args.replication1_obj, 'r')  ##check if the file is not the right file
+                except IOError:
+                    print('There was an error opening the replication 1 object file!')
+                    return
 
-    store_final_parameter_line_list.append('tss_window_size_final <- ' + tss_window_size_final)
+            if args.replication2_obj is None:
+                print('Cannot find replication 2 object file, please provide it')
+                return
+            else:
+                try:
+                    file = open(args.replication2_obj, 'r')  ##check if the file is not the right file
+                except IOError:
+                    print('There was an error opening the replication 2 object file!')
+                    return
 
-    ##step02 parameters
-    ##updating 031925
-    if args.knee_plot_filter_cell is not None:
-        knee_plot_filter_cell_final = args.knee_plot_filter_cell
-    else:
-        knee_plot_filter_cell_final = 'yes'
+        else:
+            open_replication_check_final = 'no'
 
-    store_final_parameter_line_list.append('open_knee_plot_filter_cell <- ' + '\'' + knee_plot_filter_cell_final + '\'')
+    if open_replication_check_final == 'no':
 
+        store_final_parameter_line_list = []
 
-    if args.min_cell_val is not None:
-        min_cell_val_final = args.min_cell_val
-    else:
-        min_cell_val_final = '1000'
+        ##set the open of big steps
+        if args.open_build_object is None:
+            open_build_object_final = 'yes'
+        else:
+            if args.open_build_object == 'yes':
+                open_build_object_final = 'yes'
+            else:
+                open_build_object_final = 'no'
 
-    store_final_parameter_line_list.append('min_cell_val_final <- ' + min_cell_val_final)
+        if args.open_find_cells_step is None:
+            open_find_cells_step_final = 'yes'
+        else:
+            if args.open_find_cells_step == 'yes':
+                open_find_cells_step_final = 'yes'
+            else:
+                open_find_cells_step_final = 'no'
 
-    if args.max_cell_val is not None:
-        max_cell_val_final = args.max_cell_val
-    else:
-        max_cell_val_final = '16000'
+        if args.open_is_cells_step is None:
+            open_is_cells_step_final = 'yes'
+        else:
+            if args.open_is_cells_step == 'yes':
+                open_is_cells_step_final = 'yes'
+            else:
+                open_is_cells_step_final = 'no'
 
-    store_final_parameter_line_list.append('max_cell_val_final <- ' + max_cell_val_final)
+        ##set the required files
+        if open_build_object_final == 'yes':
 
-    if args.min_tn5_val is not None:
-        min_tn5_val_final = args.min_tn5_val
-    else:
-        min_tn5_val_final = '1000'
+            if args.tn5_file is None:
+                print('Cannot find tn5 file, please provide it')
+                return
+            else:
+                try:
+                    file = open(args.tn5_file, 'r')  ##check if the file is not the right file
+                except IOError:
+                    print('There was an error opening the tn5 file!')
+                    return
 
-    store_final_parameter_line_list.append('min_tn5_val <- ' + min_tn5_val_final)
+            if args.gene_gff_file is None:
+                print('Cannot find gene gff file, please provide it')
+                return
+            else:
+                try:
+                    file = open(args.gene_gff_file, 'r')  ##check if the file is not the right file
+                except IOError:
+                    print('There was an error opening the gene gff file!')
+                    return
 
-    if args.max_tn5_val is not None:
-        max_tn5_val_final = args.max_tn5_val
-    else:
-        max_tn5_val_final = '200000'
-
-    store_final_parameter_line_list.append('max_tn5_val <- ' + max_tn5_val_final)
-
-    if args.organelle_filter_cutoff is not None:
-        organelle_filter_cutoff_final = args.organelle_filter_cutoff
-    else:
-        organelle_filter_cutoff_final = '0.2'
-
-    store_final_parameter_line_list.append('organelle_filter_cutoff_final <- ' + organelle_filter_cutoff_final)
-
-    if args.tss_min_freq_val is not None:
-        tss_min_freq_val_final = args.tss_min_freq_val
-    else:
-        tss_min_freq_val_final = '0.2'
-
-    store_final_parameter_line_list.append('tss_min_freq_val_final <- ' + tss_min_freq_val_final)
-
-    if args.tss_z_thresh_val is not None:
-        tss_z_thresh_final = args.tss_z_thresh_val
-    else:
-        tss_z_thresh_final = '2'
-
-    store_final_parameter_line_list.append('tss_z_thresh_final <- ' + tss_z_thresh_final)
-
-    if args.frip_min_freq_val is not None:
-        frip_min_freq_final = args.frip_min_freq_val
-    else:
-        frip_min_freq_final = '0.2'
-
-    store_final_parameter_line_list.append('frip_min_freq_final <- ' + frip_min_freq_final)
-
-    if args.frip_z_thresh_val is not None:
-        frip_z_thresh_final = args.frip_z_thresh_val
-    else:
-        frip_z_thresh_final = '1'
-
-    store_final_parameter_line_list.append('frip_z_thresh_final <- ' + frip_z_thresh_final)
-
-
-    ##step03
-    if args.num_test_val is not None:
-        num_test_val_final = args.num_test_val
-    else:
-        num_test_val_final = '20000'
-
-    store_final_parameter_line_list.append('num_test_val_final <- ' + num_test_val_final)
-
-    if args.num_tn5_val is not None:
-        num_tn5_val_final = args.num_tn5_val
-    else:
-        num_tn5_val_final = 'NULL'
-
-    store_final_parameter_line_list.append('num_tn5_val_final <- ' + num_tn5_val_final)
-
-    if args.num_ref_val is not None:
-        num_ref_val_final = args.num_ref_val
-    else:
-        num_ref_val_final = '1000'
-
-    store_final_parameter_line_list.append('num_ref_val_final <- ' + num_ref_val_final)
-
-    #if args.background_cutoff_val is not None:
-    #    background_cutoff_val_final = args.background_cutoff_val
-    #else:
-    #    background_cutoff_val_final = '100'
-
-    #store_final_parameter_line_list.append('background_cutoff_val_final <- ' + background_cutoff_val_final)
-
-    if args.window_size is not None:
-        window_size_bp = args.window_size
-    else:
-        window_size_bp = '500'
-
-    store_final_parameter_line_list.append('win_size <- ' + window_size_bp)
+            if args.chrom_size_file is None:
+                print('Cannot find chromosome size file, please provide it')
+                return
+            else:
+                try:
+                    file = open(args.chrom_size_file, 'r')  ##check if the file is not the right file
+                except IOError:
+                    print('There was an error opening the chromosome size file!')
+                    return
 
 
-    chr_size = 0
-    with open (args.chrom_size_file,'r') as ipt:
-        for eachline in ipt:
-            eachline = eachline.strip('\n')
-            col = eachline.strip().split()
-            chr_size += int(col[1])
+        ##only if the build object do not open and find cells open we will provide the input object
+        #if open_build_object_final == 'no':
 
-    store_final_parameter_line_list.append('genomesize <- ' + str(chr_size))
+        #    if open_find_cells_step_final == 'yes':
 
-    ##we will firstly build up the parameter setting file
-    with open (output_dir + '/temp_defined_parameters.config','w+') as opt:
-        for eachline in store_final_parameter_line_list:
-            opt.write(eachline + '\n')
+        #        if args.input_raw_object is None:
+        #            print('Cannot find a raw built object file, please provide it')
+        #            return
+        #        else:
+        #            try:
+        #                file = open(args.input_raw_object, 'r')  ##check if the file is not the right file
+        #            except IOError:
+        #                print('There was an error opening the raw built object file!')
+        #                return
 
-    ipt_script = input_required_scripts_dir + '/utils_load_and_QC_data/load_and_QC.R'
-    ipt_tn5_fl = args.tn5_file
-    ipt_chr_size_fl = args.chrom_size_file
-    ipt_gene_gff_fl = args.gene_gff_file
-    ipt_config_fl = output_dir + '/temp_defined_parameters.config'
+        #    else:
 
-    ##obtain the previous folder
-    ipt_path_to_preload_R = ''
+        #        if open_is_cells_step_final == 'yes':
 
-    if re.match('(.+)/utils/input_other_required_scripts_dir/',input_required_scripts_dir):
-        mt = re.match('(.+)/utils/input_other_required_scripts_dir/',input_required_scripts_dir)
-        ipt_path_to_preload_R = mt.group(1) + '/R'
+        #            if args.input_findcell_object is None:
+        #                print('Cannot find a find cell object file, please provide it')
+        #                return
+        #            else:
+        #                try:
+        #                    file = open(args.input_findcell_object, 'r')  ##check if the file is not the right file
+        #                except IOError:
+        #                    print('There was an error opening the find cell object file!')
+        #                    return
 
-    if re.match('(.+)/utils/input_other_required_scripts_dir',input_required_scripts_dir):
-        mt = re.match('(.+)/utils/input_other_required_scripts_dir',input_required_scripts_dir)
-        ipt_path_to_preload_R = mt.group(1) + '/R'
 
-    #ipt_path_to_preload_R = input_required_scripts_dir + '/preload_R'
+        ##required parameters
+        #if args.Pt_chrom_name is not None:
+        #    Pt_chrom_name_final = args.Pt_chrom_name
+        #else:
+        #    print('Please provide the pt chromosome name')
+        #    return
 
-    ##running
-    cmd = 'Rscript ' + ipt_script + \
-          ' ' + ipt_tn5_fl + \
-          ' ' + ipt_chr_size_fl + \
-          ' ' + ipt_gene_gff_fl + \
-          ' ' + ipt_config_fl + \
-          ' ' + output_dir + \
-          ' ' + open_build_object_final + \
-          ' ' + open_find_cells_step_final + \
-          ' ' + open_is_cells_step_final + \
-          ' ' + ipt_path_to_preload_R
-    print(cmd)
-    subprocess.call(cmd,shell=True)
+        #if args.Mt_chrom_name is not None:
+        #    Mt_chrom_name_final = args.Mt_chrom_name
+        #else:
+        #    print('Please provide the mt chromosome name')
+        #    return
+
+        if args.Pt_chrom_name is not None:
+            Pt_chrom_name_final = args.Pt_chrom_name
+        else:
+            Pt_chrom_name_final = 'ChrPt'
+
+        if args.Mt_chrom_name is not None:
+            Mt_chrom_name_final = args.Mt_chrom_name
+        else:
+            Mt_chrom_name_final = 'ChrMt'
+
+
+        store_final_parameter_line_list.append('Pt <- ' + '\'' + Pt_chrom_name_final + '\'')
+        store_final_parameter_line_list.append('Mt <- ' + '\'' + Mt_chrom_name_final + '\'')
+
+
+        store_final_parameter_line_list.append('out <- ' + '\'' + prefix + '\'')
+
+
+        if args.macs2_shift is not None:
+            macs2_shift_final = args.macs2_shift
+        else:
+            macs2_shift_final = '-75'
+
+        store_final_parameter_line_list.append('macs2_shift_final <- ' + macs2_shift_final)
+
+        if args.macs2_extsize is not None:
+            macs2_extsize_final = args.macs2_extsize
+        else:
+            macs2_extsize_final = '150'
+
+        store_final_parameter_line_list.append('macs2_extsize_final <- ' + macs2_extsize_final)
+
+        if args.macs2_fdr is not None:
+            macs2_fdr_final = args.macs2_fdr
+        else:
+            macs2_fdr_final = '0.1'
+
+        store_final_parameter_line_list.append('macs2_fdr_final <- ' + macs2_fdr_final)
+
+
+        if args.tss_window_size is not None:
+            tss_window_size_final = args.tss_window_size
+        else:
+            tss_window_size_final = '2000'
+
+        store_final_parameter_line_list.append('tss_window_size_final <- ' + tss_window_size_final)
+
+        ##step02 parameters
+        ##updating 031925
+        if args.knee_plot_filter_cell is not None:
+            knee_plot_filter_cell_final = args.knee_plot_filter_cell
+        else:
+            knee_plot_filter_cell_final = 'yes'
+
+        store_final_parameter_line_list.append('open_knee_plot_filter_cell <- ' + '\'' + knee_plot_filter_cell_final + '\'')
+
+
+        if args.min_cell_val is not None:
+            min_cell_val_final = args.min_cell_val
+        else:
+            min_cell_val_final = '1000'
+
+        store_final_parameter_line_list.append('min_cell_val_final <- ' + min_cell_val_final)
+
+        if args.max_cell_val is not None:
+            max_cell_val_final = args.max_cell_val
+        else:
+            max_cell_val_final = '16000'
+
+        store_final_parameter_line_list.append('max_cell_val_final <- ' + max_cell_val_final)
+
+        if args.min_tn5_val is not None:
+            min_tn5_val_final = args.min_tn5_val
+        else:
+            min_tn5_val_final = '1000'
+
+        store_final_parameter_line_list.append('min_tn5_val <- ' + min_tn5_val_final)
+
+        if args.max_tn5_val is not None:
+            max_tn5_val_final = args.max_tn5_val
+        else:
+            max_tn5_val_final = '200000'
+
+        store_final_parameter_line_list.append('max_tn5_val <- ' + max_tn5_val_final)
+
+        if args.organelle_filter_cutoff is not None:
+            organelle_filter_cutoff_final = args.organelle_filter_cutoff
+        else:
+            organelle_filter_cutoff_final = '0.2'
+
+        store_final_parameter_line_list.append('organelle_filter_cutoff_final <- ' + organelle_filter_cutoff_final)
+
+        if args.tss_min_freq_val is not None:
+            tss_min_freq_val_final = args.tss_min_freq_val
+        else:
+            tss_min_freq_val_final = '0.2'
+
+        store_final_parameter_line_list.append('tss_min_freq_val_final <- ' + tss_min_freq_val_final)
+
+        if args.tss_z_thresh_val is not None:
+            tss_z_thresh_final = args.tss_z_thresh_val
+        else:
+            tss_z_thresh_final = '2'
+
+        store_final_parameter_line_list.append('tss_z_thresh_final <- ' + tss_z_thresh_final)
+
+        if args.frip_min_freq_val is not None:
+            frip_min_freq_final = args.frip_min_freq_val
+        else:
+            frip_min_freq_final = '0.2'
+
+        store_final_parameter_line_list.append('frip_min_freq_final <- ' + frip_min_freq_final)
+
+        if args.frip_z_thresh_val is not None:
+            frip_z_thresh_final = args.frip_z_thresh_val
+        else:
+            frip_z_thresh_final = '1'
+
+        store_final_parameter_line_list.append('frip_z_thresh_final <- ' + frip_z_thresh_final)
+
+
+        ##step03
+        if args.num_test_val is not None:
+            num_test_val_final = args.num_test_val
+        else:
+            num_test_val_final = '20000'
+
+        store_final_parameter_line_list.append('num_test_val_final <- ' + num_test_val_final)
+
+        if args.num_tn5_val is not None:
+            num_tn5_val_final = args.num_tn5_val
+        else:
+            num_tn5_val_final = 'NULL'
+
+        store_final_parameter_line_list.append('num_tn5_val_final <- ' + num_tn5_val_final)
+
+        if args.num_ref_val is not None:
+            num_ref_val_final = args.num_ref_val
+        else:
+            num_ref_val_final = '1000'
+
+        store_final_parameter_line_list.append('num_ref_val_final <- ' + num_ref_val_final)
+
+        #if args.background_cutoff_val is not None:
+        #    background_cutoff_val_final = args.background_cutoff_val
+        #else:
+        #    background_cutoff_val_final = '100'
+
+        #store_final_parameter_line_list.append('background_cutoff_val_final <- ' + background_cutoff_val_final)
+
+        if args.window_size is not None:
+            window_size_bp = args.window_size
+        else:
+            window_size_bp = '500'
+
+        store_final_parameter_line_list.append('win_size <- ' + window_size_bp)
+
+
+        chr_size = 0
+        with open (args.chrom_size_file,'r') as ipt:
+            for eachline in ipt:
+                eachline = eachline.strip('\n')
+                col = eachline.strip().split()
+                chr_size += int(col[1])
+
+        store_final_parameter_line_list.append('genomesize <- ' + str(chr_size))
+
+        ##we will firstly build up the parameter setting file
+        with open (output_dir + '/temp_defined_parameters.config','w+') as opt:
+            for eachline in store_final_parameter_line_list:
+                opt.write(eachline + '\n')
+
+        ipt_script = input_required_scripts_dir + '/utils_load_and_QC_data/load_and_QC.R'
+        ipt_tn5_fl = args.tn5_file
+        ipt_chr_size_fl = args.chrom_size_file
+        ipt_gene_gff_fl = args.gene_gff_file
+        ipt_config_fl = output_dir + '/temp_defined_parameters.config'
+
+        ##obtain the previous folder
+        ipt_path_to_preload_R = ''
+
+        if re.match('(.+)/utils/input_other_required_scripts_dir/',input_required_scripts_dir):
+            mt = re.match('(.+)/utils/input_other_required_scripts_dir/',input_required_scripts_dir)
+            ipt_path_to_preload_R = mt.group(1) + '/R'
+
+        if re.match('(.+)/utils/input_other_required_scripts_dir',input_required_scripts_dir):
+            mt = re.match('(.+)/utils/input_other_required_scripts_dir',input_required_scripts_dir)
+            ipt_path_to_preload_R = mt.group(1) + '/R'
+
+        #ipt_path_to_preload_R = input_required_scripts_dir + '/preload_R'
+
+        ##running
+        cmd = 'Rscript ' + ipt_script + \
+              ' ' + ipt_tn5_fl + \
+              ' ' + ipt_chr_size_fl + \
+              ' ' + ipt_gene_gff_fl + \
+              ' ' + ipt_config_fl + \
+              ' ' + output_dir + \
+              ' ' + open_build_object_final + \
+              ' ' + open_find_cells_step_final + \
+              ' ' + open_is_cells_step_final + \
+              ' ' + ipt_path_to_preload_R
+        print(cmd)
+        subprocess.call(cmd,shell=True)
+
+
+
+
+    if open_replication_check_final == 'yes':
+
+        if args.replication_check_method is not None:
+            replication_check_method_str_final = args.replication_check_method
+        else:
+            replication_check_method_str_final = 'IDR'
+
+        opt_Replication_consistency_check_dir = output_dir + '/Replication_consistency_check_dir'
+        if not os.path.exists(opt_Replication_consistency_check_dir):
+            os.makedirs(opt_Replication_consistency_check_dir)
+
+        ipt_rep1_obj = args.replication1_obj
+        ipt_rep2_obj = args.replication2_obj
+
+        replication_check_method_str_final_list = replication_check_method_str_final.split(',')
+
+        if 'IDR' in replication_check_method_str_final_list:
+
+            IDR_results = opt_Replication_consistency_check_dir + '/IDR_results'
+            if not os.path.exists(IDR_results):
+                os.makedirs(IDR_results)
+
+            ##we need to first read the object to build the file
+            ipt_read_obj_Rscript = input_required_scripts_dir + '/utils_load_and_QC_data/add_01_read_obj.R'
+            cmd = 'Rscript ' + ipt_read_obj_Rscript + \
+                  ' ' + ipt_rep1_obj + \
+                  ' ' + IDR_results + \
+                  ' ' + 'rep1'
+            print(cmd)
+            subprocess.call(cmd,shell=True)
+
+            ipt_rep1_peak_fl = IDR_results + '/temp_rep1_acr_peak.txt'
+
+            cmd = 'Rscript ' + ipt_read_obj_Rscript + \
+                  ' ' + ipt_rep2_obj + \
+                  ' ' + IDR_results + \
+                  ' ' + 'rep2'
+            print(cmd)
+            subprocess.call(cmd,shell=True)
+
+            ipt_rep2_peak_fl = IDR_results + '/temp_rep2_acr_peak.txt'
+
+            ipt_idr_script = input_required_scripts_dir + '/utils_load_and_QC_data/add_01_check_replicate_IDR_101825.py'
+
+            cmd = 'python ' + ipt_idr_script + \
+                  ' ' + ipt_rep1_peak_fl + \
+                  ' ' + ipt_rep2_peak_fl + \
+                  ' ' + prefix + \
+                  ' ' + IDR_results
+            print(cmd)
+            subprocess.call(cmd,shell=True)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
