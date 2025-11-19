@@ -167,7 +167,7 @@ p <- ggplot(res_table, aes(x = mlog10pvalue, y = delta)) +
     x = expression(-log[10](pvalue)),
     y = expression(Delta~"(Cluster mean - Global mean FRIP)"),
     color = "Significant",
-    title = "Cluster-level FRIP Changes"
+    title = "Cluster-level TSS Changes"
   ) +
   theme_classic(base_size = 14)
 
@@ -243,7 +243,7 @@ p <- ggplot(res_table, aes(x = mlog10pvalue, y = delta)) +
     x = expression(-log[10](pvalue)),
     y = expression(Delta~"(Cluster mean - Global mean FRIP)"),
     color = "Significant",
-    title = "Cluster-level FRIP Changes"
+    title = "Cluster-level Doublet Score Changes"
   ) +
   theme_classic(base_size = 14)
 
