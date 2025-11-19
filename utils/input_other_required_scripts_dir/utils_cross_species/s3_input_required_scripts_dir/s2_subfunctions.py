@@ -52,7 +52,7 @@ def subfunction_summarize_overview (ipt_final_summary_fl, input_output_dir,spe1_
                             if spe1_celltype != 'broadly_accessible' and spe2_celltype == 'broadly_accessible':
                                 ACR_cate = 'ctACRbACR'
 
-                            store_shared_ACR_dic[spe1_ACR] = ACR_cate
+                            store_shared_ACR_dic[spe1_ACR + '__' + spe2_ACR] = ACR_cate
 
                         ##for the variable ACR
                         else:
@@ -86,6 +86,8 @@ def subfunction_summarize_overview (ipt_final_summary_fl, input_output_dir,spe1_
                 spe1_ACR = col[0]
                 syn_region_id = col[5]
 
+                spe2_ACR = col[3]
+
                 if syn_region_id != 'none':
 
                     if ',' in syn_region_id:
@@ -94,14 +96,14 @@ def subfunction_summarize_overview (ipt_final_summary_fl, input_output_dir,spe1_
 
                     else:
                         final_cate = 'wrong'
-                        if spe1_ACR in store_shared_ACR_dic:
-                            cate = store_shared_ACR_dic[spe1_ACR]
+                        if spe1_ACR + '__' + spe2_ACR in store_shared_ACR_dic:
+                            cate = store_shared_ACR_dic[spe1_ACR + '__' + spe2_ACR]
                             final_cate = 'shared_ACR' + '\t' +  cate
-                        if spe1_ACR not in store_shared_ACR_dic:
+                        if spe1_ACR + '__' + spe2_ACR not in store_shared_ACR_dic:
                             if spe1_ACR in store_var_ACR_dic:
                                 cate = store_var_ACR_dic[spe1_ACR]
                                 final_cate = 'variable_ACR' + '\t' + cate
-                        if spe1_ACR not in store_shared_ACR_dic:
+                        if spe1_ACR + '__' + spe2_ACR not in store_shared_ACR_dic:
                             if spe1_ACR not in store_var_ACR_dic:
                                 if spe1_ACR in store_spes_ACR_dic:
 
@@ -178,6 +180,10 @@ def subfunction_summarize_overview_ori (ipt_final_summary_fl, input_output_dir,s
     store_var_ACR_dic = {}
     store_spes_ACR_dic = {}
 
+    ##updating 111925
+    ##debug to allow the key to have acr1 and acr2 name
+
+
     count = 0
     with open(ipt_final_summary_fl, 'r') as ipt:
         for eachline in ipt:
@@ -212,7 +218,7 @@ def subfunction_summarize_overview_ori (ipt_final_summary_fl, input_output_dir,s
                             if spe1_celltype != 'broadly_accessible' and spe2_celltype == 'broadly_accessible':
                                 ACR_cate = 'ctACRbACR'
 
-                            store_shared_ACR_dic[spe1_ACR] = ACR_cate
+                            store_shared_ACR_dic[spe1_ACR + '__' + spe2_ACR] = ACR_cate
 
                         ##for the variable ACR
                         else:
@@ -246,6 +252,9 @@ def subfunction_summarize_overview_ori (ipt_final_summary_fl, input_output_dir,s
                 spe1_ACR = col[0]
                 syn_region_id = col[5]
 
+                ##updating 111925
+                spe2_ACR = col[3]
+
                 if syn_region_id != 'none':
 
                     if ',' in syn_region_id:
@@ -254,14 +263,14 @@ def subfunction_summarize_overview_ori (ipt_final_summary_fl, input_output_dir,s
 
                     else:
                         final_cate = 'wrong'
-                        if spe1_ACR in store_shared_ACR_dic:
-                            cate = store_shared_ACR_dic[spe1_ACR]
+                        if spe1_ACR + '__' + spe2_ACR in store_shared_ACR_dic:
+                            cate = store_shared_ACR_dic[spe1_ACR + '__' + spe2_ACR]
                             final_cate = 'shared_ACR' + '\t' +  cate
-                        if spe1_ACR not in store_shared_ACR_dic:
+                        if spe1_ACR + '__' + spe2_ACR not in store_shared_ACR_dic:
                             if spe1_ACR in store_var_ACR_dic:
                                 cate = store_var_ACR_dic[spe1_ACR]
                                 final_cate = 'variable_ACR' + '\t' + cate
-                        if spe1_ACR not in store_shared_ACR_dic:
+                        if spe1_ACR + '__' + spe2_ACR not in store_shared_ACR_dic:
                             if spe1_ACR not in store_var_ACR_dic:
                                 if spe1_ACR in store_spes_ACR_dic:
 
