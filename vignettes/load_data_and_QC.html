@@ -478,8 +478,7 @@ prefix.findcell_obj.rds.)<br />
 3. <strong>prefix.filtered.soc.rds</strong><br />
 4. <strong>prefix.metadata.txt</strong><br />
 5. <strong>prefix.raw_obj.rds</strong><br />
-6. <strong>prefix.findcell_obj.rds</strong><br />
-</p>
+6. <strong>prefix.findcell_obj.rds</strong></p>
 <div id="step01-process-data" class="section level3">
 <h3>Step01: Process data</h3>
 </div>
@@ -565,7 +564,11 @@ listed above to filter cell barcodes.</p>
 (Irreproducible Discovery Rate) method. The IDR method is described in
 detail: <a href="https://github.com/nboley/idr" class="uri">https://github.com/nboley/idr</a>. The input data consist of
 two object files generated from the -open_find_cells step, typically
-named prefix.findcell_obj.rds for each replicate.</p>
+named prefix.findcell_obj.rds for each replicate.<br />
+</p>
+<p>The output includes an <strong>idr_summary.log</strong> file, which
+records the total number of reported peaks, the number of peaks passing
+the IDR cutoff of 0.05, and the corresponding percentage.</p>
 <p><strong>Running</strong>:</p>
 <pre class="bash"><code>python Socrates2/utils/load_and_QC_data.py
 -script_dir Socrates2/utils/input_other_required_scripts_dir
@@ -573,6 +576,11 @@ named prefix.findcell_obj.rds for each replicate.</p>
 -open_replicate_check yes
 -rep1_obj /Path/to/rep1/prefix.findcell_obj.rds
 -rep2_obj /Path/to/rep2/prefix.findcell_obj.rds</code></pre>
+<p><strong>Outputs</strong><br />
+1.
+<strong>output_dir/Replication_consistency_check_dir/idr_summary.log</strong><br />
+2.
+<strong>output_dir/Replication_consistency_check_dir/opt_output_idr.txt.png</strong></p>
 </div>
 </div>
 
