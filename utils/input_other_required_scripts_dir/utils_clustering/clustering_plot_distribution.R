@@ -30,6 +30,12 @@ merged_dt <- merged_dt[c('cellID','FRIP','TSS','doubletscore','LouvainClusters',
 ##plot replications
 library_list <- unique(merged_dt$library)
 
+library_colors <- setNames(
+  scales::hue_pal()(length(library_list)), 
+  library_list
+)
+
+
 for (i in 1:length(library_list)){
   
   lib_name <- library_list[i]
@@ -37,7 +43,9 @@ for (i in 1:length(library_list)){
   p <- ggplot(merged_dt %>% filter(library==lib_name),
               aes(x=umap1, y=umap2, color=library)) +
     geom_point(alpha=0.7, size=1.5) +
-    scale_color_manual(values=c(lib_name="skyblue")) +
+    scale_color_manual(values = library_colors) +
+    #scale_color_manual(values = setNames("skyblue", lib_name))+
+    #scale_color_manual(values=c(lib_name="skyblue")) +
     labs(title=paste0("UMAP of ",lib_name)) +
     theme_minimal()+
     theme_classic()
