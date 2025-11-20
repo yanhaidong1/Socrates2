@@ -25,6 +25,54 @@ merged_dt$TSS <- merged_dt$tss/merged_dt$total
 
 merged_dt <- merged_dt[c('cellID','FRIP','TSS','doubletscore','LouvainClusters','library','umap1','umap2')]
 
+
+##updating 112025
+##plot replications
+library_list <- unique(merged_dt$library)
+
+for (i in 1:length(library_list)){
+  
+  lib_name <- library_list[i]
+  
+  p <- ggplot(merged_dt %>% filter(library==lib_name),
+              aes(x=umap1, y=umap2, color=library)) +
+    geom_point(alpha=0.7, size=1.5) +
+    scale_color_manual(values=c(lib_name="skyblue")) +
+    labs(title=paste0("UMAP of ",lib_name)) +
+    theme_minimal()+
+    theme_classic()
+  pdf(paste0(input_output_dir,'/','opt_',input_prefix,'.UMAP.',lib_name,'.pdf'),height = 8,width = 8)
+  print(p)
+  dev.off()
+  
+}
+
+
+#p <- ggplot(merged_dt %>% filter(library=="semroot6"),
+#            aes(x=umap1, y=umap2, color=library)) +
+#  geom_point(alpha=0.7, size=1.5) +
+#  scale_color_manual(values=c("semroot6"="skyblue")) +
+#  labs(title="UMAP of semroot6") +
+#  theme_minimal()+
+#  theme_classic()
+#pdf('opt_library_semroot6_balanced_UMAP.pdf',height = 8,width = 8)
+#p
+#dev.off()
+
+# semroot7
+#p <- ggplot(merged_dt %>% filter(library=="semroot7"),
+#            aes(x=umap1, y=umap2, color=library)) +
+# geom_point(alpha=0.7, size=1.5) +
+#  scale_color_manual(values=c("semroot7"="salmon")) +
+#  labs(title="UMAP of semroot7") +
+#  theme_minimal()+
+#  theme_classic()
+#pdf('opt_library_semroot7_balanced_UMAP.pdf',height = 8,width = 8)
+#p
+#dev.off()
+
+
+
 ##############
 ##for the FRIP
 df <- merged_dt
