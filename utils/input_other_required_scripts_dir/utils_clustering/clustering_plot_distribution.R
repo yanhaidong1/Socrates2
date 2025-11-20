@@ -41,7 +41,7 @@ for (i in 1:length(library_list)){
     labs(title=paste0("UMAP of ",lib_name)) +
     theme_minimal()+
     theme_classic()
-  pdf(paste0(input_output_dir,'/','opt_',input_prefix,'.UMAP.',lib_name,'.pdf'),height = 8,width = 8)
+  pdf(paste0(input_output_dir,'/','opt_',input_prefix,'.UMAP.library.',lib_name,'.pdf'),height = 8,width = 8)
   print(p)
   dev.off()
   
