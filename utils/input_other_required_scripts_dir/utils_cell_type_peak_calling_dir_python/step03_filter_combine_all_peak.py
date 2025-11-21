@@ -5,6 +5,7 @@ import glob
 import subprocess
 import os
 
+##updating 112125 we will remove the previous bed file
 ##updating 062425 add a function to filter out peaks that is out of genome size per chromosome
 
 
@@ -326,6 +327,10 @@ def filter_peak_by_chr_size (ipt_filtered_peak_fl, ipt_fa_fai_fl,ipt_opt_dir):
     subprocess.call(cmd,shell=True)
 
 
+    ##updating 112125 remove the previous file and only retain the
+    cmd = 'rm ' + ipt_opt_dir + '/' + flnm + '.bed'
+    print(cmd)
+    subprocess.call(cmd,shell=True)
 
 
 
