@@ -983,14 +983,16 @@ if (openAnnot == 'yes'){
 write.table(cell.data, file=paste0(output_dir,'/',prefix,".meta.txt"), quote=F, row.names=T, col.names=T, sep="\t")
 
 
+##updating 112125
+##we do not create the object
 
 ##save the annotate to the meta of the final object
-final_obj <- append(input_soc_object, list(
-  meta_annot = cell.data
-))
+#final_obj <- append(input_soc_object, list(
+#  meta_annot = cell.data
+#))
 
 
-saveRDS(final_obj,file=paste0(output_dir,'/',input_prefix,'.atac.soc.rds'))
+#saveRDS(final_obj,file=paste0(output_dir,'/',input_prefix,'.atac.soc.rds'))
 
 
 
