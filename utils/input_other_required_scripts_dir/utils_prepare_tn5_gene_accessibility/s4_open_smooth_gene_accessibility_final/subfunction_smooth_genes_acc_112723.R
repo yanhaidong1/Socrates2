@@ -584,7 +584,17 @@ smooth.data        <- function(x,
     i <- ((1:length(x = j)) - 1) %/% k + 1
     edgeList = data.frame(i, j, 1)
     A = sparseMatrix(i = edgeList[,1], j = edgeList[,2], x = edgeList[,3])
-
+    
+    if (nrow(A) != ncol(A)){
+      n <- nrow(pcs)
+      A <- sparseMatrix(
+        i = edgeList[,1],
+        j = edgeList[,2],
+        x = edgeList[,3],
+        dims = c(n, n)
+      )
+    }
+    
     # Smooth graph
     ##some questions
     ##1. what's meanning of A
