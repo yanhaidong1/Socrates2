@@ -371,6 +371,19 @@ smoothIdentity <- function(obj,
         edgeList = data.frame(i, j, 1)
         A = sparseMatrix(i = edgeList[,1], j = edgeList[,2], x = edgeList[,3])
         
+        
+        ##updating 112625 debug
+        if (nrow(A) != ncol(A)){
+          n <- nrow(pcs)
+          A <- sparseMatrix(
+            i = edgeList[,1],
+            j = edgeList[,2],
+            x = edgeList[,3],
+            dims = c(n, n)
+          )
+        }
+        
+        
         # Smooth graph
         message(" - smoothing identities ...")
         A = A + t(A)
