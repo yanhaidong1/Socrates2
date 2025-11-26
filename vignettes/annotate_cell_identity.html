@@ -695,8 +695,8 @@ that indicates cell type identity (default:
 <code>cell_identity</code>)<br />
 </p>
 <p><strong>Outputs:</strong><br />
-1. opt_<em><em>perM_genes_accessibility_cell_identity.txt  2.
-opt</em></em>_rawcounts_gene_accessibility_cell_identity.txt<br />
+1. opt_<em><em>perM_genes_accessibility_cell_identity.txt<br />
+2. opt</em></em>_rawcounts_gene_accessibility_cell_identity.txt<br />
 </p>
 <p><strong>Running</strong>:<br />
 </p>
@@ -706,6 +706,32 @@ opt</em></em>_rawcounts_gene_accessibility_cell_identity.txt<br />
 -open_gene_CPM yes 
 -soc_obj /Path/to/*.atac.soc.rds
 -meta_fl /Path/to/*.meta.txt</code></pre>
+</div>
+<div id="caculate-reads-per-million-cpm-of-genes-per-cluster" class="section level3">
+<h3>Caculate Reads Per Million (CPM) of genes per cluster</h3>
+<p>After annotating cell identities, <strong>Socrates2</strong> provides
+an additional option to calculate the <strong>Reads Per Million
+(CPM)</strong> values of genes for each cluster.</p>
+<p><strong>Inputs</strong> (Required):<br />
+1. <strong>-open_gene_CPM yes</strong><br />
+2. <strong>-script_dir</strong> (a script directory downloaded from
+GitHub: Socrates2/utils/input_other_required_scripts_dir)<br />
+3. <strong>-soc_obj</strong> (The <strong>*.atac.soc.rds</strong> object
+obtained from the <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/find_diff_markers.html">5.
+Find diff markers</a> or from the <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/prepare_gene_accessibility.html">4.
+Prepare gene accessibility</a> step)<br />
+</p>
+<p><strong>Outputs:</strong><br />
+1. opt_<em><em>perM_genes_accessibility_cell_identity.txt<br />
+2. opt</em></em>_rawcounts_gene_accessibility_cell_identity.txt<br />
+</p>
+<p><strong>Running</strong>:<br />
+</p>
+<pre class="bash"><code>python Socrates2/utils/annotate_cell_identity.py
+-script_dir Socrates2/utils/input_other_required_scripts_dir
+-o output_dir
+-open_gene_CPM yes 
+-soc_obj /Path/to/*.atac.soc.rds</code></pre>
 </div>
 </div>
 
