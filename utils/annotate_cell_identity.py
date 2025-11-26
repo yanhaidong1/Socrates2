@@ -7,6 +7,7 @@ import os
 import subprocess
 import re
 
+##updating 112625 add a clustering CPM method
 ##updating 061925 we will add a new function to obtain the PerM per cell type
 ##updating 031225 add the final meta building
 ##updating 022025 add GO enrichment test
@@ -332,15 +333,15 @@ def main(argv=None):
                     print('There was an error opening the soc object file!')
                     return
 
-            if args.meta_file is None:
-                print('Cannot find the final meta file, please provide it')
-                return
-            else:
-                try:
-                    file = open(args.meta_file, 'r')  ##check if the file is not the right file
-                except IOError:
-                    print('There was an error opening the final meta file!')
-                    return
+            #if args.meta_file is None:
+            #    print('Cannot find the final meta file, please provide it')
+            #    return
+            #else:
+            #    try:
+            #        file = open(args.meta_file, 'r')  ##check if the file is not the right file
+            #    except IOError:
+            #        print('There was an error opening the final meta file!')
+            #        return
 
 
         else:
@@ -641,13 +642,30 @@ def main(argv=None):
 
         plot_getPerM_script = input_required_scripts_dir + '/utils_annotate_cell_identity_using_markers/getPerM_celltypes.R'
 
-        if args.celltype_column_name is None:
-            celltype_column_name_final = 'cell_identity'
-        else:
-            celltype_column_name_final = args.celltype_column_name
-
         input_soc_obj_fl = args.soc_object_fl
-        input_meta_fl = args.meta_file
+
+        ##updating 112625
+        if args.meta_file is not None:
+
+            if args.celltype_column_name is None:
+                celltype_column_name_final = 'cell_identity'
+            else:
+                celltype_column_name_final = args.celltype_column_name
+
+            input_meta_fl = args.meta_file
+
+        else:
+            celltype_column_name_final = 'LouvainClusters'
+
+            cmd = 'Rscript ' + input_required_scripts_dir + '/utils_annotate_cell_identity_using_markers/read_extract_meta_object.R' + \
+                  ' ' + input_soc_obj_fl + \
+                  ' ' + open_cal_gene_CPM_final_dir
+            print(cmd)
+            subprocess.call(cmd,shell=True)
+
+            input_meta_fl =  open_cal_gene_CPM_final_dir + '/temp_meta.txt'
+
+
         input_clust_col_nm = celltype_column_name_final
 
         if re.match('.+/(.+)\.atac\.soc\.rds', input_soc_obj_fl):
