@@ -182,7 +182,12 @@ plotUMAP <- function(b, ipt_output_dir,prefix="out", column="LouvainClusters_aft
     ##updating 021921 add the col information to the meta
     head(b_filt)
     b_filt$celltype_color <- colv
-    b_filt <- b_filt[,-1]
+    
+    #b_filt <- b_filt[,-1]
+    
+    ##updating 113025
+    b_filt <- b_filt[, c(2:(ncol(b_filt)-2), 1, (ncol(b_filt)-1):ncol(b_filt))]
+    
     write.table(b_filt,paste0(ipt_output_dir,'/',prefix,".annotated_cell_identity.meta.txt"),sep = '\t',quote = F)
     
     
