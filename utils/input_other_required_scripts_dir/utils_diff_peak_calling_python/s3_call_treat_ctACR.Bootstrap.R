@@ -1,3 +1,4 @@
+##updating 120325 we will set the group
 ##updating 051925 this is for the peak calling of the treatment
 ##updating 011525 refer from Pablo script to call the ct ACR
 
@@ -49,8 +50,6 @@ source(input_config_fl)
 ##here we use the meta_slot as the treat group
 #meta_slot <- target_cluster
 
-##target_treat_colnm
-meta_slot <- target_treat_colnm
 
 
 print(input_data)
@@ -406,6 +405,36 @@ bed_file_read <- read_delim(peak_file, col_names = c("chrom", "start", "stop", "
 
 message("Reading Meta Data...")
 meta_data <- read.delim(meta,row.names = 1)
+
+
+
+##updating 120325
+##the pattern is the
+##heat:leaf1,leaf2;control:leaf3,leaf4
+if (group_pattern != 'na'){
+  
+  group_map <- unlist(
+    lapply(strsplit(group_pattern, ";")[[1]], function(x) {
+      tmp <- strsplit(x, ":")[[1]]
+      libs <- strsplit(tmp[2], ",")[[1]]
+      setNames(rep(tmp[1], length(libs)), libs)
+    })
+  )
+  
+  meta_data$group <- group_map[meta_data[[target_treat_colnm]]]
+  meta_slot <- 'group'
+  message(paste0('the group pattern is ',group_pattern))
+  
+}else{
+
+  ##target_treat_colnm
+  meta_slot <- target_treat_colnm
+  message('there is no group pattern')
+}
+
+
+
+
 
 
 
