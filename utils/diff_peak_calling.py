@@ -3,8 +3,8 @@
 
 ##this script is to perform the peak calling
 ##it has two step
-##step01 prepare the peak sparse file
-##step02 make the DAR analysis
+##step01 prepare the peak sparse fil
+##updating 120225 make a group for the library
 ##updating 080525 make a cpm peak file
 ##updating 051925 step03 find the diff peak among diff groups
 ##updating 063025 we will use the object to
@@ -84,7 +84,11 @@ def get_parsed_args():
 
 
     ##updating 051925
-    parser.add_argument("-gp_colnm", dest = 'group_col_name', help = 'Users need to provide a group column name will be used for the diff peaks calling.')
+    parser.add_argument("-gp_colnm", dest = 'group_col_name', help = 'Users need to provide a group column name will be used for the diff peaks calling.'
+                                                                     'Default:library.')
+
+    parser.add_argument("-gp_fl", dest = 'group_file', help = 'Users need to make a group patterns in a file. If -s3_open_diff_gp_peak is initiated, this argument need to be added. Otherwise,'
+                                                              'it will directly consider the item in the library')
 
 
     #parser.add_argument("-upsample_method", dest= 'upsampling_method',help = 'Users need to define the method used for the upsampling. Sample read or sample cell'
@@ -232,9 +236,11 @@ def main(argv=None):
         if args.s3_open_diff_group_peak == 'yes':
             s3_open_diff_group_peak_final = 'yes'
 
-            if args.group_col_name is None:
-                print('Please provide a group column name within the meta file')
-                return
+
+            ##updating 120325
+            #if args.group_col_name is None:
+            #    print('Please provide a group column name within the meta file')
+            #    return
 
 
         else:
@@ -312,9 +318,42 @@ def main(argv=None):
     if args.group_col_name is not None:
         group_col_name_final = args.group_col_name
     else:
-        group_col_name_final = 'na'
+        group_col_name_final = 'library'
 
     store_final_parameter_line_list.append('target_treat_colnm <- ' + '\'' + group_col_name_final + '\'')
+
+    ##updating 120325
+    if args.group_file is not None:
+
+        store_pattern_dic = {}
+        with open (args.group_file,'r') as ipt:
+            for eachline in ipt:
+                eachline = eachline.strip('\n')
+                col = eachline.strip().split()
+                if col[0] in store_pattern_dic:
+                    store_pattern_dic[col[0]].append(col[1])
+                else:
+                    store_pattern_dic[col[0]] = []
+                    store_pattern_dic[col[0]].append(col[1])
+
+        store_final_pattern_list = []
+        for eachlib in store_pattern_dic:
+            final_line = eachlib + ':' + ','.join(store_pattern_dic[eachlib])
+            store_final_pattern_list.append(final_line)
+
+        group_pattern_final = ';'.join(store_final_pattern_list)
+
+        #group_pattern_final = args.group_pattern
+
+        #if ';' not in group_pattern_final:
+        #    print('Please add ; between two group names')
+        #    return
+
+    else:
+        group_pattern_final = 'na'
+
+    ##if we initiate the group pattern final it will generate a new column in the meta file
+    store_final_parameter_line_list.append('group_pattern <- ' + '\'' + group_pattern_final + '\'')
 
 
     with open(output_dir + '/temp_defined_parameters.config', 'w+') as opt:
