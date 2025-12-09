@@ -19,10 +19,7 @@ input_rep2_peak_fl = sys.argv[2]
 
 input_prefix = sys.argv[3]
 
-##updating 110125
-input_idr_bash_script = sys.argv[4]
-
-input_output_dir = sys.argv[5]
+input_output_dir = sys.argv[4]
 
 def perform_IDR (input_rep1_peak_fl,input_rep2_peak_fl,input_prefix,input_output_dir):
 
@@ -32,7 +29,7 @@ def perform_IDR (input_rep1_peak_fl,input_rep2_peak_fl,input_prefix,input_output
           ' --output-file ' + input_output_dir + '/opt_' + input_prefix + '_idr.txt' + \
           ' --plot ' + \
           ' --input-file-type ' + 'narrowPeak' + \
-          ' --rank p.value '
+          ' --rank p.value 2> ' + input_output_dir + '/idr_summary.log'
           #' >' + input_output_dir + '/opt_' + input_prefix + '_log.txt' + ' 2>&1'
     print(cmd)
     subprocess.call(cmd,shell=True)
