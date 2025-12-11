@@ -426,9 +426,7 @@ used to call group-specific peaks.)<br />
 </p>
 <div id="option-1-call-cell-type-specific-acrs" class="section level3">
 <h3>Option 1: Call cell-type-specific ACRs</h3>
-<p>This option is used to identify cell-type-specific ACRs. Users must
-specify the column name in the metadata file that contains cell type
-information using the <code>-ct_colnm</code> parameter.</p>
+<p>This option is used to identify cell-type-specific ACRs.</p>
 <p><strong>Running</strong>:<br />
 </p>
 <pre class="bash"><code>python Socrates2/utils/diff_peak_calling.py
@@ -446,39 +444,84 @@ s2_open_diff_peak_call_final_dir/<strong>opt.all_ACRs.classified.bed</strong><br
 s2_open_diff_peak_call_final_dir/<strong>*.atac.soc.rds</strong><br />
 </p>
 </div>
-<div id="option-2-call-group-specific-acrs" class="section level3">
-<h3>Option 2: Call group-specific ACRs</h3>
-<p>This option is used to identify group-specific ACRs. Users must
-provide a metadata file and specify the column containing cell type
-information using the <code>-ct_colnm</code> parameter, as well as the
-column containing group information using the <code>-gp_colnm</code>
-parameter. This function will identify group-specific ACRs within each
-cell type. For example, if users have treatment and control groups, it
-can be used to detect ACRs that exhibit significantly higher or lower
-chromatin accessibility in the treatment group compared to the
-control.</p>
+<div id="option-2-call-group-specificcell-type-specific-acrs" class="section level3">
+<h3>Option 2: Call group-specific&amp;cell-type-specific ACRs</h3>
+<p>This function identifies group-specific ACRs within each cell type.
+For example, if users have treatment and control groups, it can be used
+to detect ACRs that show significantly higher or lower chromatin
+accessibility in the treatment group compared with the control. </p>
+<p>To run this function, users must provide a group file using
+<code>-gp_fl</code>, consisting of two tab-separated columns:: the new
+group ID used for comparison, and the corresponding subgroup names
+exactly as they appear in the library column of the meta file. For
+instance, if users want to merge four libraries (A1, A2, B1, B2) into
+two groups (A and B) and identify ACRs that are both group-specific and
+cell-type-specific, the first column should contain the group IDs A and
+B, and the second column should list the libraries A1, A2, B1, and B2,
+where A1/A2 map to group A and B1/B2 map to group B. If users need to
+change the default library column to another metadata column, they can
+use the <code>-gp_colnm</code> parameter to specify a different column
+name. </p>
 <p>The input for <code>-soc_obj</code> can be obtained either from the
 <strong>“Save final peak to an output object”</strong> step in <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/peak_call_per_celltype.html">7.
 Call Peaks per Cell Type</a>, or from <strong>Option 1: Call
 Cell-Type-Specific ACRs</strong>, specifically from the file located at
-<code>s2_open_diff_peak_call_final_dir/*.atac.soc.rds</code>.</p>
+<code>s2_open_diff_peak_call_final_dir/*.atac.soc.rds</code>. </p>
 <p><strong>Running</strong>:<br />
 </p>
 <pre class="bash"><code>python Socrates2/utils/diff_peak_calling.py
 -script_dir Socrates2/utils/input_other_required_scripts_dir
 -o output_dir
+-tn5_fl opt_tn5_mq10_sorted.bed
+-soc_obj output_dir/s2_open_diff_peak_call_final_dir/*.atac.soc.rds
+-gp_fl /Path/to/ipt_group_fl.txt
 -s1_open_prepare no
 -s2_open_diff_ct_peak no
 -s3_open_diff_gp_peak yes
--soc_obj output_dir/s2_open_diff_peak_call_final_dir/*.atac.soc.rds
--gp_colnm treatment_group
 -core 20</code></pre>
 <p><strong>Outputs</strong><br />
 1.
 s3_open_diff_group_peak_final_dir/<strong>opt.all_ACRs.celltype.group.classified.bed</strong><br />
 2.
-s3_open_diff_group_peak_final_dir/<strong>*.atac.soc.rds</strong><br />
+s3_open_diff_group_peak_final_dir/<strong>*.atac.soc.rds</strong> </p>
+</div>
+<div id="option-3-generate-read-coverage-bigwig-profiles-for-each-group-within-each-cell-type" class="section level3">
+<h3>Option 3: Generate read coverage (BigWig) profiles for each group
+within each cell type </h3>
+<p>This function will generate the read coverage profiles for each group
+within each cell type. Users could use the bigwig files to present their
+read coverage for each peak. </p>
+<p><strong>Inputs</strong> (Required):<br />
+1. <strong>-open_build_gp_bw yes|no</strong> (Run the step to generate
+BigWig files for each group within each cell type. Default: no)<br />
+2. <strong>-script_dir</strong> (A script directory downloaded from
+GitHub: Socrates2/utils/input_other_required_scripts_dir)<br />
+3. <strong>-o</strong> (Output directory. This should be the same
+directory generated from <a href="http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/peak_call_per_celltype.html">7.
+Call Peaks per Cell Type</a>)<br />
+4. <strong>-Gmfai_fl</strong> (A genome fai index file built up by
+samtools faidx)<br />
+5. <strong>-gp_meta_fl</strong> (A meta file obtained from
+<strong>Option 2: Call group-specific&amp;cell-type-specific
+ACRs</strong>, specifically from the file located at
+<code>s3_open_diff_group_peak_final_dir/temp_add_group_meta.txt</code>.)<br />
+6. <strong>-g_size</strong> (Provide an effective genome size)<br />
+7. <strong>-core</strong> (Set cores we will use for the parallele
+analysis. Default: 1)<br />
 </p>
+<p><strong>Running</strong>:<br />
+</p>
+<pre class="bash"><code>python Socrates2/utils/cell_type_peak_calling.py
+-open_build_gp_bw yes
+-script_dir Socrates2/utils/input_other_required_scripts_dir
+-o /Path/to/output_dir
+-Gmfai_fl genome.fai
+-gp_meta_fl /Path/to/temp_add_group_meta.txt
+-g_size 3e8 (Users need to adjust this value to match their own effect genome size)
+-core 20</code></pre>
+<p><strong>Outputs</strong><br />
+1.
+s5_open_bigwig_build_group_final_dir/store_final_bw_dir/<strong>*.bw</strong></p>
 </div>
 </div>
 
