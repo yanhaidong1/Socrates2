@@ -39,7 +39,7 @@ For the installation manual, please refer to the scPlantReg platform: http://112
 
 
 ## Issue reports
-Please find the common issue: [Issue Reports](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/issue_reports.html)
+For a summary of the most common issues and their corresponding solutions, please refer to the following documentation: [Issue Reports](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/issue_reports.html)
 
 
 
