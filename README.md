@@ -38,6 +38,9 @@ For the installation manual, please refer to the scPlantReg platform: http://112
 [12. Cross species analysis](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/cross_species_analysis.html)
 
 
+## Issue reports
+Please find the common issue: [Issue Reports](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/issue_reports.html)
+
 
 
 
