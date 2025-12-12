@@ -4,6 +4,7 @@
 ##this script is to perform the peak calling
 ##it has two step
 ##step01 prepare the peak sparse fil
+##updating 120825 make a decsion to build the bw for the treatment groups
 ##updating 120225 make a group for the library
 ##updating 080525 make a cpm peak file
 ##updating 051925 step03 find the diff peak among diff groups
@@ -89,6 +90,8 @@ def get_parsed_args():
 
     parser.add_argument("-gp_fl", dest = 'group_file', help = 'Users need to make a group patterns in a file. If -s3_open_diff_gp_peak is initiated, this argument need to be added. Otherwise,'
                                                               'it will directly consider the item in the library')
+
+    #parser.add_argument("-bdg_dir", dest = 'bdg_directory', help = 'If users initiate this argument, they will build bigwig files for each group.')
 
 
     #parser.add_argument("-upsample_method", dest= 'upsampling_method',help = 'Users need to define the method used for the upsampling. Sample read or sample cell'
@@ -540,7 +543,9 @@ def main(argv=None):
 
                 if os.path.isdir(eachcelltype_dir):
 
-                    ipt_target_acr_fl = eachcelltype_dir + '/opt.all_ACRs.classified.bed'
+                    ##updating 121125
+                    #ipt_target_acr_fl = eachcelltype_dir + '/opt.all_ACRs.classified.bed'
+                    ipt_target_acr_fl = eachcelltype_dir + '/' + prefix_str_final + '.' + threshold_val_final + '.all_ACRs.classified.bed'
 
                     with open (ipt_target_acr_fl,'r') as ipt:
                         for eachline in ipt:
@@ -548,62 +553,70 @@ def main(argv=None):
                             final_line = eachline + '\t' + ctname
                             store_final_line_list.append(final_line)
 
-            with open (s3_open_diff_group_peak_final_dir + '/opt.all_ACRs.celltype.group.classified.bed','w+') as opt:
+            with open (s3_open_diff_group_peak_final_dir + '/' + prefix_str_final + '.' + threshold_val_final + '.all_ACRs.celltype.group.classified.bed','w+') as opt:
                 for eachline in store_final_line_list:
                     opt.write(eachline + '\n')
 
+
+            ##updating 121125
+            ##we actually do not want to build the soc as it does not help much and cost a lot spaces
+
             ##as the first two steps must run, and check if soc is built otherwise check if users provided
-            all_files_s2_list = glob.glob(output_dir + '/s2_open_diff_peak_call_final_dir/*')
-            soc_build = 'no'
-            soc_build_path = ''
-            input_prefix = 'output'
-            for eachfl in all_files_s2_list:
-                mt = re.match('.+/(.+)',eachfl)
-                flnm = mt.group(1)
-                if 'atac.soc.rds' in flnm:
-                    mt = re.match('(.+)\.atac\.soc\.rds',flnm)
-                    input_prefix = mt.group(1)
-                    soc_build = 'yes'
-                    soc_build_path = eachfl
+            #all_files_s2_list = glob.glob(output_dir + '/s2_open_diff_peak_call_final_dir/*')
+            #soc_build = 'no'
+            #soc_build_path = ''
+            #input_prefix = 'output'
+            #for eachfl in all_files_s2_list:
+            #    mt = re.match('.+/(.+)',eachfl)
+            #    flnm = mt.group(1)
+            #    if 'atac.soc.rds' in flnm:
+            #        mt = re.match('(.+)\.atac\.soc\.rds',flnm)
+            #        input_prefix = mt.group(1)
+            #        soc_build = 'yes'
+            #        soc_build_path = eachfl
 
-            if soc_build == 'yes':
+            #if soc_build == 'yes':
 
-                ipt_R_script = input_required_scripts_dir + '/utils_diff_peak_calling_python/save_object.R'
-                cmd = 'Rscript ' + ipt_R_script + \
-                      ' ' + soc_build_path + \
-                      ' ' + s3_open_diff_group_peak_final_dir + '/opt.all_ACRs.celltype.group.classified.bed' + \
-                      ' ' + s3_open_diff_group_peak_final_dir + \
-                      ' ' + input_prefix
-                print(cmd)
-                subprocess.call(cmd,shell=True)
+            #    ipt_R_script = input_required_scripts_dir + '/utils_diff_peak_calling_python/save_object.R'
+            #    cmd = 'Rscript ' + ipt_R_script + \
+            #          ' ' + soc_build_path + \
+            #          ' ' + s3_open_diff_group_peak_final_dir + '/opt.all_ACRs.celltype.group.classified.bed' + \
+            #          ' ' + s3_open_diff_group_peak_final_dir + \
+            #          ' ' + input_prefix
+            #    print(cmd)
+            #    subprocess.call(cmd,shell=True)
 
-            else:
+            #else:
 
                 ##if users do not build the soc in the second step, it will use the input of soc object to build one
-                if args.soc_object_fl is not None:
+            #    if args.soc_object_fl is not None:
 
-                    ipt_soc_obj_fl = args.soc_object_fl
+            #        ipt_soc_obj_fl = args.soc_object_fl
 
-                    if re.match('.+/(.+)\.atac\.soc\.rds', ipt_soc_obj_fl):
-                        mt = re.match('.+/(.+)\.atac\.soc\.rds', ipt_soc_obj_fl)
-                        input_prefix = mt.group(1)
-                    else:
-                        if re.match('(.+)\.atac\.soc\.rds', ipt_soc_obj_fl):
-                            mt = re.match('(.+)\.atac\.soc\.rds', ipt_soc_obj_fl)
-                            input_prefix = mt.group(1)
-                        else:
-                            print('Please use *.atac.soc.rds file without changing the file name')
-                            return
+            #        if re.match('.+/(.+)\.atac\.soc\.rds', ipt_soc_obj_fl):
+            #            mt = re.match('.+/(.+)\.atac\.soc\.rds', ipt_soc_obj_fl)
+            #            input_prefix = mt.group(1)
+            #        else:
+            #            if re.match('(.+)\.atac\.soc\.rds', ipt_soc_obj_fl):
+            #                mt = re.match('(.+)\.atac\.soc\.rds', ipt_soc_obj_fl)
+            #                input_prefix = mt.group(1)
+            #            else:
+            #                print('Please use *.atac.soc.rds file without changing the file name')
+            #                return
 
 
-                    ipt_R_script = input_required_scripts_dir + '/utils_diff_peak_calling_python/save_object.R'
-                    cmd = 'Rscript ' + ipt_R_script + \
-                          ' ' + ipt_soc_obj_fl + \
-                          ' ' + s3_open_diff_group_peak_final_dir + '/opt.all_ACRs.celltype.classified.bed' + \
-                          ' ' + s3_open_diff_group_peak_final_dir + \
-                          ' ' + input_prefix
-                    print(cmd)
-                    subprocess.call(cmd, shell=True)
+            #        ipt_R_script = input_required_scripts_dir + '/utils_diff_peak_calling_python/save_object.R'
+            #        cmd = 'Rscript ' + ipt_R_script + \
+            #              ' ' + ipt_soc_obj_fl + \
+            #              ' ' + s3_open_diff_group_peak_final_dir + '/opt.all_ACRs.celltype.classified.bed' + \
+            #              ' ' + s3_open_diff_group_peak_final_dir + \
+            #              ' ' + input_prefix
+            #        print(cmd)
+            #        subprocess.call(cmd, shell=True)
+
+
+
+
 
 
 
