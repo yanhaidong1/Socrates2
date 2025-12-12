@@ -1,3 +1,4 @@
+##updating 121125 we will set an option to re-run and only change the threshold
 ##updating 120325 we will set the group
 ##updating 051925 this is for the peak calling of the treatment
 ##updating 011525 refer from Pablo script to call the ct ACR
@@ -432,6 +433,25 @@ if (group_pattern != 'na'){
   message('there is no group pattern')
 }
 
+##updating 120825
+write.table(meta_data,paste0(input_output_dir,'/temp_add_group_meta.txt'),quote = F,sep = '\t')
+
+
+
+##updating 121125
+##do not run the group that contain 0 for either one of group
+meta_data$count <- 1
+aggregated_dt <- aggregate(count ~ cell_identity + group,data = meta_data,sum)
+all_groups <- unique(aggregated_dt$group)
+cell_ids <- unique(aggregated_dt$cell_identity)
+missing_cell_types <- cell_ids[
+  sapply(cell_ids, function(cid) {
+    groups_present <- aggregated_dt$group[aggregated_dt$cell_identity == cid]
+    length(setdiff(all_groups, groups_present)) > 0
+  })
+]
+
+#message(paste0('the missing cell types is ',missing_cell_types))
 
 
 
@@ -441,10 +461,13 @@ if (group_pattern != 'na'){
 ##updating 051925
 ##we will split the meta based on treat group 
 ##use the for loop
-all_celltype_list <- unique(meta_data[[target_cluster]])
+all_celltype_all_list <- unique(meta_data[[target_cluster]])
+
+##updating 121125 remove the missing cell types
+all_celltype_list <- setdiff(all_celltype_all_list, missing_cell_types)
 
 for (i in 1:length(all_celltype_list)) {
-
+  
   ipt_target_celltype <- all_celltype_list[i]
   
   ##create an directory to run for each cell type
@@ -457,166 +480,193 @@ for (i in 1:length(all_celltype_list)) {
   }
   
   
-  meta_ct_data <- meta_data[meta_data[[target_cluster]] == ipt_target_celltype,]
-  
-  ## Use the column for meta_data for cell type ACR calling 
-  meta_slot_var <- c(meta_slot)
-  
-  message("Reading Input Data...")
-  raw_cpm_counts_all_genes <- read_delim(input, delim="\t", col_names = c("gene_name", "barcode", "accessability")) %>%
-      dplyr::mutate(cellID = barcode)  %>%
-      dplyr::mutate(geneID = gene_name)
-  
-  
-  ## Generate the Null distribution of values... 
-  null_distributions <- replicate(null_permutations, generate_null_distribution(meta_ct_data, meta_slot_var), simplify = FALSE)
-  #Older slower implementation 
-  #null_dist_values <- lapply(null_distributions, generate_null_dist_values_optimized, "final_annotation_n", raw_cpm_counts_all_genes)
-  
-  
-  counter <- 1
-  null_dist_values <- mclapply(null_distributions, generate_null_dist_values_optimized, 
-           meta_slot_var, raw_cpm_counts_all_genes,
-           mc.preschedule = FALSE, mc.set.seed = TRUE,
-           mc.silent = FALSE, mc.cores = 25,
-           mc.cleanup = TRUE, mc.allow.recursive = TRUE, affinity.list = NULL)
-  
-  
-  # Apply the function to the list of matrices
-  valid_indices <- sapply(null_dist_values, is_valid_matrix)
-  # Filter out invalid matrices
-  null_dist_values <- null_dist_values[valid_indices]
-  
-  
-  
-  
-  message("Generating 1000 Bootstraps")
-  y <- bootstraps(meta_ct_data, times = entropy_bootstraps, strata = !!sym(meta_slot_var))
-  
-  # Set up parallel processing
-  message("Running Bootstraps...")
-  
-  ## Older Slower Version
-  # counter <- 1
-  # tic()
-  # results <- y %>%
-  #   mutate(p_values = map(splits, ~ generate_pvalues_bootstraps_fast(analysis(.x), raw_cpm_counts_all_genes, "final_annotation_n"))) %>%
-  #   select(id, p_values)
-  # toc()
-  
-  #Set to 3gb
-  #options(future.globals.maxSize= 9e+9)
-  ## Increase speed by threading...
-  options(future.globals.maxSize= 100000 * 1024^2)
-  
-  ##debug
-  ##debug
-  #saveRDS(y,'temp_y.rds')
-  #results <- y %>%
-  #  mutate(safe_output = future_map(splits, ~ generate_pvalues_bootstraps_fast(analysis(.x), raw_cpm_counts_all_genes, meta_slot_var)))
-  
-  #saveRDS(results,'temp_results_1.rds')
-  
-  
-  
-  generate_pvalues_bootstraps_fast_safe_function <- purrr::safely(generate_pvalues_bootstraps_fast)
-  counter <- 1
-  plan(multicore)
-  results <- y %>%
-   mutate(safe_output = future_map(splits, ~ generate_pvalues_bootstraps_fast_safe_function(analysis(.x), raw_cpm_counts_all_genes, meta_slot_var))) %>%
-   mutate(has_error = map_lgl(safe_output, ~ !is.null(.x$error))) %>%
-   # Filter out rows with errors
-   filter(!has_error) %>%
-   # Extract p_values from the safe_output
-   mutate(p_values = map(safe_output, "result")) %>%
-   select(id, p_values)
-  
-  saveRDS(results,'temp_results.rds')
-  
-  expaneded_bootstraps <- results %>%
-    mutate(p_values = map(p_values, ~ as_tibble(.x, rownames = "ACR_values"))) %>% # Convert matrices to tibbles and include row names
-    unnest(cols = p_values) %>%                          # Unnest the tibbles
-    pivot_longer(cols = -c(id, ACR_values),              # Keep 'id' and 'ACR_values' fixed
-                 names_to = "cell_type",                 # Assign the column names to 'cell_type'
-                 values_to = "value") %>%                # Assign the values to 'value'
-    rename(BootstrapID = id)                             # Rename the columns to the desired names
-  
-  nested_data <- expaneded_bootstraps %>% 
-      select(-BootstrapID) %>%
-      group_by(ACR_values, cell_type) %>%
-      nest() %>% 
-      rename(distribution = "data")
-  
-  
-  message("Merging Bootstraps and Null...")
-  
-  melted_nested_nulls <- imap_dfr(null_dist_values, function(matrix, index) {
-    df_matrix <- reshape2::melt(matrix)
-    df_matrix <- df_matrix %>%
-      rename(
-        row_name = Var1,
-        column_name = Var2,
-        value = value
-      ) %>%
-      mutate(matrix_index = index)
-    return(df_matrix)
-  })
-  
-  
-  rm(null_dist_values)
-  gc()
-  
-  null_dist_generation <- melted_nested_nulls %>% 
-      rename(ACR_values = row_name) %>%
-      select(ACR_values, value) %>%
-      group_by(ACR_values) %>%
-      nest() %>%
-      rename(null_dist = data)
-  
-  saveRDS(null_dist_generation,'temp_null_dist_generation.rds')
-  
-  merged_bootstraps_nulls <- left_join(nested_data, null_dist_generation, by = c("ACR_values"))
-  
-  
-  
-  
-  message("Calculating Pvalues....")
-  calculated_Pvals_all <- calculate_pvalues_per_ACR(merged_bootstraps_nulls)
-  ## Save the RDS object here after all the hard work is done... 
-  
-  message("Saving Intermediate Data")
-  save_pval_null_dists <- paste0(opt_ct_dir,'/',prefix, ".combined_data.rds")
-  saveRDS(calculated_Pvals_all, file = save_pval_null_dists)
-  
-  message("Filtering Pvalues...")
-  calculated_Pvals_all_quantify <- calculated_Pvals_all %>% 
-      dplyr::select(ACR_values, cell_type, perm_pval, perm_pval_lower, perm_pval_upper, pnorm_pval, z_score) 
-  
-  save_pval_null_dists <- paste0(opt_ct_dir,'/',prefix, ".all_pvalues.csv")
-  write_delim(calculated_Pvals_all_quantify, file = save_pval_null_dists, delim=",")
-  
-  
-  ## Clean up happen later after script is finalized. Stops from StackOverflow
-  rm(calculated_Pvals_all)
-  rm(merged_bootstraps_nulls)
-  gc()
-  
-  #setwd("/scratch/jpm73279/comparative_single_cell/dev_location/entropy_final")
-  
-  
-  
-  if (stat_test == "perm") {
-    quantify_cell_type_specific_acrs(calculated_Pvals_all_quantify, "perm_pval", threshold, prefix)
-  } else if (stat_test == "pnorm") {
-    quantify_cell_type_specific_acrs(calculated_Pvals_all_quantify, "pnorm_pval", threshold, prefix)
+  ##updating 121125
+  ##check if the opt_pvalues.csv exist
+  if (file.exists(paste0(opt_ct_dir,'/','opt', ".all_pvalues.csv"))) {
+    
+    message("File found and we will re-run to test different threshold")
+    
+    final_prefix <- paste0(prefix,'.',threshold)
+    
+    calculated_Pvals_all_quantify <- read.csv(paste0(opt_ct_dir,'/','opt', ".all_pvalues.csv"))
+    
+    if (stat_test == "perm") {
+      quantify_cell_type_specific_acrs(calculated_Pvals_all_quantify, "perm_pval", threshold, final_prefix)
+    } else if (stat_test == "pnorm") {
+      quantify_cell_type_specific_acrs(calculated_Pvals_all_quantify, "pnorm_pval", threshold, final_prefix)
+    } else {
+      stop("Invalid stat_test value")
+    }
+    
+    message("Done! Check your outputs Dork! :D ")
+    
+    
+    
   } else {
-    stop("Invalid stat_test value")
+    
+    final_prefix <- paste0(prefix,'.',threshold)
+  
+    meta_ct_data <- meta_data[meta_data[[target_cluster]] == ipt_target_celltype,]
+    
+    ## Use the column for meta_data for cell type ACR calling 
+    meta_slot_var <- c(meta_slot)
+    
+    message("Reading Input Data...")
+    raw_cpm_counts_all_genes <- read_delim(input, delim="\t", col_names = c("gene_name", "barcode", "accessability")) %>%
+        dplyr::mutate(cellID = barcode)  %>%
+        dplyr::mutate(geneID = gene_name)
+    
+    
+    ## Generate the Null distribution of values... 
+    null_distributions <- replicate(null_permutations, generate_null_distribution(meta_ct_data, meta_slot_var), simplify = FALSE)
+    #Older slower implementation 
+    #null_dist_values <- lapply(null_distributions, generate_null_dist_values_optimized, "final_annotation_n", raw_cpm_counts_all_genes)
+    
+    
+    counter <- 1
+    null_dist_values <- mclapply(null_distributions, generate_null_dist_values_optimized, 
+             meta_slot_var, raw_cpm_counts_all_genes,
+             mc.preschedule = FALSE, mc.set.seed = TRUE,
+             mc.silent = FALSE, mc.cores = 25,
+             mc.cleanup = TRUE, mc.allow.recursive = TRUE, affinity.list = NULL)
+    
+    
+    # Apply the function to the list of matrices
+    valid_indices <- sapply(null_dist_values, is_valid_matrix)
+    # Filter out invalid matrices
+    null_dist_values <- null_dist_values[valid_indices]
+    
+    
+    
+    
+    message("Generating 1000 Bootstraps")
+    y <- bootstraps(meta_ct_data, times = entropy_bootstraps, strata = !!sym(meta_slot_var))
+    
+    # Set up parallel processing
+    message("Running Bootstraps...")
+    
+    ## Older Slower Version
+    # counter <- 1
+    # tic()
+    # results <- y %>%
+    #   mutate(p_values = map(splits, ~ generate_pvalues_bootstraps_fast(analysis(.x), raw_cpm_counts_all_genes, "final_annotation_n"))) %>%
+    #   select(id, p_values)
+    # toc()
+    
+    #Set to 3gb
+    #options(future.globals.maxSize= 9e+9)
+    ## Increase speed by threading...
+    options(future.globals.maxSize= 100000 * 1024^2)
+    
+    ##debug
+    ##debug
+    #saveRDS(y,'temp_y.rds')
+    #results <- y %>%
+    #  mutate(safe_output = future_map(splits, ~ generate_pvalues_bootstraps_fast(analysis(.x), raw_cpm_counts_all_genes, meta_slot_var)))
+    
+    #saveRDS(results,'temp_results_1.rds')
+    
+    
+    
+    generate_pvalues_bootstraps_fast_safe_function <- purrr::safely(generate_pvalues_bootstraps_fast)
+    counter <- 1
+    plan(multicore)
+    results <- y %>%
+     mutate(safe_output = future_map(splits, ~ generate_pvalues_bootstraps_fast_safe_function(analysis(.x), raw_cpm_counts_all_genes, meta_slot_var))) %>%
+     mutate(has_error = map_lgl(safe_output, ~ !is.null(.x$error))) %>%
+     # Filter out rows with errors
+     filter(!has_error) %>%
+     # Extract p_values from the safe_output
+     mutate(p_values = map(safe_output, "result")) %>%
+     select(id, p_values)
+    
+    saveRDS(results,'temp_results.rds')
+    
+    expaneded_bootstraps <- results %>%
+      mutate(p_values = map(p_values, ~ as_tibble(.x, rownames = "ACR_values"))) %>% # Convert matrices to tibbles and include row names
+      unnest(cols = p_values) %>%                          # Unnest the tibbles
+      pivot_longer(cols = -c(id, ACR_values),              # Keep 'id' and 'ACR_values' fixed
+                   names_to = "cell_type",                 # Assign the column names to 'cell_type'
+                   values_to = "value") %>%                # Assign the values to 'value'
+      rename(BootstrapID = id)                             # Rename the columns to the desired names
+    
+    nested_data <- expaneded_bootstraps %>% 
+        select(-BootstrapID) %>%
+        group_by(ACR_values, cell_type) %>%
+        nest() %>% 
+        rename(distribution = "data")
+    
+    
+    message("Merging Bootstraps and Null...")
+    
+    melted_nested_nulls <- imap_dfr(null_dist_values, function(matrix, index) {
+      df_matrix <- reshape2::melt(matrix)
+      df_matrix <- df_matrix %>%
+        rename(
+          row_name = Var1,
+          column_name = Var2,
+          value = value
+        ) %>%
+        mutate(matrix_index = index)
+      return(df_matrix)
+    })
+    
+    
+    rm(null_dist_values)
+    gc()
+    
+    null_dist_generation <- melted_nested_nulls %>% 
+        rename(ACR_values = row_name) %>%
+        select(ACR_values, value) %>%
+        group_by(ACR_values) %>%
+        nest() %>%
+        rename(null_dist = data)
+    
+    saveRDS(null_dist_generation,'temp_null_dist_generation.rds')
+    
+    merged_bootstraps_nulls <- left_join(nested_data, null_dist_generation, by = c("ACR_values"))
+    
+    
+    
+    
+    message("Calculating Pvalues....")
+    calculated_Pvals_all <- calculate_pvalues_per_ACR(merged_bootstraps_nulls)
+    ## Save the RDS object here after all the hard work is done... 
+    
+    message("Saving Intermediate Data")
+    save_pval_null_dists <- paste0(opt_ct_dir,'/',final_prefix, ".combined_data.rds")
+    saveRDS(calculated_Pvals_all, file = save_pval_null_dists)
+    
+    message("Filtering Pvalues...")
+    calculated_Pvals_all_quantify <- calculated_Pvals_all %>% 
+        dplyr::select(ACR_values, cell_type, perm_pval, perm_pval_lower, perm_pval_upper, pnorm_pval, z_score) 
+    
+    ##change the prefix to opt
+    save_pval_null_dists <- paste0(opt_ct_dir,'/','opt', ".all_pvalues.csv")
+    write_delim(calculated_Pvals_all_quantify, file = save_pval_null_dists, delim=",")
+    
+    
+    ## Clean up happen later after script is finalized. Stops from StackOverflow
+    rm(calculated_Pvals_all)
+    rm(merged_bootstraps_nulls)
+    gc()
+    
+    #setwd("/scratch/jpm73279/comparative_single_cell/dev_location/entropy_final")
+    
+    
+    
+    if (stat_test == "perm") {
+      quantify_cell_type_specific_acrs(calculated_Pvals_all_quantify, "perm_pval", threshold, final_prefix)
+    } else if (stat_test == "pnorm") {
+      quantify_cell_type_specific_acrs(calculated_Pvals_all_quantify, "pnorm_pval", threshold, final_prefix)
+    } else {
+      stop("Invalid stat_test value")
+    }
+    
+    message("Done! Check your outputs Dork! :D ")
+
+  
   }
-  
-  message("Done! Check your outputs Dork! :D ")
-
-  
-
   
   
 }
