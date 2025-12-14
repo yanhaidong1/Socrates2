@@ -421,9 +421,13 @@ to generate. Default: 1000)<br />
 8. <strong>-entropy_bootstraps</strong> (The number of bootstraps for
 the entropy metric to generate. Default: 1000)<br />
 9. <strong>-prefix</strong> (Prefix for output. Default: opt)<br />
-10. <strong>-gp_colnm</strong> (The column containing group information
-used to call group-specific peaks.)<br />
-</p>
+10. <strong>-gp_colnm</strong> (The column name containing library
+labels to be grouped according to the group file specified by
+<code>-gp_fl</code>. Default: library)<br />
+11. <strong>-gp_fl</strong> (Required when the following <strong>Option
+2: Call group-specific&amp;cell-type-specific ACRs</strong> is selected.
+This file specifies the group assignments of cells to be compared in
+<strong>Option 2</strong>.)</p>
 <div id="option-1-call-cell-type-specific-acrs" class="section level3">
 <h3>Option 1: Call cell-type-specific ACRs</h3>
 <p>This option is used to identify cell-type-specific ACRs.</p>
@@ -451,7 +455,7 @@ For example, if users have treatment and control groups, it can be used
 to detect ACRs that show significantly higher or lower chromatin
 accessibility in the treatment group compared with the control. </p>
 <p>To run this function, users must provide a group file using
-<code>-gp_fl</code>, consisting of two tab-separated columns:: the new
+<code>-gp_fl</code>, consisting of two tab-separated columns: the new
 group ID used for comparison, and the corresponding subgroup names
 exactly as they appear in the library column of the meta file. For
 instance, if users want to merge four libraries (A1, A2, B1, B2) into
@@ -482,6 +486,7 @@ Cell-Type-Specific ACRs</strong>, specifically from the file located at
 <p><strong>Outputs</strong><br />
 1.
 s3_open_diff_group_peak_final_dir/<strong>opt.*.all_ACRs.celltype.group.classified.filtration.bed</strong><br />
+2. s3_open_diff_group_peak_final_dir/temp_add_group_meta.txt<br />
 </p>
 </div>
 <div id="option-3-generate-read-coverage-bigwig-profiles-for-each-group-within-each-cell-type" class="section level3">
