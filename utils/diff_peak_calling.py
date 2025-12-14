@@ -4,6 +4,7 @@
 ##this script is to perform the peak calling
 ##it has two step
 ##step01 prepare the peak sparse fil
+##updating 121225 make the group CPM
 ##updating 120825 make a decsion to build the bw for the treatment groups
 ##updating 120225 make a group for the library
 ##updating 080525 make a cpm peak file
@@ -528,7 +529,7 @@ def main(argv=None):
                   ' ' + output_dir + '/temp_defined_parameters.config' + \
                   ' ' + s3_open_diff_group_peak_final_dir
             print(cmd)
-            subprocess.call(cmd,shell=True)
+            #subprocess.call(cmd,shell=True)
 
             #else:
             #    ##set another R script
@@ -543,19 +544,90 @@ def main(argv=None):
 
                 if os.path.isdir(eachcelltype_dir):
 
-                    ##updating 121125
-                    #ipt_target_acr_fl = eachcelltype_dir + '/opt.all_ACRs.classified.bed'
-                    ipt_target_acr_fl = eachcelltype_dir + '/' + prefix_str_final + '.' + threshold_val_final + '.all_ACRs.classified.bed'
+                    if ctname != 'temp_peak_CPM_dir':
 
-                    with open (ipt_target_acr_fl,'r') as ipt:
-                        for eachline in ipt:
-                            eachline = eachline.strip('\n')
-                            final_line = eachline + '\t' + ctname
-                            store_final_line_list.append(final_line)
+                        ##updating 121125
+                        #ipt_target_acr_fl = eachcelltype_dir + '/opt.all_ACRs.classified.bed'
+                        ipt_target_acr_fl = eachcelltype_dir + '/' + prefix_str_final + '.' + threshold_val_final + '.all_ACRs.classified.bed'
+
+                        ##updating 121225 check if the file exist
+                        if os.path.isfile(ipt_target_acr_fl) == True:
+
+                            with open (ipt_target_acr_fl,'r') as ipt:
+                                for eachline in ipt:
+                                    eachline = eachline.strip('\n')
+                                    final_line = eachline + '\t' + ctname
+                                    store_final_line_list.append(final_line)
 
             with open (s3_open_diff_group_peak_final_dir + '/' + prefix_str_final + '.' + threshold_val_final + '.all_ACRs.celltype.group.classified.bed','w+') as opt:
                 for eachline in store_final_line_list:
                     opt.write(eachline + '\n')
+
+            ##updating 121225
+            ##make the CPM for the group and treat
+            ipt_peak_ori_sparse_fl = output_dir + '/s1_open_prepare_peak_tn5_final/opt_peak_sparse_sorted_dir/opt_peak_sorted.sparse'
+            ipt_meta_fl = s3_open_diff_group_peak_final_dir + '/temp_add_group_meta.txt'
+
+            temp_peak_CPM_dir = s3_open_diff_group_peak_final_dir + '/temp_peak_CPM_dir'
+            if not os.path.exists(temp_peak_CPM_dir):
+                os.makedirs(temp_peak_CPM_dir)
+
+            cmd = 'Rscript ' + input_required_scripts_dir + '/utils_diff_peak_calling_python/s3_call_treat_ctACR.filtration.R' + \
+                  ' ' + ipt_peak_ori_sparse_fl + \
+                  ' ' + ipt_meta_fl + \
+                  ' ' + temp_peak_CPM_dir
+            print(cmd)
+            subprocess.call(cmd,shell=True)
+
+
+            ##updating 121325
+            ##make a final filtration
+            ipt_classified_fl = s3_open_diff_group_peak_final_dir + '/opt.' + threshold_val_final + '.all_ACRs.celltype.group.classified.bed'
+            ipt_filtration_fl = s3_open_diff_group_peak_final_dir + '/temp_peak_CPM_dir/opt_group_celltypefilteration.peak.list.txt'
+
+            store_group_peak_dic = {}
+            with open (ipt_filtration_fl,'r') as ipt:
+                for eachline in ipt:
+                    eachline = eachline.strip('\n')
+                    col = eachline.strip().split()
+                    group = col[0]
+                    peak = col[1]
+                    if group in store_group_peak_dic:
+                        store_group_peak_dic[group][peak] = 1
+                    else:
+                        store_group_peak_dic[group] = {}
+                        store_group_peak_dic[group][peak] = 1
+
+            store_final_line_list = []
+            with open (ipt_classified_fl,'r') as ipt:
+                for eachline in ipt:
+                    eachline = eachline.strip('\n')
+                    col = eachline.strip().split()
+                    peak = col[0] + '_' + col[1] + '_' + col[2]
+                    mt = re.match('(.+);(.+)',col[3])
+                    treatcontrol = mt.group(2)
+                    grouptype = mt.group(1)
+                    celltype = col[-1]
+                    group = celltype + '.' + treatcontrol
+
+                    if grouptype == 'broadly_accessible':
+                        store_final_line_list.append(eachline)
+                    else:
+                        if group in store_group_peak_dic:
+                            filter_peak_dic = store_group_peak_dic[group]
+                            if peak in filter_peak_dic:
+                                store_final_line_list.append(eachline)
+                        else:
+                            store_final_line_list.append(eachline)
+
+            with open ( s3_open_diff_group_peak_final_dir + '/opt.' + threshold_val_final + '.all_ACRs.celltype.group.classified.filtration.bed','w+') as opt:
+                for eachline in store_final_line_list:
+                    opt.write(eachline + '\n')
+
+
+
+
+
 
 
             ##updating 121125
