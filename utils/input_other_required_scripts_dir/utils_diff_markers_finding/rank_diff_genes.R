@@ -45,10 +45,12 @@ input_output_dir <- as.character(args[3])
 
 source(config)
 
+##updating add an option to present the markers by cell type clustering
+
 
 ###################################################################################################
 # plot activity scores of de novo genes
-plot.new.markers   <- function(input_soc_obj_fl,output_dir,
+plot.new.markers   <- function(input_soc_obj_fl,output_dir,celltype_column_name,
                                outname="ActivityScores.pdf",
                                row.o=NULL,
                                top=5, 
@@ -69,8 +71,11 @@ plot.new.markers   <- function(input_soc_obj_fl,output_dir,
         stop("ERROR: must provide metadata and activity matrix")
     }
     if(! "Cluster" %in% colnames(df)){
-        #df$Cluster <- df$umapclust
-        df$Cluster <- df$LouvainClusters
+  
+        #df$Cluster <- df$LouvainClusters
+        
+        df$Cluster <- df[[celltype_column_name]]
+        
     }
 
     # estimate significant differences
@@ -224,7 +229,7 @@ plot.new.markers   <- function(input_soc_obj_fl,output_dir,
 }
 
 
-plot.new.markers(input_soc_obj_fl,input_output_dir,
+plot.new.markers(input_soc_obj_fl,input_output_dir,celltype_column_name,
                  top=top_gene,
                  normT=normT_type,
                  threshold=threshold_prop,
