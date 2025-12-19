@@ -64,8 +64,16 @@ plot.new.markers   <- function(input_soc_obj_fl,output_dir,celltype_column_name,
     ipt_soc_obj <- readRDS(input_soc_obj_fl)  
     
     acts <- ipt_soc_obj$gene_acc_smooth
-    df <- ipt_soc_obj$meta
-  
+    
+    ##updating 121925
+    if (celltype_column_name == 'LouvainClusters'){
+    
+      df <- ipt_soc_obj$meta
+    }else{
+      df <- ipt_soc_obj$final_meta
+    }
+      
+      
     # verbose start-up
     if(is.null(df) | is.null(acts)){
         stop("ERROR: must provide metadata and activity matrix")
