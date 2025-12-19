@@ -47,6 +47,11 @@ def get_parsed_args():
                                                             'Default: output')
 
 
+    ##updating 121925
+    ##add an option to change the cluster name
+    parser.add_argument("-celltype_col",  dest = 'celltype_column_name', help = 'Provide a cell type column name.d'
+                                                                                'Default: LouvainClusters')
+
     ##parse of parameters
     args = parser.parse_args()
     return args
@@ -109,6 +114,15 @@ def main(argv=None):
         prefix_name_final = 'output'
 
     store_final_parameter_line_list.append('input_prefix <- ' + '\'' + prefix_name_final + '\'')
+
+
+    ##updating 121925
+    if args.celltype_column_name is not None:
+        celltype_column_name_final = args.celltype_column_name
+    else:
+        celltype_column_name_final = 'LouvainClusters'
+
+    store_final_parameter_line_list.append('celltype_column_name <- ' + '\'' + celltype_column_name_final + '\'')
 
 
     ##we will firstly build up the parameter setting file
