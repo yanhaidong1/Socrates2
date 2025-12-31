@@ -92,6 +92,12 @@ def get_parsed_args():
     parser.add_argument("-gp_fl", dest = 'group_file', help = 'Users need to make a group patterns in a file. If -s3_open_diff_gp_peak is initiated, this argument need to be added. Otherwise,'
                                                               'it will directly consider the item in the library')
 
+    ##optional 122925
+    ##set if we will set balance between group
+    parser.add_argument("-gp_balance", dest = 'group_balance', help = 'Users will balance the group cell between two comparisons.'
+                                                                      'Default: no.')
+
+
     #parser.add_argument("-bdg_dir", dest = 'bdg_directory', help = 'If users initiate this argument, they will build bigwig files for each group.')
 
 
@@ -360,6 +366,18 @@ def main(argv=None):
     store_final_parameter_line_list.append('group_pattern <- ' + '\'' + group_pattern_final + '\'')
 
 
+    ##updating 122925
+    if args.group_balance is None:
+        open_group_balance = 'no'
+    else:
+        if args.group_balance == 'yes':
+            open_group_balance = 'yes'
+        else:
+            print('Please set -gp_balance yes')
+            return
+
+    store_final_parameter_line_list.append('open_group_balance <- ' + '\'' + open_group_balance + '\'')
+
     with open(output_dir + '/temp_defined_parameters.config', 'w+') as opt:
         for eachline in store_final_parameter_line_list:
             opt.write(eachline + '\n')
@@ -515,6 +533,8 @@ def main(argv=None):
 
         ipt_peak_fl = output_dir + '/s1_open_prepare_peak_tn5_final/opt_prepare_peak_acc_dir/opt_peak.bed'
 
+
+
         if os.path.isfile(ipt_peak_sparse_fl) == True:
 
             ##updating 070125
@@ -529,7 +549,7 @@ def main(argv=None):
                   ' ' + output_dir + '/temp_defined_parameters.config' + \
                   ' ' + s3_open_diff_group_peak_final_dir
             print(cmd)
-            #subprocess.call(cmd,shell=True)
+            subprocess.call(cmd,shell=True)
 
             #else:
             #    ##set another R script
@@ -567,6 +587,9 @@ def main(argv=None):
             ##make the CPM for the group and treat
             ipt_peak_ori_sparse_fl = output_dir + '/s1_open_prepare_peak_tn5_final/opt_peak_sparse_sorted_dir/opt_peak_sorted.sparse'
             ipt_meta_fl = s3_open_diff_group_peak_final_dir + '/temp_add_group_meta.txt'
+
+
+
 
             temp_peak_CPM_dir = s3_open_diff_group_peak_final_dir + '/temp_peak_CPM_dir'
             if not os.path.exists(temp_peak_CPM_dir):
@@ -686,9 +709,33 @@ def main(argv=None):
             #        print(cmd)
             #        subprocess.call(cmd, shell=True)
 
+                    ##updating 122925
 
 
+            #if args.group_balance is None:
+            #    open_group_balance = 'no'
+            #else:
+            #    if args.group_balance == 'yes':
+            #        open_group_balance = 'yes'
+            #    else:
+            #        print('Please set -gp_balance yes')
+            #        return
 
+            #if open_group_balance == 'yes':
+
+            #    ipt_R_script = input_required_scripts_dir + '/utils_diff_peak_calling_python/s3_balance_treat_meta.R'
+            #    cmd = 'Rscript ' + ipt_R_script + \
+            #          ' ' + ipt_temp_meta_fl + \
+            #          ' ' + s3_open_diff_group_peak_final_dir + \
+            #          ' ' + output_dir + '/temp_defined_parameters.config'
+            #    print(cmd)
+            #    subprocess.call(cmd, shell=True)
+
+            #    ipt_meta_fl = s3_open_diff_group_peak_final_dir + '/temp_add_group_meta_balance_group.txt'
+
+            #else:
+
+            #    ipt_meta_fl = ipt_temp_meta_fl
 
 
 
