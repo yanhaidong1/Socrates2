@@ -1,3 +1,4 @@
+##updating 122925 we will set an option to open the balance
 ##updating 121125 we will set an option to re-run and only change the threshold
 ##updating 120325 we will set the group
 ##updating 051925 this is for the peak calling of the treatment
@@ -435,6 +436,65 @@ if (group_pattern != 'na'){
 
 ##updating 120825
 write.table(meta_data,paste0(input_output_dir,'/temp_add_group_meta.txt'),quote = F,sep = '\t')
+
+##updating 122925
+if (open_group_balance == 'yes'){
+  
+  message('Users choose to open group balance')
+  
+  ipt_meta_dt <- meta_data
+
+  set.seed(123)  # for reproducibility
+  
+  cell_identity_col <- target_cluster
+  group_col <- "group"
+  
+  df <- ipt_meta_dt
+  
+  # store original rownames (cell IDs)
+  cell_ids <- rownames(df)
+  
+  # split data by cell_identity
+  split_by_identity <- split(seq_len(nrow(df)), df[[cell_identity_col]])
+  
+  # function to balance groups within one cell_identity
+  balance_one_identity <- function(idx) {
+    sub_groups <- df[idx, group_col]
+    
+    # counts per group
+    group_indices <- split(idx, sub_groups)
+    min_n <- min(lengths(group_indices))
+    
+    # sample equally from each group
+    unlist(lapply(group_indices, function(x) {
+      sample(x, min_n)
+    }))
+  }
+  
+  # apply balancing
+  balanced_indices <- unlist(
+    lapply(split_by_identity, balance_one_identity)
+  )
+  
+  # subset balanced data
+  df_balanced <- df[balanced_indices, , drop = FALSE]
+  
+  # restore original rownames
+  rownames(df_balanced) <- cell_ids[balanced_indices]
+  
+  shared_cells <- intersect(rownames(ipt_meta_dt),rownames(df_balanced))
+  
+  df_balanced <- df_balanced[shared_cells,]
+  
+  meta_data <- df_balanced
+  
+  write.table(meta_data,paste0(input_output_dir,'/temp_add_group_meta_balance_group.txt'),quote = F,sep = '\t')
+  
+}
+
+
+
+
 
 
 
