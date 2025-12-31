@@ -70,7 +70,11 @@ def update_prediction_by_cluster (input_clustering_fl,input_Rscript_fl,input_cel
                 method = col[1]
                 if method == eachmethod:
 
-                    store_cell_annot_dic[cellnm] = annot
+                    ##updating 122125
+                    ##we will not consider the Unknown
+                    if annot != 'Unknown':
+
+                        store_cell_annot_dic[cellnm] = annot
 
         store_final_line_list = []
         store_final_line_eachcell_list = []
@@ -96,17 +100,20 @@ def update_prediction_by_cluster (input_clustering_fl,input_Rscript_fl,input_cel
                 prop = cellnum/total_cell_num
                 store_celltype_prop_dic[eachcelltype] = prop
 
-            ##find the max prop for the eachcelltype
-            max_celltype = max(store_celltype_prop_dic, key=store_celltype_prop_dic.get)
+            ##updating 122125
+            if len(list(store_celltype_prop_dic.keys())) != 0:
 
-            max_celltype_prop = store_celltype_prop_dic[max_celltype]
+                ##find the max prop for the eachcelltype
+                max_celltype = max(store_celltype_prop_dic, key=store_celltype_prop_dic.get)
 
-            final_line = eachcluster + '\t' + max_celltype + '\t' + str(max_celltype_prop)
-            store_final_line_list.append(final_line)
+                max_celltype_prop = store_celltype_prop_dic[max_celltype]
 
-            for eachcell in cluster_cellnm_list:
-                final_line = eachcluster + '\t' + eachcell + '\t' + max_celltype + '\t' + str(max_celltype_prop)
-                store_final_line_eachcell_list.append(final_line)
+                final_line = eachcluster + '\t' + max_celltype + '\t' + str(max_celltype_prop)
+                store_final_line_list.append(final_line)
+
+                for eachcell in cluster_cellnm_list:
+                    final_line = eachcluster + '\t' + eachcell + '\t' + max_celltype + '\t' + str(max_celltype_prop)
+                    store_final_line_eachcell_list.append(final_line)
 
         with open (input_output_dir + '/opt_' + eachmethod + '_final_celltype_annotation_per_cluster.txt','w+') as opt:
             for eachline in store_final_line_list:
