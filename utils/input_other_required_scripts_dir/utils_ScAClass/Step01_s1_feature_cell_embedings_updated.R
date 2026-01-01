@@ -1,5 +1,6 @@
 ## sample ##
 
+##updating 010126 we will set the most variable PCs to perform the analysis
 ##updating 032622 use the NMF way to do the classification
 ##
 
@@ -46,6 +47,10 @@ reduction_major_type <- as.character(args[6]) ##SVD or NMF
 
 top_variant_ft_num <- as.numeric(args[7]) ##default 5000
 
+##updating 010126
+npcs_variance_cutoff <- as.numeric(args[8])
+##default: 0.001
+
 
 ##set some parameters
 reduction_type <- 'pca'
@@ -87,6 +92,39 @@ reference_obj <- ScaleData(reference_obj, features = rownames(reference_obj))
 ##SVD ways
 if (reduction_major_type == 'SVD'){
   reference_obj <- RunPCA(reference_obj, features = rownames(reference_obj),npcs=npcs)
+  
+  ##updating 010126 perform the stdev
+  pca_stdev <- reference_obj[["pca"]]@stdev
+  pve <- (pca_stdev^2) / sum(pca_stdev^2)
+  
+  pve_threshold <- npcs_variance_cutoff
+  use_pcs <- which(pve > pve_threshold)
+  
+  ####################
+  ##filter out bad pca
+  pca <- reference_obj[["pca"]]
+  
+  pca@cell.embeddings <- pca@cell.embeddings[, use_pcs, drop = FALSE]
+  pca@feature.loadings <- pca@feature.loadings[, use_pcs, drop = FALSE]
+  if (ncol(pca@feature.loadings.projected) > 0) {
+    pca@feature.loadings.projected <-
+      pca@feature.loadings.projected[, use_pcs, drop = FALSE]
+  }
+  pca@stdev <- pca@stdev[use_pcs]
+  
+  new_pc_names <- paste0("PC_", seq_along(use_pcs))
+  
+  colnames(pca@cell.embeddings) <- new_pc_names
+  colnames(pca@feature.loadings) <- new_pc_names
+  
+  if (ncol(pca@feature.loadings.projected) > 0) {
+    colnames(pca@feature.loadings.projected) <- new_pc_names
+  }
+  
+  reference_obj[["pca"]] <- pca
+  #############################
+  
+  
   reduction_ref_data <- Reductions(reference_obj, slot = reduction_type)
   loadings_ref <- Loadings(reduction_ref_data) ##loadings_ref rowname is gene feature name and PCs is the column
   cellEmbeddings_ref <- Embeddings(reduction_ref_data) ##cellembeddings rowname is cell name and PCs is the column
