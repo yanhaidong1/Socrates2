@@ -67,6 +67,11 @@ def get_parsed_args():
                                                             'If users provide one more PC number, all the prediction under each PC number will be analyzed.'
                                                             'Default: 50.')
 
+    ##updating 010126
+    parser.add_argument("-PC_var",dest='pc_variance_cutoff', help = 'Provide a variance cutoff to filter out PCs not meet the cutoff.'
+                                                                    'Default: 0.001')
+
+
     parser.add_argument("-Rd_type", dest='Reduction_type', help = 'Provide a reduction type. Users can choose SVD or NMF.'
                                                                   'Default: SVD.')
 
@@ -242,6 +247,13 @@ def main(argv=None):
     else:
         top_var_ft_num = args.top_variant_ft_num
 
+    ##updating 010126
+    if args.pc_variance_cutoff is None:
+        pc_variance_cutoff_final = '0.001'
+    else:
+        pc_variance_cutoff_final = args.pc_variance_cutoff
+
+
 
     ########
     ##Step01 prepare embedding files used for the training models
@@ -277,7 +289,8 @@ def main(argv=None):
               ' ' + PC_str + \
               ' ' + reduction_major_type + \
               ' ' + Step01_prepare_embedding_dir + \
-              ' ' + top_var_ft_num
+              ' ' + top_var_ft_num + \
+              ' ' + pc_variance_cutoff_final
         print(cmd)
         subprocess.call(cmd,shell=True)
 
