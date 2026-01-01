@@ -24,10 +24,12 @@ input_output_dir = sys.argv[7]
 
 top_variant_ft_num = sys.argv[8]
 
+pc_variance_cutoff = sys.argv[9]
+
 
 def prepare_feature_cell_embeddlings (input_training_matrix_rds_fl,input_unknown_matrix_csv_fl,input_training_meta_fl,input_feature_embedding_R_script_fl,
                                       input_output_dir,
-                                      PCnum_string,reduction_major_type,top_variant_ft_num):
+                                      PCnum_string,reduction_major_type,top_variant_ft_num,pc_variance_cutoff):
 
 
     ##now we only consider the training and independent test dataset
@@ -47,7 +49,8 @@ def prepare_feature_cell_embeddlings (input_training_matrix_rds_fl,input_unknown
               ' ' + opt_PC_dir + \
               ' ' + eachPCnum + \
               ' ' + reduction_major_type + \
-              ' ' + top_variant_ft_num
+              ' ' + top_variant_ft_num + \
+              ' ' + pc_variance_cutoff
         print(cmd)
         subprocess.call(cmd, shell=True)
 
@@ -55,7 +58,7 @@ def prepare_feature_cell_embeddlings (input_training_matrix_rds_fl,input_unknown
 
 prepare_feature_cell_embeddlings (input_training_matrix_rds_fl,input_unknown_matrix_csv_fl,input_training_meta_fl,input_feature_embedding_R_script_fl,
                                       input_output_dir,
-                                      PCnum_string,reduction_major_type,top_variant_ft_num)
+                                      PCnum_string,reduction_major_type,top_variant_ft_num,pc_variance_cutoff)
 
 
 
