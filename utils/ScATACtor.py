@@ -75,7 +75,7 @@ def get_parsed_args():
     parser.add_argument("-Rd_type", dest='Reduction_type', help = 'Provide a reduction type. Users can choose SVD or NMF.'
                                                                   'Default: SVD.')
 
-    parser.add_argument("-ML_method", dest='ML_method', help = 'Provide a machine learning method. ScAClass provides RF (Random Forest) and SVM (Support Vector Machine).'
+    parser.add_argument("-ML_classifier", dest='ML_method', help = 'Provide a machine learning method. ScAClass provides RF (Random Forest) and SVM (Support Vector Machine).'
                                                                'Default: svm.')
 
     parser.add_argument("-SVM_kernel", dest="SVM_kernel", help = 'SVM method provides ‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’ in sklearn.'
