@@ -107,7 +107,8 @@ def permute_random_regions (final_bed_fl,input_gff_fl,peak_fl,opt_dir,input_ref_
                 #    final_line = col[0] + '\t' + col[3] + '\t' + col[4]
                 #    store_excl_bed_line_list.append(final_line)
 
-                if cate == 'exon':
+                ##updating 010426 we will also check if it is equal to CDS
+                if cate == 'exon' or cate == 'CDS':
                     final_line = col[0] + '\t' + col[3] + '\t' + col[4]
                     store_excl_bed_line_list.append(final_line)
 
