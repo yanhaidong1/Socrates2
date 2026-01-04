@@ -258,7 +258,11 @@ if (only_cluster == 'no'){
           #dat <- list.files(pattern=paste0(input_obj_dir,'/','*.filtered.soc.rds'))
           dat <- lapply(dat, function(x){
             obj <- readRDS(paste0(input_obj_dir,'/',x))
-            obj$counts <- obj$counts[Matrix::rowMeans(obj$counts > 0)>0.01,]
+            
+            ##udpating 010426
+            obj$counts <- obj$counts[Matrix::rowMeans(obj$counts > 0)>minimum_matrix_rowmean_final,]
+            
+            #obj$counts <- obj$counts[Matrix::rowMeans(obj$counts > 0)>0.01,]
             obj$counts <- obj$counts[,Matrix::colSums(obj$counts)>0]
             obj$meta <- obj$meta[colnames(obj$counts),]
             
