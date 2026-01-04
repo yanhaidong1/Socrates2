@@ -60,6 +60,11 @@ def get_parsed_args():
 
     #####################
     ##optional parameters
+
+    ##updating 010425
+    parser.add_argument('-min_mtx_rowmean', dest = 'minimum_matrix_rowmean',help = 'Minimum number of row mean of peak by cell matrix.'
+                                                                                   'Default: 0.01')
+
     parser.add_argument('-min_cell', dest = 'minimum_cell_num', help = 'Minimum number of accessible features per cell for cell filtration.'
                                                                        'Default: 1000')
 
@@ -197,6 +202,14 @@ def main(argv=None):
         remove_temp = 'yes'
 
     store_final_parameter_line_list.append('remove_temp <- ' + '\'' + remove_temp + '\'')
+
+    ##updating 010426
+    if args.minimum_matrix_rowmean is not None:
+        minimum_matrix_rowmean_final = args.minimum_matrix_rowmean
+    else:
+        minimum_matrix_rowmean_final = '0.01'
+    store_final_parameter_line_list.append('minimum_matrix_rowmean_final <- ' + minimum_matrix_rowmean_final)
+
 
 
     if args.minimum_cell_num is not None:
