@@ -146,7 +146,9 @@ def get_parsed_args():
     parser.add_argument("-category",dest='category_gff', help = 'Set gene or transcript to be calculated.'
                                                         'Default: gene')
 
-
+    ##updating 010526
+    parser.add_argument("-use_picard", dest = 'use_picard_tool', help ='If the users will use the picrad to remove the PCR duplicate.'
+                                                                       'Default: yes')
 
 
 
@@ -422,6 +424,20 @@ def main(argv=None):
         promoter_extended_size_final = '500'
 
 
+    ##updating 010526
+    if args.use_picard_tool is None:
+        use_picard_tool_final = 'yes'
+    else:
+        if args.use_picard_tool == 'yes':
+            use_picard_tool_final = 'yes'
+        else:
+            if args.use_picard_tool == 'no':
+                use_picard_tool_final = 'no'
+            else:
+                print('Please set -use_picard no to close the picard usage')
+                return
+
+
 
     ##updating 031625
     if s1_open_build_black_file_final == 'yes':
@@ -552,7 +568,7 @@ def main(argv=None):
         input_bam_fl = args.bam_file
 
         s1_procbam.process_bam (input_required_scripts_dir,input_bam_fl,s1_open_process_BAM_final_dir,
-                                core_number_run,mapping_quality_val,remove_step_s1_temp_final)
+                                core_number_run,mapping_quality_val,remove_step_s1_temp_final,use_picard_tool_final)
 
         ##updating 012325 update the black list file
         if args.black_list_file is not None:
