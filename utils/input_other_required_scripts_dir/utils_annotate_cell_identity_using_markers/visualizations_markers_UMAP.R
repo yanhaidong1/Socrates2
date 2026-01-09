@@ -1,4 +1,5 @@
 #Visualizing marker genes using UMAP
+##updating 051525 we will make a final 
 ##load a function
 ##updating 010524 we will use the object to run the marker visulization
 ##updating 120824 use symbol other than the common and remove the name in the UMAP showing
@@ -32,14 +33,17 @@ plot.act.scores    <- function(df,output_dir,
                                lim=0.95){
   
   # prep data
+  shared_ids <- intersect(rownames(df) ,colnames(acts))
+  df <- df[shared_ids,]
+  acts <- acts[,shared_ids]
+  
   #df <- df[rownames(df) %in% colnames(acts),]
   #acts <- acts[,which(rownames(df) %in% colnames(acts))]
   
   #acts <- acts[,rownames(df)]
-  shared_ids <- intersect(rownames(df) ,colnames(acts))
-  df <- df[shared_ids,]
-  acts <- acts[,shared_ids]
-
+  
+  
+  
   
   # reorder rows
   ##updating 102221 do not use the geneID to be the rownames
@@ -133,7 +137,7 @@ plot.act.scores    <- function(df,output_dir,
 UMAP_plot <- function(ipt_object_fl,
                       ipt_marker_fl,
                       input_output_dir,
-                      lim = 0.98,
+                      ipt_lim_val,
                       opt_name = 'output'){
     
   ipt_object <- readRDS(ipt_object_fl)
@@ -151,7 +155,7 @@ UMAP_plot <- function(ipt_object_fl,
   plot.act.scores(meta_dt, input_output_dir,acts=impute.activity,
                   info=marker.info,
                   logT=F,
-                  lim=0.98,
+                  lim=ipt_lim_val,
                   marker.dist=NULL,
                   outname=opt_name)
 
@@ -160,7 +164,7 @@ UMAP_plot <- function(ipt_object_fl,
 UMAP_plot(ipt_object_fl,
           ipt_marker_fl,
           input_output_dir,
-          lim = ipt_lim_val,
+          ipt_lim_val,
           opt_name = 'opt_UMAP_marker.png'
           )
 
