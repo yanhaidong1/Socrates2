@@ -1,5 +1,5 @@
 ###################################################################################################
-
+##updating 011026 we will set the final_meta if we use the cell_identity column
 ##updating 010525 we will use the object
 #' Visualizing marker genes using dot plot
 
@@ -37,8 +37,15 @@ prepare_geneImputAcc_prop     <- function(input_object,
   #acts <- readRDS(input_imputed_mtx_rds)
   acts <- input_object$gene_acc_smooth
   
+  
   #meta_dt <- read.delim(input_meta_fl,row.names = 1)
-  meta_dt <- input_object$meta
+  ##updating 011026
+  if (target_col != 'LouvainClusters'){
+    meta_dt <- input_object$final_meta
+  }else{
+    meta_dt <- input_object$meta
+  }
+  
   
   ####
   ##s2 calculat the avg mean values
