@@ -79,7 +79,7 @@ def get_parsed_args():
                                               'Default: 10000')
 
     parser.add_argument("-open_equal_cellnum",dest = 'open_equal_cell_number', help = 'if users would like to initiate similar cell number per cell type.'
-                                                                                      'Default:no')
+                                                                                      'Default:yes')
 
 
     ##parse of parameters
@@ -292,15 +292,33 @@ def main(argv=None):
     else:
         Top_ACR_number_plot_final = '10000'
 
+
+
+    #if args.open_equal_cell_number is None:
+    #    open_equal_cell_number_final = 'no'
+    #    print('Users do not want to allow the cell type with equal number of cell')
+    #else:
+    #    if args.open_equal_cell_number == 'yes':
+    #        open_equal_cell_number_final = 'yes'
+    #    else:
+    #        open_equal_cell_number_final = 'no'
+    #        print('Users do not want to allow the cell type with equal number of cell')
+
+    ##updating 011126
+    ##set the equal cell number
     if args.open_equal_cell_number is None:
-        open_equal_cell_number_final = 'no'
-        print('Users do not want to allow the cell type with equal number of cell')
+        open_equal_cell_number_final = 'yes'
+        print('Users want to allow the cell type with equal number of cell')
     else:
         if args.open_equal_cell_number == 'yes':
             open_equal_cell_number_final = 'yes'
         else:
-            open_equal_cell_number_final = 'no'
-            print('Users do not want to allow the cell type with equal number of cell')
+            if args.open_equal_cell_number == 'no':
+                open_equal_cell_number_final = 'no'
+                print('Users do not want to allow the cell type with equal number of cell')
+            else:
+                print('Users need to set -open_equal_cellnum no to close the equal cell number setting')
+                return
 
 
 
@@ -447,6 +465,10 @@ def main(argv=None):
         print(cmd)
         subprocess.call(cmd, shell=True)
 
+        cmd = 'rm ' + './Rplots.pdf'
+        print(cmd)
+        subprocess.call(cmd,shell=True)
+
     else:
 
         ##we will build an object R script to call the pesodutime
@@ -512,7 +534,9 @@ def main(argv=None):
         print(cmd)
         subprocess.call(cmd, shell=True)
 
-
+        cmd = 'rm ' + './Rplots.pdf'
+        print(cmd)
+        subprocess.call(cmd,shell=True)
 
 
 if __name__ == "__main__":
