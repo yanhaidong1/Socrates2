@@ -69,7 +69,7 @@ def get_parsed_args():
 
     ##updating 010126
     parser.add_argument("-PC_var",dest='pc_variance_cutoff', help = 'Provide a variance cutoff to filter out PCs not meet the cutoff.'
-                                                                    'Default: 0.001')
+                                                                    'Default: 0.01')
 
 
     parser.add_argument("-Rd_type", dest='Reduction_type', help = 'Provide a reduction type. Users can choose SVD or NMF.'
@@ -249,7 +249,7 @@ def main(argv=None):
 
     ##updating 010126
     if args.pc_variance_cutoff is None:
-        pc_variance_cutoff_final = '0.001'
+        pc_variance_cutoff_final = '0.01'
     else:
         pc_variance_cutoff_final = args.pc_variance_cutoff
 
