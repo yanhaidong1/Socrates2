@@ -568,16 +568,18 @@ set a top variant ft number. Default: 5000)<br />
 step)<br />
 4. <strong>-PC_str 50</strong> (Provide a PC number string used for the
 embeddings. Default: 50)<br />
-5. <strong>-Rd_type SVD</strong> (Provide a reduction type. Default:
-SVD)<br />
-6. <strong>-ML_classifier SVM</strong> (Provide a machine learning
+5. <strong>-PC_var 0.01</strong> (Only principal components explaining
+more than 1% of the total variance in the dataset are retained for
+feature selection and model training. Default: 0.01) 6. <strong>-Rd_type
+SVD</strong> (Provide a reduction type. Default: SVD)<br />
+7. <strong>-ML_classifier SVM</strong> (Provide a machine learning
 method. ScATACtor provides Random Forest/RF and Support Vector
 Machine/SVM. Default: SVM)<br />
-7. <strong>-SVM_kernel rbf</strong> (SVM method provides ‘linear’,
+8. <strong>-SVM_kernel rbf</strong> (SVM method provides ‘linear’,
 ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’ in sklearn. Default: rbf)<br />
-8. <strong>-open_smote yes</strong> (Smote will impute data enabling
+9. <strong>-open_smote yes</strong> (Smote will impute data enabling
 data balance manner. Default: yes)<br />
-9. <strong>-running_steps All</strong> (Provide running steps to check
+10. <strong>-running_steps All</strong> (Provide running steps to check
 whether we will run the specific steps. Default: All)<br />
 </p>
 <p><strong>Outputs:</strong><br />
