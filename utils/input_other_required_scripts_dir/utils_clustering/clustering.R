@@ -1,5 +1,6 @@
 # run Socrates on merged socrates object #
 
+##updating 013826 we will set an option to rename library
 ##updating 031225 we will not build the subclustering as it will complex the processing, high res will solve the issue
 ##updating 031125 we will open the win sparse in order to perform the subclustering
 ##updating 020225 we will add the parameter of harmony function
@@ -147,12 +148,18 @@ mergeSocObjects <- function(obj.list){
   metas <- do.call(rbind, metas)
   rownames(metas) <- metas$cellID
   
-  ##updating 061925
-  ##we will still open this one
-  metas$library <- data.frame(do.call(rbind, strsplit(rownames(metas), "-")))[,2]
   
-  ##udpating 021925 we will mute this library as we have developed this library before
-  #metas$library <- data.frame(do.call(rbind, strsplit(rownames(metas), "-")))[,2]
+  ##updating 012826
+  ##if rename_library_final is no we will open 
+  if (rename_library_final == 'no'){
+  
+    ##updating 061925
+    ##we will still open this one
+    metas$library <- data.frame(do.call(rbind, strsplit(rownames(metas), "-")))[,2]
+    
+    ##udpating 021925 we will mute this library as we have developed this library before
+    #metas$library <- data.frame(do.call(rbind, strsplit(rownames(metas), "-")))[,2]
+  }
   
   metas <- metas[colnames(counts),]
   
@@ -267,25 +274,30 @@ if (only_cluster == 'no'){
             obj$meta <- obj$meta[colnames(obj$counts),]
             
             
-            ##updating 061925 close the following
-            ##updating 021925
-            ##modify the meta file add the lib to the cell barcode
-            #libnm <- gsub('.filtered.soc.rds','',x)
-            #obj_meta <- obj$meta
-            #obj_counts <- obj$counts
+            ##updating 012826 open when rename_library_final is yes
+            if (rename_library_final == 'yes'){
             
-            #obj_meta$library <- libnm
-            #obj_meta$cellID <- gsub('-.+','',obj_meta$cellID)
-            #obj_meta$cellID <- paste0(obj_meta$cellID,'-',libnm)
-            #rownames(obj_meta) <- obj_meta$cellID
-            
-            #colnames(obj_counts) <- gsub('-.+','',colnames(obj_counts))
-            #colnames(obj_counts) <- paste0(colnames(obj_counts),'-',libnm)
-            
-            #obj$counts <- obj_counts
-            #obj$meta <- obj_meta
-            ####################
-            
+              ##updating 061925 close the following
+              ##updating 021925
+              ##modify the meta file add the lib to the cell barcode
+              libnm <- gsub('.filtered.soc.rds','',x)
+              obj_meta <- obj$meta
+              obj_counts <- obj$counts
+              
+              obj_meta$library <- libnm
+              obj_meta$cellID <- gsub('-.+','',obj_meta$cellID)
+              obj_meta$cellID <- paste0(obj_meta$cellID,'-',libnm)
+              rownames(obj_meta) <- obj_meta$cellID
+              
+              colnames(obj_counts) <- gsub('-.+','',colnames(obj_counts))
+              colnames(obj_counts) <- paste0(colnames(obj_counts),'-',libnm)
+              
+              obj$counts <- obj_counts
+              obj$meta <- obj_meta
+              ####################
+            }
+              
+              
             return(obj)
           })
           
