@@ -99,6 +99,14 @@ def get_parsed_args():
                         help='If the mean doublet score of a given cluster is significantly larger (p < 0.05) than the average doublet score of all other clusters, and the difference between the other clusters and the given cluster lowers the specified -max_effect_doublet, the cluster will be flagged as a red flag.'
                              'Default: -3')
 
+
+    ##updating 012826
+    ##some libraries include the cells with the same name as the library
+    parser.add_argument('-rename_lib', dest = 'rename_library', help = 'Users will rename the library using the names underlying input_object_dir.'
+                                                                       'Default: no')
+
+
+
     ##parse of parameters
     args = parser.parse_args()
     return args
@@ -275,6 +283,23 @@ def main(argv=None):
         max_effect_value_doublet_final = '-3'
 
     store_final_parameter_line_list.append('max_effect_value_doublet <- ' + max_effect_value_doublet_final)
+
+
+    ##updating 012826
+    if args.rename_library is None:
+        rename_library_final = 'no'
+    else:
+        if args.rename_library == 'yes':
+            rename_library_final = 'yes'
+        else:
+            if args.rename_library == 'no':
+                rename_library_final = 'no'
+            else:
+                print('Please initial -rename_lib yes to open this argument')
+                return
+
+    store_final_parameter_line_list.append('rename_library_final <- ' + '\'' + rename_library_final + '\'')
+
 
 
 
