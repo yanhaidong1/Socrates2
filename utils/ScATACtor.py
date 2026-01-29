@@ -202,7 +202,8 @@ def main(argv=None):
         reduction_major_type = args.Reduction_type
 
     if args.ML_method is None:
-        Machine_learning_method = 'svm'
+        ##updating 012926 use rf as the default
+        Machine_learning_method = 'rf'
     else:
         Machine_learning_method = args.ML_method
 
