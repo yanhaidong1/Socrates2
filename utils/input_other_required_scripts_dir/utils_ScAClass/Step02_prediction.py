@@ -33,10 +33,13 @@ input_output_dir = sys.argv[7]
 ##updating 102524
 decide_use_low_mem = sys.argv[8]
 
+##updating 013026
+open_parameter_tunning_final = sys.argv[9]
+
 
 
 def training_prediction (input_training_testing_script_fl,input_training_meta_fl,input_embedding_dir,
-                         SVM_para,open_smote_upsampling,target_method_string,
+                         SVM_para,open_smote_upsampling,target_method_string,open_parameter_tunning_final,
                          input_output_dir):
 
     ipt_feature_cell_embeddings_dir = input_embedding_dir
@@ -141,13 +144,14 @@ def training_prediction (input_training_testing_script_fl,input_training_meta_fl
                   ' ' + store_eachcelltype_PC_dir + \
                   ' ' + SVM_para + \
                   ' ' + open_smote_upsampling + \
-                  ' ' + target_method_string
+                  ' ' + target_method_string + \
+                  ' ' + open_parameter_tunning_final
             print(cmd)
             subprocess.call(cmd, shell=True)
 
 
 def training_prediction_low_mem (input_training_testing_script_fl,input_training_meta_fl,input_embedding_dir,
-                         SVM_para,open_smote_upsampling,target_method_string,
+                         SVM_para,open_smote_upsampling,target_method_string,open_parameter_tunning_final,
                          input_output_dir):
 
     ipt_feature_cell_embeddings_dir = input_embedding_dir
@@ -266,7 +270,8 @@ def training_prediction_low_mem (input_training_testing_script_fl,input_training
                       ' ' + store_eachcelltype_PC_dir + \
                       ' ' + SVM_para + \
                       ' ' + open_smote_upsampling + \
-                      ' ' + target_method_string
+                      ' ' + target_method_string + \
+                      ' ' + open_parameter_tunning_final
                 print(cmd)
                 subprocess.call(cmd, shell=True)
 
@@ -276,13 +281,13 @@ def training_prediction_low_mem (input_training_testing_script_fl,input_training
 if decide_use_low_mem == 'no':
 
     training_prediction (input_training_testing_script_fl,input_training_meta_fl,input_embedding_dir,
-                             SVM_para,open_smote_upsampling,target_method_string,
+                             SVM_para,open_smote_upsampling,target_method_string,open_parameter_tunning_final,
                              input_output_dir)
 
 else:
 
     training_prediction_low_mem(input_training_testing_script_fl, input_training_meta_fl, input_embedding_dir,
-                                SVM_para, open_smote_upsampling, target_method_string,
+                                SVM_para, open_smote_upsampling, target_method_string,open_parameter_tunning_final,
                                 input_output_dir)
 
 

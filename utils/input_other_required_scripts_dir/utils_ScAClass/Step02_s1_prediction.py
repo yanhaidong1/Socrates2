@@ -42,6 +42,8 @@ target_method_string = sys.argv[7]
 
 target_method_list = target_method_string.split(',')
 
+open_parameter_tunning_final = sys.argv[8]
+
 
 ##we will directly write out the outputs
 def write_out_results (labels_pred,id_nm_dic,features_indep_test,testing_type,input_opt_dir):
@@ -173,6 +175,40 @@ def train_evaluation (input_train_file,input_meta_train_file,
 
     ########
     ##For RF
+    ##test 011726
+    ##use the rf ori to have a test
+    if 'rf_ori' in target_method_list:
+
+        clf_rf = RandomForestClassifier(n_estimators=500, n_jobs=42).fit(features_train, labels_train)
+        ##save rf model
+        pkl_filename = input_opt_dir + "/rf_model.pkl"
+        with open(pkl_filename, 'wb') as file:
+            pickle.dump(clf_rf, file)
+
+        ##for the validation data
+        clfs = [clf_rf]
+
+        ##for the independent data
+        features_indep_test = read_csv(input_test_indep_file, index_col=0).values.T
+
+        features_indep_test_notvalue = read_csv(input_test_indep_file, index_col=0).T
+        # meta_indep_test = read_csv(input_meta_test_indep_file,header = 0, index_col = 0)
+        # labels_indep_test = meta_indep_test.loc[:,"cell_type"].replace(names_to_id).values
+
+        ##updating 020221
+        prob_pred_all = ''
+        labels_indep_pred = []
+        prob_indep_pred = []
+        for clf in clfs:
+            prob_pred_all = clf.predict_proba(features_indep_test)
+            labels_indep_pred.append(np.argsort(-prob_pred_all, axis=1)[:, 0])
+            prob_indep_pred.append(
+                np.array([prob_pred_all[i, labels_indep_pred[-1][i]] for i in range(labels_indep_pred[-1].shape[0])]))
+
+        write_out_results(labels_indep_pred, id_nm_dic, features_indep_test_notvalue, 'rf_ori', input_opt_dir)
+
+
+
     if 'rf' in target_method_list:
 
 
@@ -536,12 +572,245 @@ def train_evaluation (input_train_file,input_meta_train_file,
         # writeout_compare_file(labels_indep_pred, labels_indep_test, meta_indep_test, id_nm_dic, input_opt_dir, 'SVMindetest',only_predict_unknown_cell,'no')
         write_out_results(labels_indep_pred, id_nm_dic, features_indep_test_novalue, name, input_opt_dir)
 
+def train_evaluation_no_hypertunning (input_train_file,input_meta_train_file,
+                      input_test_indep_file,input_opt_dir,SVM_para,open_smote,target_method_list):
+
+    ##run script
+    ##load import file
+    features_train = read_csv(input_train_file, index_col = 0).values.T
+    meta_train = read_csv(input_meta_train_file,header = 0, index_col = 0)
+
+    label_names = meta_train.loc[:,"cell_type"].unique()
+    names_to_id = { key:val for val,key in enumerate(label_names)}
+    labels_train = meta_train.loc[:,"cell_type"].replace(names_to_id).values
+
+    ##updating 041522 decide whether we need the smote
+    if open_smote == 'yes':
+        print('we will use the smote to do the augmentation')
+        sm = SMOTE(random_state=42)
+        features_train, labels_train = sm.fit_resample(features_train, labels_train)
+
+    ##initiate a function to store single cell id and its real name
+    ##change the order of id and name
+    id_nm_dic = {}
+    for eachnm in names_to_id:
+        id_nm_dic[str(names_to_id[eachnm])] = eachnm
+
+    #########
+    ##For svm
+    ##PREIOUS is linear
+    if 'svm' in target_method_list:
+
+        clf_svm = svm.SVC(kernel=SVM_para,probability=True)
+        clf_svm.fit(features_train, labels_train)
+        ##save svm model
+        pkl_filename = input_opt_dir + "/svm_model.pkl"
+        with open(pkl_filename, 'wb') as file:
+            pickle.dump(clf_svm, file)
+
+        ##for the validation data
+        clfs = [clf_svm]
+
+        ##for the independent data
+        features_indep_test =  read_csv(input_test_indep_file, index_col = 0).values.T
+        #meta_indep_test = read_csv(input_meta_test_indep_file,header = 0, index_col = 0)
+        #labels_indep_test = meta_indep_test.loc[:,"cell_type"].replace(names_to_id).values
+        features_indep_test_novalue = read_csv(input_test_indep_file, index_col=0).T
+
+        prob_pred_all = ''
+        labels_indep_pred = []
+        prob_indep_pred = []
+        for clf in clfs:
+            prob_pred_all = clf.predict_proba(features_indep_test)
+            labels_indep_pred.append(np.argsort(-prob_pred_all, axis=1)[:, 0])
+            prob_indep_pred.append(np.array([prob_pred_all[i, labels_indep_pred[-1][i]] for i in range(labels_indep_pred[-1].shape[0])]))
+
+        ##close write compare file
+        #writeout_compare_file(labels_indep_pred, labels_indep_test, meta_indep_test, id_nm_dic, input_opt_dir, 'SVMindetest',only_predict_unknown_cell,'no')
+        write_out_results(labels_indep_pred, id_nm_dic, features_indep_test_novalue, 'svm', input_opt_dir)
+
+
+    ########
+    ##For RF
+    if 'rf' in target_method_list:
+
+        clf_rf = RandomForestClassifier(n_estimators = 500, n_jobs = 42).fit(features_train, labels_train)
+        ##save rf model
+        pkl_filename = input_opt_dir + "/rf_model.pkl"
+        with open(pkl_filename, 'wb') as file:
+            pickle.dump(clf_rf, file)
+
+        ##for the validation data
+        clfs = [clf_rf]
+
+        ##for the independent data
+        features_indep_test =  read_csv(input_test_indep_file, index_col = 0).values.T
+
+        features_indep_test_notvalue = read_csv(input_test_indep_file, index_col=0).T
+        #meta_indep_test = read_csv(input_meta_test_indep_file,header = 0, index_col = 0)
+        #labels_indep_test = meta_indep_test.loc[:,"cell_type"].replace(names_to_id).values
+
+        ##updating 020221
+        prob_pred_all = ''
+        labels_indep_pred = []
+        prob_indep_pred = []
+        for clf in clfs:
+            prob_pred_all = clf.predict_proba(features_indep_test)
+            labels_indep_pred.append(np.argsort(-prob_pred_all, axis=1)[:, 0])
+            prob_indep_pred.append(np.array([prob_pred_all[i, labels_indep_pred[-1][i]] for i in range(labels_indep_pred[-1].shape[0])]))
+
+        write_out_results(labels_indep_pred, id_nm_dic, features_indep_test_notvalue, 'rf', input_opt_dir)
+
+    ##updating 101225
+    #if 'others' in target_method_list:
+
+    if 'lr' in target_method_list:
+        models = {
+            "lr": LogisticRegression(max_iter=1000)
+        }
+
+        for name, model in models.items():
+            clf = model.fit(features_train, labels_train)
+
+            pkl_filename = input_opt_dir + "/" + name + "_model.pkl"
+            with open(pkl_filename, 'wb') as file:
+                pickle.dump(clf, file)
+
+            ##for the validation data
+            clfs = [clf]
+
+            ##for the independent data
+            features_indep_test = read_csv(input_test_indep_file, index_col=0).values.T
+            # meta_indep_test = read_csv(input_meta_test_indep_file,header = 0, index_col = 0)
+            # labels_indep_test = meta_indep_test.loc[:,"cell_type"].replace(names_to_id).values
+            features_indep_test_novalue = read_csv(input_test_indep_file, index_col=0).T
+
+            prob_pred_all = ''
+            labels_indep_pred = []
+            prob_indep_pred = []
+            for clf in clfs:
+                prob_pred_all = clf.predict_proba(features_indep_test)
+                labels_indep_pred.append(np.argsort(-prob_pred_all, axis=1)[:, 0])
+                prob_indep_pred.append(np.array(
+                    [prob_pred_all[i, labels_indep_pred[-1][i]] for i in range(labels_indep_pred[-1].shape[0])]))
+
+            ##close write compare file
+            # writeout_compare_file(labels_indep_pred, labels_indep_test, meta_indep_test, id_nm_dic, input_opt_dir, 'SVMindetest',only_predict_unknown_cell,'no')
+            write_out_results(labels_indep_pred, id_nm_dic, features_indep_test_novalue, name, input_opt_dir)
+
+    if 'knn' in target_method_list:
+        models = {
+            "knn": KNeighborsClassifier(n_neighbors=5)
+        }
+
+        for name, model in models.items():
+            clf = model.fit(features_train, labels_train)
+
+            pkl_filename = input_opt_dir + "/" + name + "_model.pkl"
+            with open(pkl_filename, 'wb') as file:
+                pickle.dump(clf, file)
+
+            ##for the validation data
+            clfs = [clf]
+
+            ##for the independent data
+            features_indep_test = read_csv(input_test_indep_file, index_col=0).values.T
+            # meta_indep_test = read_csv(input_meta_test_indep_file,header = 0, index_col = 0)
+            # labels_indep_test = meta_indep_test.loc[:,"cell_type"].replace(names_to_id).values
+            features_indep_test_novalue = read_csv(input_test_indep_file, index_col=0).T
+
+            prob_pred_all = ''
+            labels_indep_pred = []
+            prob_indep_pred = []
+            for clf in clfs:
+                prob_pred_all = clf.predict_proba(features_indep_test)
+                labels_indep_pred.append(np.argsort(-prob_pred_all, axis=1)[:, 0])
+                prob_indep_pred.append(np.array(
+                    [prob_pred_all[i, labels_indep_pred[-1][i]] for i in range(labels_indep_pred[-1].shape[0])]))
+
+            ##close write compare file
+            # writeout_compare_file(labels_indep_pred, labels_indep_test, meta_indep_test, id_nm_dic, input_opt_dir, 'SVMindetest',only_predict_unknown_cell,'no')
+            write_out_results(labels_indep_pred, id_nm_dic, features_indep_test_novalue, name, input_opt_dir)
+
+    if 'nb' in target_method_list:
+        models = {
+            "nb": GaussianNB()
+        }
+
+        for name, model in models.items():
+            clf = model.fit(features_train, labels_train)
+
+            pkl_filename = input_opt_dir + "/" + name + "_model.pkl"
+            with open(pkl_filename, 'wb') as file:
+                pickle.dump(clf, file)
+
+            ##for the validation data
+            clfs = [clf]
+
+            ##for the independent data
+            features_indep_test = read_csv(input_test_indep_file, index_col=0).values.T
+            # meta_indep_test = read_csv(input_meta_test_indep_file,header = 0, index_col = 0)
+            # labels_indep_test = meta_indep_test.loc[:,"cell_type"].replace(names_to_id).values
+            features_indep_test_novalue = read_csv(input_test_indep_file, index_col=0).T
+
+            prob_pred_all = ''
+            labels_indep_pred = []
+            prob_indep_pred = []
+            for clf in clfs:
+                prob_pred_all = clf.predict_proba(features_indep_test)
+                labels_indep_pred.append(np.argsort(-prob_pred_all, axis=1)[:, 0])
+                prob_indep_pred.append(np.array(
+                    [prob_pred_all[i, labels_indep_pred[-1][i]] for i in range(labels_indep_pred[-1].shape[0])]))
+
+            ##close write compare file
+            # writeout_compare_file(labels_indep_pred, labels_indep_test, meta_indep_test, id_nm_dic, input_opt_dir, 'SVMindetest',only_predict_unknown_cell,'no')
+            write_out_results(labels_indep_pred, id_nm_dic, features_indep_test_novalue, name, input_opt_dir)
+
+    if 'gbm' in target_method_list:
+        models = {
+            "gbm": GradientBoostingClassifier(n_estimators=500)
+        }
+
+        for name, model in models.items():
+            clf = model.fit(features_train, labels_train)
+
+            pkl_filename = input_opt_dir + "/" + name + "_model.pkl"
+            with open(pkl_filename, 'wb') as file:
+                pickle.dump(clf, file)
+
+            ##for the validation data
+            clfs = [clf]
+
+            ##for the independent data
+            features_indep_test = read_csv(input_test_indep_file, index_col=0).values.T
+            # meta_indep_test = read_csv(input_meta_test_indep_file,header = 0, index_col = 0)
+            # labels_indep_test = meta_indep_test.loc[:,"cell_type"].replace(names_to_id).values
+            features_indep_test_novalue = read_csv(input_test_indep_file, index_col=0).T
+
+            prob_pred_all = ''
+            labels_indep_pred = []
+            prob_indep_pred = []
+            for clf in clfs:
+                prob_pred_all = clf.predict_proba(features_indep_test)
+                labels_indep_pred.append(np.argsort(-prob_pred_all, axis=1)[:, 0])
+                prob_indep_pred.append(np.array(
+                    [prob_pred_all[i, labels_indep_pred[-1][i]] for i in range(labels_indep_pred[-1].shape[0])]))
+
+            ##close write compare file
+            # writeout_compare_file(labels_indep_pred, labels_indep_test, meta_indep_test, id_nm_dic, input_opt_dir, 'SVMindetest',only_predict_unknown_cell,'no')
+            write_out_results(labels_indep_pred, id_nm_dic, features_indep_test_novalue, name, input_opt_dir)
 
 
 
-train_evaluation (input_training_dataset_fl,input_training_meta_fl,
-                  input_indep_testing_dataset_fl,input_output_dir,SVM_para,open_smote,target_method_list)
 
+if open_parameter_tunning_final == 'yes':
 
+    print('Users choose to open the hyperparameter tunning')
+    train_evaluation (input_training_dataset_fl,input_training_meta_fl,
+                      input_indep_testing_dataset_fl,input_output_dir,SVM_para,open_smote,target_method_list)
 
+else:
 
+    print('Users choose to close the hyperparameter tunning')
+    train_evaluation_no_hypertunning(input_training_dataset_fl, input_training_meta_fl,
+                     input_indep_testing_dataset_fl, input_output_dir, SVM_para, open_smote, target_method_list)
