@@ -461,7 +461,11 @@ doublet score of all other clusters, and the difference between the
 other clusters and the given cluster lowers the specified
 -max_effect_doublet, the cluster will be flagged as a red flag. Default:
 -3)<br />
-</p>
+21. <strong>-rename_lib</strong> (If users do not want to use the
+library names embedded in the cell IDs and instead wish to replace them
+with the library names defined in input_object_dir, they can set
+-rename_lib to no. In this case, users must ensure that the Tn5 cell IDs
+are consistent with the renamed library identifiers. Default: no)</p>
 <p><strong>Outputs</strong><br />
 1. <strong>*.atac.soc.rds</strong><br />
 2. <strong>*.UMAP.clusters.pdf</strong><br />
