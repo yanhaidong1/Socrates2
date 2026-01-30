@@ -9,6 +9,7 @@ import subprocess
 import re
 import glob
 
+##udpating 013026 we will set an option to close the classifier to save the time
 ##updating 100325 we will close the organ and species name as we do not use them
 ##updating 062225 we will use the obj as the input for the ScAClass
 ##updating 110424 we will set the tissue and organ to be the reference
@@ -82,8 +83,11 @@ def get_parsed_args():
                                                                  'Default: rbf.')
 
     parser.add_argument("-open_smote", dest="open_smote", help = 'Smote will impute data enabling data balance manner.'
-                                                                 'Default: yes')
+                                                                 'Default: no')
 
+    ##updating 013026
+    parser.add_argument("-open_tunning", dest ='open_parameter_tunning', help = 'Users will choose to perform the parameter tunning.'
+                                                                                'Default: no')
 
 
     ##parse of parameters
@@ -212,14 +216,33 @@ def main(argv=None):
     else:
         SVM_kernel_method = args.SVM_kernel
 
+    ##updating 013026 allow the smote to be no
     if args.open_smote is None:
-        decide_use_smote = 'yes'
+        decide_use_smote = 'no'
     else:
         if args.open_smote == 'yes':
             decide_use_smote = 'yes'
         else:
-            decide_use_smote = 'no'
-            print('Users close the smote, please use \'-open_smote\' yes to open the smote')
+            if args.open_smote != 'no':
+                print('Users choose to close the smote, please use \'-open_smote\' no to close the smote')
+                return
+            else:
+                decide_use_smote = 'no'
+
+    ##updating 013026 allow the hyperparameter tunning
+    if args.open_parameter_tunning is None:
+        open_parameter_tunning_final = 'no'
+    else:
+        if args.open_parameter_tunning == 'yes':
+            open_parameter_tunning_final = 'yes'
+        else:
+            if args.open_parameter_tunning != 'no':
+                print('Users choose to close the hyperparameter tunning, please use \'-open_tunning\' no to close the hyperparameter tunning')
+                return
+            else:
+                open_parameter_tunning_final = 'no'
+
+
 
     if args.running_steps is None:
 
@@ -310,6 +333,10 @@ def main(argv=None):
         ipt_sub_script_1 = utils_dir + '/Step02_s1_prediction.py'
 
         ipt_train_meta_fl = args.train_meta_file
+
+        ##updating 013026
+        ##add an option for hyperparameter tunning
+
         cmd = 'python ' + ipt_script + \
               ' ' + ipt_sub_script_1 + \
               ' ' + ipt_train_meta_fl + \
@@ -318,7 +345,8 @@ def main(argv=None):
               ' ' + decide_use_smote + \
               ' ' + Machine_learning_method + \
               ' ' + Step02_training_prediction_dir + \
-              ' ' + decide_use_low_mem
+              ' ' + decide_use_low_mem + \
+              ' ' + open_parameter_tunning_final
         print(cmd)
         subprocess.call(cmd,shell=True)
 
