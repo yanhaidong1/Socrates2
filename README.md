@@ -1,4 +1,3 @@
-<img width="468" height="14" alt="image" src="https://github.com/user-attachments/assets/6632ac64-f265-4f34-9f74-351f4cd5c779" />
 # Socrates2
 
 
