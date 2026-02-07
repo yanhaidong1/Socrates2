@@ -14,6 +14,7 @@ For the installation manual, please refer to the scPlantReg platform: http://112
 ## Tutorials
 Before running Socrates2, users need to prepare aligned BAM files as input for all downstream analyses.
 We provide detailed tutorials for generating BAM files from scATAC-seq data produced by multiple experimental platforms:
+
 [1. 10X Genomics Chromium platform](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/links_to_different_data_inputs/10x-Genomics_scATAC-seq_Data_Processing_Bam.html)
 
 [2. MGI DNBseq platform](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/links_to_different_data_inputs/BGI-DNBseq_scATAC-seq_Data_Processing_Bam.html)
