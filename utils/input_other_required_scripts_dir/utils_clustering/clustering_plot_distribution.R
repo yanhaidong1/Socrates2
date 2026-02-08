@@ -109,7 +109,7 @@ test_each_cluster_strict <- function(df, sd_fold = 2) {
     x <- df$FRIP[df$LouvainClusters == cl]
     y <- df$FRIP[df$LouvainClusters != cl]
     
-    res <- wilcox.test(x, y, alternative = "greater")
+    res <- wilcox.test(x, y, alternative = "two.sided")
     
     mean_x <- mean(x, na.rm = TRUE)
     mean_y <- mean(y, na.rm = TRUE)
@@ -242,7 +242,7 @@ test_each_cluster_strict <- function(df, sd_fold = 2) {
     x <- df$TSS[df$LouvainClusters == cl]
     y <- df$TSS[df$LouvainClusters != cl]
     
-    res <- wilcox.test(x, y, alternative = "greater")
+    res <- wilcox.test(x, y, alternative = "two.sided")
     
     mean_x <- mean(x, na.rm = TRUE)
     mean_y <- mean(y, na.rm = TRUE)
@@ -373,7 +373,7 @@ test_each_cluster_strict <- function(df, sd_fold = 2) {
     x <- df$doubletscore[df$LouvainClusters == cl]
     y <- df$doubletscore[df$LouvainClusters != cl]
     
-    res <- wilcox.test(x, y, alternative = "greater")
+    res <- wilcox.test(x, y, alternative = "two.sided")
     
     mean_x <- mean(x, na.rm = TRUE)
     mean_y <- mean(y, na.rm = TRUE)
