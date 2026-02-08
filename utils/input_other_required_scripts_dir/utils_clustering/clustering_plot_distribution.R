@@ -2,6 +2,9 @@
 library(ggplot2)
 library(dplyr)
 library(viridis)
+library(ggrepel)
+
+##updating 022826 we will use the two sd to perform the cutoff
 
 args <- commandArgs(T)
 
@@ -56,30 +59,6 @@ for (i in 1:length(library_list)){
 }
 
 
-#p <- ggplot(merged_dt %>% filter(library=="semroot6"),
-#            aes(x=umap1, y=umap2, color=library)) +
-#  geom_point(alpha=0.7, size=1.5) +
-#  scale_color_manual(values=c("semroot6"="skyblue")) +
-#  labs(title="UMAP of semroot6") +
-#  theme_minimal()+
-#  theme_classic()
-#pdf('opt_library_semroot6_balanced_UMAP.pdf',height = 8,width = 8)
-#p
-#dev.off()
-
-# semroot7
-#p <- ggplot(merged_dt %>% filter(library=="semroot7"),
-#            aes(x=umap1, y=umap2, color=library)) +
-# geom_point(alpha=0.7, size=1.5) +
-#  scale_color_manual(values=c("semroot7"="salmon")) +
-#  labs(title="UMAP of semroot7") +
-#  theme_minimal()+
-#  theme_classic()
-#pdf('opt_library_semroot7_balanced_UMAP.pdf',height = 8,width = 8)
-#p
-#dev.off()
-
-
 
 ##############
 ##for the FRIP
@@ -100,53 +79,109 @@ pdf(paste0(input_output_dir,'/','opt_',input_prefix,'.UMAP.FRiP.pdf'),width = 8,
 print(p)
 dev.off()
 
-##make a test for the sig test
-##min_effect is the difference between the target cluster to average of other clusters 
-test_each_cluster_strict <- function(df, min_effect = 0.1) {
+##assign the df to the ipt_dt
+ipt_dt <- df
+
+test_each_cluster_strict <- function(df, sd_fold = 2) {
+  
   clusters <- unique(df$LouvainClusters)
-  results <- data.frame(LouvainClusters = clusters, 
-                        p_value = NA, 
-                        mean_FRIP = NA, 
-                        delta = NA)
+  
+  #df$FRIP <- df$Peak.Tn5/df$Total.Tn5
+  
+  ## 1. 先计算每个 cluster 的均值
+  cluster_means <- tapply(df$FRIP,
+                          df$LouvainClusters,
+                          mean,
+                          na.rm = TRUE)
+  
+  ## 2. cluster 均值之间的 SD
+  cluster_sd <- sd(cluster_means, na.rm = TRUE)
+  
+  results <- data.frame(
+    LouvainClusters = clusters,
+    p_value = NA_real_,
+    mean_FRIP = NA_real_,
+    delta = NA_real_,
+    stringsAsFactors = FALSE
+  )
   
   for (cl in clusters) {
     x <- df$FRIP[df$LouvainClusters == cl]
     y <- df$FRIP[df$LouvainClusters != cl]
-    res <- wilcox.test(x, y, alternative = "less")
     
-    mean_x <- mean(x)
-    mean_y <- mean(y)
-    delta  <- mean_y - mean_x  # how much lower the cluster is than others
+    res <- wilcox.test(x, y, alternative = "greater")
     
-    results[results$LouvainClusters == cl, ] <- c(cl, res$p.value, mean_x, delta)
+    mean_x <- mean(x, na.rm = TRUE)
+    mean_y <- mean(y, na.rm = TRUE)
+    
+    ##we will use the global - cluster
+    delta <- mean_y - mean_x
+    #delta <- mean_x - mean_y
+    
+    results[results$LouvainClusters == cl,
+            c("p_value", "mean_FRIP", "delta")] <-
+      c(res$p.value, mean_x, delta)
   }
   
-  results$p_value <- as.numeric(results$p_value)
-  results$mean_FRIP <- as.numeric(results$mean_FRIP)
-  results$delta <- as.numeric(results$delta)
+  ## 3. 严格判定：基于 cluster mean SD
+  results$significant <- results$p_value < 0.05 &
+    results$delta > sd_fold * cluster_sd
   
-  results$significant <- results$p_value < 0.05 & results$delta >= min_effect
+  ## 可选：保留阈值，方便画图和解释
+  results$cluster_sd <- cluster_sd
+  results$threshold  <- sd_fold * cluster_sd
+  
   results
 }
 
-#for the df with fake
-res_table <- test_each_cluster_strict(df, min_effect = min_effect_value_FRiP)
+##for the original without filtering the xylem with high doublet scores
+res_table <- test_each_cluster_strict(ipt_dt, sd_fold = sd_fold_value)
+#default 2
+
 res_table$mlog10pvalue <- -log10(res_table$p_value)
+
+##replace the Inf to the biggest value
+res_table[] <- lapply(res_table, function(x) {
+  if (is.numeric(x)) {
+    max_val <- max(x[is.finite(x)], na.rm = TRUE)
+    x[is.infinite(x)] <- max_val
+  }
+  x
+})
+
+##set the range 
+x_range <- range(res_table$mlog10pvalue, na.rm = TRUE)
+y_range <- range(res_table$delta, na.rm = TRUE)
+
+cutoff_threshold <-unique(res_table$threshold)
+
 p <- ggplot(res_table, aes(x = mlog10pvalue, y = delta)) +
   geom_point(aes(color = significant), size = 8, alpha = 1) +
   scale_color_manual(values = c("FALSE" = "grey60", "TRUE" = "red")) +
   
-  # Add horizontal and vertical reference lines
-  #geom_hline(yintercept = 0, linetype = "dashed", color = "black", linewidth = 0.5) +
-  geom_hline(yintercept = min_effect_value_FRiP, linetype = "dotted", color = "blue", linewidth = 0.7) +
-  geom_vline(xintercept = -log10(0.05), linetype = "dotted", color = "darkgreen", linewidth = 0.7) +
-  coord_cartesian(xlim = c(0, 150), ylim = c(-0.15, 0.15)) +
-  # Add cluster labels
-  #geom_text(aes(label = LouvainClusters), vjust = -1, size = 3.2) +
+  geom_hline(yintercept = cutoff_threshold,
+             linetype = "dotted", color = "blue", linewidth = 0.7) +
+  geom_vline(xintercept = -log10(0.05),
+             linetype = "dotted", color = "darkgreen", linewidth = 0.7) +
+  
+  
+  geom_text_repel(
+    aes(label = LouvainClusters),
+    size = 6,
+    max.overlaps = Inf,      # 确保每个点都有标签
+    box.padding = 0.4,
+    point.padding = 0.3,
+    segment.color = "grey70",
+    segment.size = 0.3
+  ) +
+  coord_cartesian(
+    xlim = x_range + c(-0.5, 0.5) * diff(x_range),
+    ylim = y_range + c(-0.5, 0.5) * diff(y_range)
+  ) +
   
   labs(
     x = expression(-log[10](pvalue)),
-    y = expression(Delta~"(Cluster mean - Global mean FRIP)"),
+    y = expression(Delta~"(Global mean - Cluster mean FRIP)"),
     color = "Significant",
     title = "Cluster-level FRIP Changes"
   ) +
@@ -155,6 +190,7 @@ p <- ggplot(res_table, aes(x = mlog10pvalue, y = delta)) +
 pdf(paste0(input_output_dir,'/','opt_',input_prefix,'.UMAP.FRiP.cluster.test.pdf'),width = 8,height = 6 )
 p
 dev.off()
+
 
 
 #############
@@ -176,52 +212,108 @@ pdf(paste0(input_output_dir,'/','opt_',input_prefix,'.UMAP.TSS.pdf'),width = 8,h
 print(p)
 dev.off()
 
-##perform the testing
-test_each_cluster_strict <- function(df, min_effect = 0.1) {
+##assign the df to the ipt_dt
+ipt_dt <- df
+
+test_each_cluster_strict <- function(df, sd_fold = 2) {
+  
   clusters <- unique(df$LouvainClusters)
-  results <- data.frame(LouvainClusters = clusters, 
-                        p_value = NA, 
-                        mean_FRIP = NA, 
-                        delta = NA)
+  
+  #df$TSS <- df$TSS.Tn5/df$Total.Tn5
+  
+  ## 1. 先计算每个 cluster 的均值
+  cluster_means <- tapply(df$TSS,
+                          df$LouvainClusters,
+                          mean,
+                          na.rm = TRUE)
+  
+  ## 2. cluster 均值之间的 SD
+  cluster_sd <- sd(cluster_means, na.rm = TRUE)
+  
+  results <- data.frame(
+    LouvainClusters = clusters,
+    p_value = NA_real_,
+    mean_FRIP = NA_real_,
+    delta = NA_real_,
+    stringsAsFactors = FALSE
+  )
   
   for (cl in clusters) {
     x <- df$TSS[df$LouvainClusters == cl]
     y <- df$TSS[df$LouvainClusters != cl]
-    res <- wilcox.test(x, y, alternative = "less")
     
-    mean_x <- mean(x)
-    mean_y <- mean(y)
-    delta  <- mean_y - mean_x  # how much lower the cluster is than others
+    res <- wilcox.test(x, y, alternative = "greater")
     
-    results[results$LouvainClusters == cl, ] <- c(cl, res$p.value, mean_x, delta)
+    mean_x <- mean(x, na.rm = TRUE)
+    mean_y <- mean(y, na.rm = TRUE)
+    
+    ##we will use the global - cluster
+    delta <- mean_y - mean_x
+    #delta <- mean_x - mean_y
+    
+    results[results$LouvainClusters == cl,
+            c("p_value", "mean_TSS", "delta")] <-
+      c(res$p.value, mean_x, delta)
   }
   
-  results$p_value <- as.numeric(results$p_value)
-  results$mean_FRIP <- as.numeric(results$mean_FRIP)
-  results$delta <- as.numeric(results$delta)
+  ## 3. 严格判定：基于 cluster mean SD
+  results$significant <- results$p_value < 0.05 &
+    results$delta > sd_fold * cluster_sd
   
-  results$significant <- results$p_value < 0.05 & results$delta >= min_effect
+  ## 可选：保留阈值，方便画图和解释
+  results$cluster_sd <- cluster_sd
+  results$threshold  <- sd_fold * cluster_sd
+  
   results
 }
 
-#for the df with fake
-res_table <- test_each_cluster_strict(df, min_effect = min_effect_value_TSS)
+##for the original without filtering the xylem with high doublet scores
+res_table <- test_each_cluster_strict(ipt_dt, sd_fold = sd_fold_value)
+
 res_table$mlog10pvalue <- -log10(res_table$p_value)
+
+##replace the Inf to the biggest value
+res_table[] <- lapply(res_table, function(x) {
+  if (is.numeric(x)) {
+    max_val <- max(x[is.finite(x)], na.rm = TRUE)
+    x[is.infinite(x)] <- max_val
+  }
+  x
+})
+
+##set the range 
+x_range <- range(res_table$mlog10pvalue, na.rm = TRUE)
+y_range <- range(res_table$delta, na.rm = TRUE)
+
+cutoff_threshold <-unique(res_table$threshold)
+
 p <- ggplot(res_table, aes(x = mlog10pvalue, y = delta)) +
   geom_point(aes(color = significant), size = 8, alpha = 1) +
   scale_color_manual(values = c("FALSE" = "grey60", "TRUE" = "red")) +
   
-  # Add horizontal and vertical reference lines
-  #geom_hline(yintercept = 0, linetype = "dashed", color = "black", linewidth = 0.5) +
-  geom_hline(yintercept = min_effect_value_TSS, linetype = "dotted", color = "blue", linewidth = 0.7) +
-  geom_vline(xintercept = -log10(0.05), linetype = "dotted", color = "darkgreen", linewidth = 0.7) +
-  coord_cartesian(xlim = c(0, 150), ylim = c(-0.15, 0.15)) +
-  # Add cluster labels
-  #geom_text(aes(label = LouvainClusters), vjust = -1, size = 3.2) +
+  geom_hline(yintercept = cutoff_threshold,
+             linetype = "dotted", color = "blue", linewidth = 0.7) +
+  geom_vline(xintercept = -log10(0.05),
+             linetype = "dotted", color = "darkgreen", linewidth = 0.7) +
+  
+  
+  geom_text_repel(
+    aes(label = LouvainClusters),
+    size = 6,
+    max.overlaps = Inf,      # 确保每个点都有标签
+    box.padding = 0.4,
+    point.padding = 0.3,
+    segment.color = "grey70",
+    segment.size = 0.3
+  ) +
+  coord_cartesian(
+    xlim = x_range + c(-0.5, 0.5) * diff(x_range),
+    ylim = y_range + c(-0.5, 0.5) * diff(y_range)
+  ) +
   
   labs(
     x = expression(-log[10](pvalue)),
-    y = expression(Delta~"(Cluster mean - Global mean FRIP)"),
+    y = expression(Delta~"(Global mean - Cluster mean TSS)"),
     color = "Significant",
     title = "Cluster-level TSS Changes"
   ) +
@@ -230,6 +322,7 @@ p <- ggplot(res_table, aes(x = mlog10pvalue, y = delta)) +
 pdf(paste0(input_output_dir,'/','opt_',input_prefix,'.UMAP.TSS.cluster.test.pdf'),width = 8,height = 6 )
 p
 dev.off()
+
 
 
 
@@ -252,48 +345,103 @@ pdf(paste0(input_output_dir,'/','opt_',input_prefix,'.UMAP.doublet.pdf'),width =
 print(p)
 dev.off()
 
+##assign the df to the ipt_dt
+ipt_dt <- df
 
-test_each_cluster_strict <- function(df, max_effect = -3) {
+test_each_cluster_strict <- function(df, sd_fold = 2) {
+  
   clusters <- unique(df$LouvainClusters)
-  results <- data.frame(LouvainClusters = clusters, 
-                        p_value = NA, 
-                        mean_FRIP = NA, 
-                        delta = NA)
+  
+  ## 1. 先计算每个 cluster 的均值
+  cluster_means <- tapply(df$doubletscore,
+                          df$LouvainClusters,
+                          mean,
+                          na.rm = TRUE)
+  
+  ## 2. cluster 均值之间的 SD
+  cluster_sd <- sd(cluster_means, na.rm = TRUE)
+  
+  results <- data.frame(
+    LouvainClusters = clusters,
+    p_value = NA_real_,
+    mean_FRIP = NA_real_,
+    delta = NA_real_,
+    stringsAsFactors = FALSE
+  )
   
   for (cl in clusters) {
     x <- df$doubletscore[df$LouvainClusters == cl]
     y <- df$doubletscore[df$LouvainClusters != cl]
+    
     res <- wilcox.test(x, y, alternative = "greater")
     
-    mean_x <- mean(x)
-    mean_y <- mean(y)
-    delta  <- mean_y - mean_x  # how much lower the cluster is than others
+    mean_x <- mean(x, na.rm = TRUE)
+    mean_y <- mean(y, na.rm = TRUE)
     
-    results[results$LouvainClusters == cl, ] <- c(cl, res$p.value, mean_x, delta)
+    ##we will use the cluster - global
+    #delta <- mean_y - mean_x
+    delta <- mean_x - mean_y
+    
+    results[results$LouvainClusters == cl,
+            c("p_value", "mean_FRIP", "delta")] <-
+      c(res$p.value, mean_x, delta)
   }
   
-  results$p_value <- as.numeric(results$p_value)
-  results$mean_FRIP <- as.numeric(results$mean_FRIP)
-  results$delta <- as.numeric(results$delta)
+  ## 3. 严格判定：基于 cluster mean SD
+  results$significant <- results$p_value < 0.05 &
+    results$delta > sd_fold * cluster_sd
   
-  results$significant <- results$p_value < 0.05 & results$delta <= max_effect
+  ## 可选：保留阈值，方便画图和解释
+  results$cluster_sd <- cluster_sd
+  results$threshold  <- sd_fold * cluster_sd
+  
   results
 }
 
-#for the df with fake
-res_table <- test_each_cluster_strict(df, max_effect = max_effect_value_doublet)
+##for the original without filtering the xylem with high doublet scores
+res_table <- test_each_cluster_strict(ipt_dt, sd_fold = sd_fold_value)
+
 res_table$mlog10pvalue <- -log10(res_table$p_value)
+
+##replace the Inf to the biggest value
+res_table[] <- lapply(res_table, function(x) {
+  if (is.numeric(x)) {
+    max_val <- max(x[is.finite(x)], na.rm = TRUE)
+    x[is.infinite(x)] <- max_val
+  }
+  x
+})
+
+##set the range 
+x_range <- range(res_table$mlog10pvalue, na.rm = TRUE)
+y_range <- range(res_table$delta, na.rm = TRUE)
+
+cutoff_threshold <-unique(res_table$threshold)
+
 p <- ggplot(res_table, aes(x = mlog10pvalue, y = delta)) +
   geom_point(aes(color = significant), size = 8, alpha = 1) +
   scale_color_manual(values = c("FALSE" = "grey60", "TRUE" = "red")) +
   
-  # Add horizontal and vertical reference lines
-  #geom_hline(yintercept = 0, linetype = "dashed", color = "black", linewidth = 0.5) +
-  geom_hline(yintercept = max_effect_value_doublet, linetype = "dotted", color = "blue", linewidth = 0.7) +
-  geom_vline(xintercept = -log10(0.05), linetype = "dotted", color = "darkgreen", linewidth = 0.7) +
-  coord_cartesian(xlim = c(0, 150), ylim = c(-10, 10)) +
-  # Add cluster labels
-  #geom_text(aes(label = LouvainClusters), vjust = -1, size = 3.2) +
+  geom_hline(yintercept = cutoff_threshold,
+             linetype = "dotted", color = "blue", linewidth = 0.7) +
+  geom_vline(xintercept = -log10(0.05),
+             linetype = "dotted", color = "darkgreen", linewidth = 0.7) +
+  
+  
+  geom_text_repel(
+    aes(label = LouvainClusters),
+    size = 6,
+    max.overlaps = Inf,      # 确保每个点都有标签
+    box.padding = 0.4,
+    point.padding = 0.3,
+    segment.color = "grey70",
+    segment.size = 0.3
+  )+
+  
+  coord_cartesian(
+    xlim = x_range + c(-0.5, 0.5) * diff(x_range),
+    ylim = y_range + c(-0.5, 0.5) * diff(y_range)
+  ) +
   
   labs(
     x = expression(-log[10](pvalue)),
@@ -306,6 +454,17 @@ p <- ggplot(res_table, aes(x = mlog10pvalue, y = delta)) +
 pdf(paste0(input_output_dir,'/','opt_',input_prefix,'.UMAP.doublet.cluster.test.pdf'),width = 8,height = 6 )
 p
 dev.off()
+
+
+
+
+
+
+
+
+
+
+
 
 
 
