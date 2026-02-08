@@ -85,19 +85,26 @@ def get_parsed_args():
                                                                 'Default: output')
 
 
+
+    ##updating 020826
+    ##we will set the standard deviation other than hard cut off
+    parser.add_argument('-sd_fold', dest = 'standard_dev_fold', help = 'Applies an additional effect-size threshold, requiring the difference between the cell-type mean and the global mean to exceed a predefined value proportional to the standard deviation of cell-type means, scaled by a two-fold stringency factor by default.'
+                                                                       'Default: 2')
+
+
     ##updating 110125
     ##distribution of quality scores
-    parser.add_argument('-min_effect_FRiP', dest='min_effect_value_FRiP',
-                        help='If the mean FRiP of a given cluster is significantly lower (p < 0.05) than the average FRiP of all other clusters, and the difference between the other clusters and the given cluster exceeds the specified -min_effect_FRiP, the cluster will be flagged as a red flag.'
-                             'Default: 0.1')
+    #parser.add_argument('-min_effect_FRiP', dest='min_effect_value_FRiP',
+    #                    help='If the mean FRiP of a given cluster is significantly lower (p < 0.05) than the average FRiP of all other clusters, and the difference between the other clusters and the given cluster exceeds the specified -min_effect_FRiP, the cluster will be flagged as a red flag.'
+    #                         'Default: 0.1')
 
-    parser.add_argument('-min_effect_TSS', dest='min_effect_value_TSS',
-                        help='If the mean TSS of a given cluster is significantly lower (p < 0.05) than the average TSS of all other clusters, and the difference between the other clusters and the given cluster exceeds the specified -min_effect_TSS, the cluster will be flagged as a red flag.'
-                             'Default: 0.1')
+    #parser.add_argument('-min_effect_TSS', dest='min_effect_value_TSS',
+    #                    help='If the mean TSS of a given cluster is significantly lower (p < 0.05) than the average TSS of all other clusters, and the difference between the other clusters and the given cluster exceeds the specified -min_effect_TSS, the cluster will be flagged as a red flag.'
+    #                         'Default: 0.1')
 
-    parser.add_argument('-max_effect_doublet', dest='max_effect_value_doublet',
-                        help='If the mean doublet score of a given cluster is significantly larger (p < 0.05) than the average doublet score of all other clusters, and the difference between the other clusters and the given cluster lowers the specified -max_effect_doublet, the cluster will be flagged as a red flag.'
-                             'Default: -3')
+    #parser.add_argument('-max_effect_doublet', dest='max_effect_value_doublet',
+    #                    help='If the mean doublet score of a given cluster is significantly larger (p < 0.05) than the average doublet score of all other clusters, and the difference between the other clusters and the given cluster lowers the specified -max_effect_doublet, the cluster will be flagged as a red flag.'
+    #                         'Default: -3')
 
 
     ##updating 012826
@@ -262,27 +269,37 @@ def main(argv=None):
 
     store_final_parameter_line_list.append('input_prefix <- ' + '\'' + prefix_name_final + '\'')
 
+
+    ##updating 020826
+    if args.standard_dev_fold is not None:
+        standard_dev_fold_final = args.standard_dev_fold
+    else:
+        standard_dev_fold_final = '2'
+
+    store_final_parameter_line_list.append('sd_fold_value <- ' + standard_dev_fold_final)
+
+
     ##updating 110125
-    if args.min_effect_value_FRiP is not None:
-        min_effect_value_FRiP_final = args.min_effect_value_FRiP
-    else:
-        min_effect_value_FRiP_final = '0.1'
+    #if args.min_effect_value_FRiP is not None:
+    #    min_effect_value_FRiP_final = args.min_effect_value_FRiP
+    #else:
+    #    min_effect_value_FRiP_final = '0.1'
 
-    store_final_parameter_line_list.append('min_effect_value_FRiP <- ' + min_effect_value_FRiP_final)
+    #store_final_parameter_line_list.append('min_effect_value_FRiP <- ' + min_effect_value_FRiP_final)
 
-    if args.min_effect_value_TSS is not None:
-        min_effect_value_TSS_final = args.min_effect_value_TSS
-    else:
-        min_effect_value_TSS_final = '0.1'
+    #if args.min_effect_value_TSS is not None:
+    #    min_effect_value_TSS_final = args.min_effect_value_TSS
+    #else:
+    #    min_effect_value_TSS_final = '0.1'
 
-    store_final_parameter_line_list.append('min_effect_value_TSS <- ' + min_effect_value_TSS_final)
+    #store_final_parameter_line_list.append('min_effect_value_TSS <- ' + min_effect_value_TSS_final)
 
-    if args.max_effect_value_doublet is not None:
-        max_effect_value_doublet_final = args.max_effect_value_doublet
-    else:
-        max_effect_value_doublet_final = '-3'
+    #if args.max_effect_value_doublet is not None:
+    #    max_effect_value_doublet_final = args.max_effect_value_doublet
+    #else:
+    #    max_effect_value_doublet_final = '-3'
 
-    store_final_parameter_line_list.append('max_effect_value_doublet <- ' + max_effect_value_doublet_final)
+    #store_final_parameter_line_list.append('max_effect_value_doublet <- ' + max_effect_value_doublet_final)
 
 
     ##updating 012826
