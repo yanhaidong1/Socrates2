@@ -4,7 +4,8 @@ library(dplyr)
 library(viridis)
 library(ggrepel)
 
-##updating 022826 we will use the two sd to perform the cutoff
+##updating 020926 we will add a plot to show the composition among clusters
+##updating 020826 we will use the two sd to perform the cutoff
 
 args <- commandArgs(T)
 
@@ -456,12 +457,103 @@ p
 dev.off()
 
 
+#################
+##updating 020926
+##calculate the RCS
+##but it only works for the two replicates
+meta <- merged_dt
+
+if (length(unique(meta$library))==2){
+
+  df_prop <- meta %>%
+    count(LouvainClusters, library) %>%
+    group_by(LouvainClusters) %>%
+    mutate(
+      total = sum(n),
+      prop  = n / total
+    ) %>%
+    ungroup()
+  
+  head(df_prop)
+  
+  #df_rcs <- df_prop %>%
+  #  select(LouvainClusters, library, prop) %>%
+  #  tidyr::pivot_wider(
+  #    names_from = library,
+  #    values_from = prop,
+  #    values_fill = 0
+  #  ) %>%
+  #  mutate(
+  #    RCS = 1 - abs(semroot6 - semroot7)
+  #  )
+  
+  df_rcs <- df_prop %>%
+    select(LouvainClusters, library, prop) %>%
+    tidyr::pivot_wider(
+      names_from  = library,
+      values_from = prop,
+      values_fill = 0
+    ) %>%
+    rowwise() %>%
+    mutate(
+      RCS = 1 - abs(diff(c_across(-LouvainClusters)))
+    ) %>%
+    ungroup()
+  
+  head(df_rcs)
 
 
+  df_rcs <- df_rcs %>%
+    mutate(
+      RCS_group = ifelse(RCS >= 0.6, "High consistency", "Low consistency")
+    )
+  
+  p <- ggplot() +
+    geom_bar(
+      data = df_prop,
+      aes(x = LouvainClusters, y = prop, fill = library),
+      stat = "identity"
+    ) +
+    geom_point(
+      data = df_rcs,
+      aes(
+        x = LouvainClusters,
+        y = RCS,
+        shape = RCS_group
+      ),
+      size = 4,
+      color = "black",
+      stroke = 1.2   # 空心圆边框更清晰
+    ) +
+    geom_hline(
+      yintercept = 0.6,
+      linetype = "dashed",
+      color = "black",
+      linewidth = 0.8
+    ) +
+    scale_shape_manual(
+      values = c(
+        "High consistency" = 16,  # 实心
+        "Low consistency"  = 1    # 空心
+      )
+    ) +
+    scale_y_continuous(
+      name = "Cell proportion",
+      sec.axis = sec_axis(~ ., name = "Replication consistency (RCS)")
+    ) +
+    labs(shape = "Replication consistency") +
+    theme_classic()
+  #pdf('opt_balanced_add_RCS_two_axis_add_label.pdf',height = 6,width = 8)
+  #print(p)
+  #dev.off()
+  
+  
+  pdf(paste0(input_output_dir,'/','opt_',input_prefix,'.RCS.cluster.pdf'),height = 6,width = 8 )
+  print(p)
+  dev.off()
 
 
-
-
+}
 
 
 
