@@ -54,7 +54,8 @@ After obtaining the BAM files, please follow the step-by-step tutorials below to
 For a summary of the most common issues and their corresponding solutions, please refer to the following documentation: [Issue Reports](http://htmlpreview.github.io/?https://github.com/yanhaidong1/Socrates2/blob/main/vignettes/issue_reports.html)
 
 
-
+## Contact
+Please contact Haidong Yan via email at yanhaidong1991@163.com if you encounter any issues.
 
 
 
