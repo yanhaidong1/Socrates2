@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-ENV_NAME="py39_r42_CR2"
+ENV_NAME="Socrates2"
 
 mamba create -n $ENV_NAME -c conda-forge -c bioconda -c defaults \
   python=3.9 r-base=4.2.3 perl=5.32 libnsl=2.0.0 icu=73.2 \
