@@ -11,7 +11,7 @@
 
 
 
-<title>issue_reports</title>
+<title>issue_reports_0601</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -370,7 +370,7 @@ error typically occurs when R attempts to load packages from a
 pre-existing or system-wide R library path instead of the newly created
 conda environment’s library.</p>
 <p><strong>Example error message:</strong></p>
-<pre class="bash"><code>Error: package or namespace load failed for ‘rtracklayer’ in dyn.load(file, DLLpath = DLLpath, ...):
+<pre class="bash"><code>Error: package or namespace load failed for &#39;rtracklayer&#39; in dyn.load(file, DLLpath = DLLpath, ...):
 
  unable to load shared object &#39;/path/to/old/R/library/rtracklayer/libs/rtracklayer.so&#39;:
 
@@ -378,20 +378,19 @@ conda environment’s library.</p>
 
 Execution halted
 
-ERROR: lazy loading failed for package ‘BSgenome’
+ERROR: lazy loading failed for package &#39;BSgenome&#39;
 
-* removing ‘/path/to/old/R/library/BSgenome’
-</code></pre>
-<p>The issue arises because R’s library path (.libPaths()) may still
-point to global or user-specific R library locations outside the conda
-environment. This causes R to attempt loading packages from incompatible
-library paths, leading to dependency conflicts.</p>
+* removing &#39;/path/to/old/R/library/BSgenome&#39;</code></pre>
+<p>The issue arises because R’s library path (<code>.libPaths()</code>)
+may still point to global or user-specific R library locations outside
+the conda environment. This causes R to attempt loading packages from
+incompatible library paths, leading to dependency conflicts.</p>
 <p><strong>Solution:</strong></p>
-<p>To resolve this, modify the ~/.Rprofile file in your home directory
-to ensure R uses the conda environment’s library path exclusively when
-the conda environment is active.</p>
-<p>Add the following code to your ~/.Rprofile:</p>
-<pre class="bash"><code>local({
+<p>To resolve this, modify the <code>~/.Rprofile</code> file in your
+home directory to ensure R uses the conda environment’s library path
+exclusively when the conda environment is active.</p>
+<p>Add the following code to your <code>~/.Rprofile</code>:</p>
+<pre class="r"><code>local({
 
  cp &lt;- Sys.getenv(&quot;CONDA_PREFIX&quot;)
 
@@ -401,7 +400,7 @@ the conda environment is active.</p>
 
  if (dir.exists(conda_lib) &amp;&amp; file.access(conda_lib, 4) == 0) {
 
- _# Set environment variables to use conda R library exclusively_
+ # Set environment variables to use conda R library exclusively
 
  Sys.setenv(R_LIBS = conda_lib)
 
@@ -417,7 +416,7 @@ the conda environment is active.</p>
 <p><strong>Verification:</strong><br />
 After adding this code and restarting R within the activated conda
 environment,</p>
-<p><strong>Running (in R):</strong></p>
+<p><strong>Run (in R):</strong></p>
 <pre class="r"><code>.libPaths()
 
 Sys.getenv(&quot;R_LIBS&quot;)</code></pre>
@@ -432,7 +431,7 @@ installed via conda/mamba within the environment.</p>
 <p>After activating the Socrates2 environment, certain tools may fail to
 run or load properly. Common symptoms include:</p>
 <ol style="list-style-type: decimal">
-<li>Executable files not found (e.g., macs2)</li>
+<li>Executable files not found (e.g., <code>macs2</code>)</li>
 </ol>
 <p><strong>Example error message:</strong></p>
 <pre class="bash"><code>(base) [……]$ conda activate Socrates2
@@ -455,7 +454,7 @@ ImportError: /home/hy17471/.conda/envs/Socrates2/lib/python3.9/site-packages/MAC
 <p><strong>Example error message:</strong></p>
 <pre class="bash"><code>……
 
-Error: package or namespace load failed for ‘devtools’ in dyn.load(file, DLLpath = DLLpath, ...):
+Error: package or namespace load failed for &#39;devtools&#39; in dyn.load(file, DLLpath = DLLpath, ...):
 
  unable to load shared object &#39;/home/hy17471/.conda/envs/Socrates2/lib/R/library/stringi/libs/stringi.so&#39;:
 
@@ -466,19 +465,96 @@ Error: package or namespace load failed for ‘devtools’ in dyn.load(file, DLL
 and <strong>LD_LIBRARY_PATH</strong> environment variables may not be
 set correctly, resulting in:</p>
 <ol style="list-style-type: decimal">
-<li><p>The system using incorrect executable file paths</p></li>
-<li><p>Dynamic libraries being loaded from system paths instead of the
-environment’s internal library paths</p></li>
+<li>The system using incorrect executable file paths</li>
+<li>Dynamic libraries being loaded from system paths instead of the
+environment’s internal library paths</li>
 </ol>
 <p><strong>Solution:</strong><br />
 After activating the environment, manually set the environment
 variables:</p>
-<p><strong>Running:</strong></p>
+<p><strong>Run:</strong></p>
 <pre class="bash"><code>source activate Socrates2
 
 export PATH=~/.conda/envs/Socrates2/bin:$PATH
 
 export LD_LIBRARY_PATH=~/.conda/envs/Socrates2/lib:$LD_LIBRARY_PATH</code></pre>
+</div>
+<div id="issue-3-node-stack-overflow-deep-recursion-error-during-doublet-detection" class="section level3">
+<h3>Issue 3: Node Stack Overflow / Deep Recursion Error During Doublet
+Detection</h3>
+<p>During the clustering step of Socrates2, users may encounter an R
+error related to stack overflow or infinite recursion. The error
+typically occurs when the pipeline attempts to detect doublets after
+UMAP projection.</p>
+<p><strong>Example error message:</strong></p>
+<pre class="bash"><code>……
+
+Error in `&lt;current-expression&gt;`: node stack overflow
+
+Calls: saveRDS ... .quickCoerceSelect -&gt; .findMethodInTable -&gt; is -&gt; stopifnot
+
+……</code></pre>
+<p>Or</p>
+<pre class="bash"><code>……
+
+Error: evaluation nested too deeply: infinite recursion / options(expressions=)?
+
+……</code></pre>
+<p>The error appears consistently when using R versions <strong>≥
+4.3</strong> (e.g., R 4.3, 4.4, 4.5), even when all R packages are built
+for the same R version. The same workflow runs successfully without
+error under R 4.2. The error occurs during the doublet detection phase,
+after creating synthetic doublets and projecting them onto the UMAP.</p>
+<p><strong>Root cause analysis:</strong></p>
+<p>Socrates2 and some of its dependencies (e.g.,
+<code>BiocGenerics</code>, <code>GenomicRanges</code>,
+<code>umap</code>, <code>SeuratObject</code>) rely on internal R
+behaviors such as S4 method dispatch and recursive C/C++ calls. Changes
+introduced in R 4.3+ have altered these behaviors, leading to:</p>
+<ol style="list-style-type: decimal">
+<li>Excessive recursion depth when handling large S4 objects (e.g.,
+merged Seurat/Cicero objects).</li>
+<li>Potential infinite recursion loops or stack exhaustion, especially
+during complex operations like KNN doublet detection.</li>
+</ol>
+<p>In contrast, R 4.2 maintains the expected internal behavior, and all
+Socrates2 dependencies are fully compatible with it.</p>
+<p><strong>Solution:</strong></p>
+<p>Do not use R 4.3, 4.4, or 4.5. Instead, use the dedicated environment
+provided by the official Socrates2 setup script, which is pinned to R
+4.2.3.</p>
+<p><strong>Step-by-step instructions (also displayed on the Socrates2
+page at <a href="http://scplantreg.com/home/" class="uri">http://scplantreg.com/home/</a>):</strong></p>
+<ol style="list-style-type: decimal">
+<li>Ensure you have the <code>Socrates2_one_step_envset.sh</code> script
+available.</li>
+<li>Run the installation script in the background:</li>
+</ol>
+<p><strong>Run:</strong></p>
+<pre class="bash"><code>nohup bash Socrates2_one_step_envset.sh &gt; Socrates2_installation.log 2&gt;&amp;1 &amp;</code></pre>
+<ol start="3" style="list-style-type: decimal">
+<li>Monitor the installation:</li>
+</ol>
+<p><strong>Run:</strong></p>
+<pre class="bash"><code>tail -f Socrates2_installation.log</code></pre>
+<p>Wait until <code>Environment Socrates2 is ready!</code> appears.</p>
+<ol start="4" style="list-style-type: decimal">
+<li>Activate the environment:</li>
+</ol>
+<p><strong>Run:</strong></p>
+<pre class="bash"><code>conda activate Socrates2</code></pre>
+<ol start="5" style="list-style-type: decimal">
+<li>Re-run your analysis pipeline (including the clustering step) within
+this environment.</li>
+</ol>
+<p><strong>Verification:</strong></p>
+<p>After activating the environment, confirm that R version is
+4.2.x:</p>
+<p><strong>Run:</strong></p>
+<pre class="bash"><code>R --version</code></pre>
+<hr />
+<p>If you encounter any further issues, please contact us directly via
+email at <a href="mailto:yanhaidong1991@163.com" class="email">yanhaidong1991@163.com</a>.</p>
 </div>
 </div>
 
