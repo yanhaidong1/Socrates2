@@ -11,7 +11,7 @@
 
 
 
-<title>clustering</title>
+<title>clustering-081826</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -521,6 +521,27 @@ mean and the cluster mean. Only clusters with a p value &lt; 0.05 and a
 global-to-cluster mean difference exceeding the specified effect-size
 threshold were considered to fail the test and were marked as
 significant = TRUE (i.e., flagged clusters).</p>
+</div>
+<div id="before-running" class="section level3">
+<h3>Before running</h3>
+<p>It is important to note that if users want to modify or improve the
+clustering results, the <code>-num_var</code> and <code>-num_PCs</code>
+parameters are the two key parameters to adjust. If the initial
+clustering results are not satisfactory, users can fine-tune these
+parameters and rerun the clustering.</p>
+<p>For <code>-num_var</code>, the default recommendation is 10,000
+(<code>-num_var 10000</code>), but users can increase this value or use
+all available features. To use all variable features, set
+<code>-num_var 0</code>, which instructs the function to include all
+features in the analysis.</p>
+<p>Users can also adjust the number of principal components
+(<code>-num_PCs</code>). While 15 PCs is recommended as a starting
+point, users can increase this value to 50 or explore other values. The
+choice of the number of PCs can substantially affect the clustering
+results and performance.</p>
+<p>Therefore, users are encouraged to test different combinations of
+<code>-num_var</code> and <code>-num_PCs</code> to obtain the most
+appropriate clustering for their dataset.</p>
 <p><strong>Running</strong>:</p>
 <pre class="bash"><code>mkdir input_obj_dir
 cp /Path/to/*filtered.soc.rds input_obj_dir
