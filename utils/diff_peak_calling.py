@@ -1,0 +1,759 @@
+#!/usr/bin/env python
+
+
+##this script is to perform the peak calling
+##it has two step
+##step01 prepare the peak sparse fil
+##updating 121225 make the group CPM
+##updating 120825 make a decsion to build the bw for the treatment groups
+##updating 120225 make a group for the library
+##updating 080525 make a cpm peak file
+##updating 051925 step03 find the diff peak among diff groups
+##updating 063025 we will use the object to
+##updating 070125 we will set the object for the different group comparing
+
+import argparse
+import glob
+import sys
+import os
+import subprocess
+import re
+
+
+from input_other_required_scripts_dir.utils_diff_peak_calling_python import s1_make_peak_sparse as s1_prepare
+
+
+def get_parsed_args():
+
+    parser = argparse.ArgumentParser(description="cell type peak calling pipeline")
+
+    ##require files
+    parser.add_argument("-o", dest='output_dir', default="./", help="Output directory to store the output files."
+                                                                    "Default: ./ ")
+
+    parser.add_argument("-script_dir", dest='required_script_dir',
+                        help='Users must provide the required script dir provided by GitHub.')
+
+    ##step 01
+    parser.add_argument("-s1_open_prepare", dest='s1_open_prepare_peak_tn5',
+                        help='Run the step 01 to prepare peak tn5 file.'
+                             'Default: yes')
+
+    ##updating 063025
+    parser.add_argument("-soc_obj", dest='soc_object_fl',
+                        help='Provide an object obtained from the peak calling step.')
+
+    parser.add_argument("-peak_fl", dest = 'peak_file', help = 'Provide the final peak file.')
+
+    parser.add_argument("-tn5_fl", dest='tn5_bed_file', help="Provide the tn5 bed file.")
+
+
+    ##step 02
+    parser.add_argument("-s2_open_diff_ct_peak", dest='s2_open_diff_peak_call',help='Run the step 02 to call the DA peak per cell type.'
+                                                                                 'Default: yes')
+
+
+    parser.add_argument("-meta_fl", dest='meta_file', help='Provide the meta file recording cell identity information.')
+
+
+    ##updating 051925
+    ##step 03
+    parser.add_argument("-s3_open_diff_gp_peak", dest= 's3_open_diff_group_peak', help = 'Run the step 03 to call the DA peak for the specific group.'
+                                                                                         'Default: no')
+
+
+    ##Optional
+    parser.add_argument("-core", dest='core_number', help='Specify how many cores we will use.'
+                                                          'Default: 1')
+
+    parser.add_argument("-ct_colnm", dest='celltype_cluster_col_name',
+                        help='Define the cluster column name of the meta file.')
+
+    parser.add_argument("-stat_test", dest='stat_test_method', help='Users need to provide the method used for the stat test. pnorm or perm.'
+                                                                    'Default: perm.')
+
+    parser.add_argument("-threshold", dest='threshold_val', help = 'The threshold value for statistical testing.'
+                                                                   'Default: 0.001')
+
+    parser.add_argument("-null_permutations", dest='null_permutations_val', help = 'The number of null permutations to generate.'
+                                                                   'Default: 1000')
+
+    parser.add_argument("-entropy_bootstraps", dest = 'entropy_bootstraps_val', help = 'The number of bootstraps for the entropy metric to generate.'
+                                                                                       'Default: 1000')
+
+    parser.add_argument("-prefix", dest = 'prefix_str', help = 'Prefix for output.'
+                                                               'Default:opt')
+
+
+    ##updating 051925
+    parser.add_argument("-gp_colnm", dest = 'group_col_name', help = 'Users need to provide a group column name will be used for the diff peaks calling.'
+                                                                     'Default:library.')
+
+    parser.add_argument("-gp_fl", dest = 'group_file', help = 'Users need to make a group patterns in a file. If -s3_open_diff_gp_peak is initiated, this argument need to be added. Otherwise,'
+                                                              'it will directly consider the item in the library')
+
+    ##optional 122925
+    ##set if we will set balance between group
+    parser.add_argument("-gp_balance", dest = 'group_balance', help = 'Users will balance the group cell between two comparisons.'
+                                                                      'Default: no.')
+
+
+    #parser.add_argument("-bdg_dir", dest = 'bdg_directory', help = 'If users initiate this argument, they will build bigwig files for each group.')
+
+
+    #parser.add_argument("-upsample_method", dest= 'upsampling_method',help = 'Users need to define the method used for the upsampling. Sample read or sample cell'
+    #                                               'Default: read')
+
+    #parser.add_argument("-FDR", dest = 'FDR_cutoff', help = 'Provide a FDR cutoff to filter the differentially accessible peaks'
+    #                                                        'Default: 0.1')
+
+    #parser.add_argument("-log2fc", dest= 'log2fc_cutoff', help = 'Provde a log2fc cutoff to filter the differentially accessible peaks.'
+    #                                                             'Default: 1')
+
+    ##parse of parameters
+    args = parser.parse_args()
+    return args
+
+
+def main(argv=None):
+
+    if argv is None:
+        argv = sys.argv
+    args = get_parsed_args()
+
+
+    output_dir = args.output_dir
+    if not output_dir.endswith('/'):
+        output_dir = output_dir + '/'
+    else:
+        output_dir = output_dir
+
+    if args.required_script_dir is None:
+        print('Cannot find required script dir, please provide the dir in \'-script_dir\' !')
+        return
+    else:
+        input_required_scripts_dir = args.required_script_dir
+
+
+    if args.s1_open_prepare_peak_tn5 is None:
+
+        s1_open_prepare_peak_tn5_final = 'yes'
+
+    else:
+
+        if args.s1_open_prepare_peak_tn5 == 'yes':
+
+            s1_open_prepare_peak_tn5_final = 'yes'
+
+        else:
+            s1_open_prepare_peak_tn5_final = 'no'
+            print(
+                'Users choose to close the peak preparation, please use \'-s1_open_prepare yes\' to open this step')
+
+    if s1_open_prepare_peak_tn5_final == 'yes':
+
+        ##updating 063025
+        ##if users provide the soc from the last step
+        if args.soc_object_fl is not None:
+            print('Use object from the last step as the input file')
+            try:
+                file = open(args.soc_object_fl, 'r')  ##check if the file is not the right file
+            except IOError:
+                print('There was an error opening the object file!')
+                return
+            use_soc_object_as_ipt = 'yes'
+        else:
+            use_soc_object_as_ipt = 'no'
+
+        if use_soc_object_as_ipt == 'no':
+
+            print('Do not use object from the last step as the input file and please provide the peak file as input')
+
+            if args.peak_file is None:
+                print('Cannot find the peak file, please provide it')
+                return
+            else:
+                try:
+                    file = open(args.peak_file, 'r')  ##check if the file is not the right file
+                except IOError:
+                    print('There was an error opening the peak file!')
+                    return
+
+        if args.tn5_bed_file is None:
+            print('Cannot find the tn5 file, please provide it')
+            return
+        else:
+            try:
+                file = open(args.tn5_bed_file, 'r')  ##check if the file is not the right file
+            except IOError:
+                print('There was an error opening the tn5 file!')
+                return
+
+
+
+    if args.s2_open_diff_peak_call is None:
+
+        s2_open_diff_peak_call_final = 'yes'
+
+    else:
+
+        if args.s2_open_diff_peak_call == 'yes':
+
+            s2_open_diff_peak_call_final = 'yes'
+
+        else:
+
+            s2_open_diff_peak_call_final = 'no'
+            print('Users choose to close the open diff peak calling, please use \'-s2_open_diff_peak yes\' to open this step')
+
+    if s2_open_diff_peak_call_final == 'yes':
+        ##updating 063025
+        if args.soc_object_fl is not None:
+            print('Use object from the last step as the input file')
+            try:
+                file = open(args.soc_object_fl, 'r')  ##check if the file is not the right file
+            except IOError:
+                print('There was an error opening the object file!')
+                return
+            use_soc_object_as_ipt = 'yes'
+        else:
+            use_soc_object_as_ipt = 'no'
+
+        if use_soc_object_as_ipt == 'no':
+
+            print(
+                'Do not use object from the last step as the input file and please provide the meta file as input')
+
+            if args.meta_file is None:
+                print('Cannot find the meta file, please provide it')
+                return
+            else:
+                try:
+                    file = open(args.meta_file, 'r')  ##check if the file is not the right file
+                except IOError:
+                    print('There was an error opening the meta file!')
+                    return
+
+
+
+    ##updating 051925
+    if args.s3_open_diff_group_peak is None:
+
+        s3_open_diff_group_peak_final = 'no'
+
+    else:
+
+        if args.s3_open_diff_group_peak == 'yes':
+            s3_open_diff_group_peak_final = 'yes'
+
+
+            ##updating 120325
+            #if args.group_col_name is None:
+            #    print('Please provide a group column name within the meta file')
+            #    return
+
+
+        else:
+            print('Users choose to close the open diff peak calling per group, please use \'-s3_open_diff_gp_peak yes\' to open this step')
+            return
+
+
+
+    store_final_parameter_line_list = []
+    ##step02 parameters
+    if args.core_number is not None:
+        core_number_final = args.core_number
+    else:
+        core_number_final = '1'
+
+    store_final_parameter_line_list.append('thread_num <- ' + core_number_final)
+
+
+    if args.celltype_cluster_col_name is not None:
+        celltype_cluster_col_name_final = args.celltype_cluster_col_name
+        store_final_parameter_line_list.append('target_cluster <- ' + '\'' + celltype_cluster_col_name_final + '\'')
+    else:
+
+        ##updating 063025
+        if args.soc_object_fl is not None:
+            celltype_cluster_col_name_final = 'cell_identity'
+            store_final_parameter_line_list.append('target_cluster <- ' + '\'' + celltype_cluster_col_name_final + '\'')
+        else:
+            if s2_open_diff_peak_call_final == 'yes':
+                print ('Please use \'-ct_colnm\' to specify the column name showing cell identity once users do not use the object as the input file.')
+                return
+
+
+    if args.stat_test_method is not None:
+        stat_test_method_final = args.stat_test_method
+    else:
+        stat_test_method_final = 'perm'
+
+    store_final_parameter_line_list.append('stat_test <- ' + '\'' + stat_test_method_final + '\'')
+
+
+    if args.threshold_val is not None:
+        threshold_val_final = args.threshold_val
+    else:
+        threshold_val_final = '0.0001'
+
+    store_final_parameter_line_list.append('threshold <- ' + threshold_val_final)
+
+
+    if args.null_permutations_val is not None:
+        null_permutations_val_final = args.null_permutations_val
+    else:
+        null_permutations_val_final = '1000'
+
+    store_final_parameter_line_list.append('null_permutations <- ' + null_permutations_val_final)
+
+
+    if args.entropy_bootstraps_val is not None:
+        entropy_bootstraps_val_final = args.entropy_bootstraps_val
+    else:
+        entropy_bootstraps_val_final = '1000'
+
+    store_final_parameter_line_list.append('entropy_bootstraps <- ' + entropy_bootstraps_val_final)
+
+
+    if args.prefix_str is not None:
+        prefix_str_final = args.prefix_str
+    else:
+        prefix_str_final = 'opt'
+
+    store_final_parameter_line_list.append('prefix <- ' + '\'' + prefix_str_final + '\'')
+
+
+    ##updating 051925
+    if args.group_col_name is not None:
+        group_col_name_final = args.group_col_name
+    else:
+        group_col_name_final = 'library'
+
+    store_final_parameter_line_list.append('target_treat_colnm <- ' + '\'' + group_col_name_final + '\'')
+
+    ##updating 120325
+    if args.group_file is not None:
+
+        store_pattern_dic = {}
+        with open (args.group_file,'r') as ipt:
+            for eachline in ipt:
+                eachline = eachline.strip('\n')
+                col = eachline.strip().split()
+                if col[0] in store_pattern_dic:
+                    store_pattern_dic[col[0]].append(col[1])
+                else:
+                    store_pattern_dic[col[0]] = []
+                    store_pattern_dic[col[0]].append(col[1])
+
+        store_final_pattern_list = []
+        for eachlib in store_pattern_dic:
+            final_line = eachlib + ':' + ','.join(store_pattern_dic[eachlib])
+            store_final_pattern_list.append(final_line)
+
+        group_pattern_final = ';'.join(store_final_pattern_list)
+
+        #group_pattern_final = args.group_pattern
+
+        #if ';' not in group_pattern_final:
+        #    print('Please add ; between two group names')
+        #    return
+
+    else:
+        group_pattern_final = 'na'
+
+    ##if we initiate the group pattern final it will generate a new column in the meta file
+    store_final_parameter_line_list.append('group_pattern <- ' + '\'' + group_pattern_final + '\'')
+
+
+    ##updating 122925
+    if args.group_balance is None:
+        open_group_balance = 'no'
+    else:
+        if args.group_balance == 'yes':
+            open_group_balance = 'yes'
+        else:
+            print('Please set -gp_balance yes')
+            return
+
+    store_final_parameter_line_list.append('open_group_balance <- ' + '\'' + open_group_balance + '\'')
+
+    with open(output_dir + '/temp_defined_parameters.config', 'w+') as opt:
+        for eachline in store_final_parameter_line_list:
+            opt.write(eachline + '\n')
+
+
+    if s1_open_prepare_peak_tn5_final == 'yes':
+
+        print ('Users will prepare the peak tn5 sparse file before calling cell type specific peaks.')
+
+        s1_open_prepare_peak_tn5_final_dir = output_dir + '/s1_open_prepare_peak_tn5_final'
+        if not os.path.exists(s1_open_prepare_peak_tn5_final_dir):
+            os.makedirs(s1_open_prepare_peak_tn5_final_dir)
+
+        ##updating 063025
+        if args.soc_object_fl is not None:
+
+            ipt_object_file = args.soc_object_fl
+            cmd = 'Rscript ' + input_required_scripts_dir + '/utils_diff_peak_calling_python/read_object.R' + \
+                  ' ' + ipt_object_file + \
+                  ' ' + s1_open_prepare_peak_tn5_final_dir
+            print(cmd)
+            subprocess.call(cmd,shell=True)
+
+            input_peak_fl = s1_open_prepare_peak_tn5_final_dir + '/temp_peak.txt'
+
+        else:
+
+            input_peak_fl = args.peak_file
+
+        input_tn5_bed_fl = args.tn5_bed_file
+        input_fastSparsetn5_pl = input_required_scripts_dir + '/utils_diff_peak_calling_python/fastSparse.tn5.py'
+
+        s1_prepare.make_sparse (input_peak_fl,input_tn5_bed_fl,input_fastSparsetn5_pl,
+                                s1_open_prepare_peak_tn5_final_dir)
+
+        s1_prepare.sort_sparse(s1_open_prepare_peak_tn5_final_dir)
+
+        input_peak_tn5_fl = s1_open_prepare_peak_tn5_final_dir + '/opt_peak_sparse_sorted_dir/opt_peak_sorted.sparse'
+
+        s1_prepare.prepare_peak_acc (input_peak_tn5_fl,input_peak_fl,s1_open_prepare_peak_tn5_final_dir)
+
+        ##final output for the next step is storing
+        ##opt_prepare_peak_acc_dir/
+
+        plot_getPerM_script = input_required_scripts_dir + '/utils_diff_peak_calling_python/s1_getPerM_celltypes.R'
+        ipt_peak_sparse_fl = s1_open_prepare_peak_tn5_final_dir + '/opt_peak_sparse_sorted_dir/opt_peak_sorted.sparse'
+        if args.soc_object_fl is not None:
+            input_meta_fl = s1_open_prepare_peak_tn5_final_dir + '/temp_unmodi_update_meta.txt'
+        else:
+            input_meta_fl = args.meta_file
+
+        ##updating 080625
+        ##we will prepare the CPM of peak sparse file
+        opt_peaks_celltype_CPM_dir = s1_open_prepare_peak_tn5_final_dir + '/opt_peaks_celltype_CPM_dir'
+        if not os.path.exists(opt_peaks_celltype_CPM_dir):
+            os.makedirs(opt_peaks_celltype_CPM_dir)
+
+        cmd = 'Rscript ' + plot_getPerM_script + \
+              ' ' + ipt_peak_sparse_fl + \
+              ' ' + input_meta_fl + \
+              ' ' + output_dir + '/temp_defined_parameters.config' + \
+              ' ' + opt_peaks_celltype_CPM_dir
+        print(cmd)
+        subprocess.call(cmd, shell=True)
+
+
+    if s2_open_diff_peak_call_final == 'yes':
+
+        print ('Users will call the differential accessible peaks across cell types.')
+
+        s2_open_diff_peak_call_final_dir = output_dir + '/s2_open_diff_peak_call_final_dir'
+        if not os.path.exists(s2_open_diff_peak_call_final_dir):
+            os.makedirs(s2_open_diff_peak_call_final_dir)
+
+        R_script = input_required_scripts_dir + '/utils_diff_peak_calling_python/s2_call_ctACR.Bootstrap.R'
+        R_script_saveobj = input_required_scripts_dir + '/utils_diff_peak_calling_python/s2_call_ctACR.Bootstrap_saveobj.R'
+
+        ipt_peak_sparse_fl = output_dir + '/s1_open_prepare_peak_tn5_final/opt_prepare_peak_acc_dir/opt_accessibility.txt'
+
+        ##updating 063025
+        if args.soc_object_fl is not None:
+            ipt_meta_fl = output_dir + '/s1_open_prepare_peak_tn5_final/temp_unmodi_update_meta.txt'
+        else:
+            ipt_meta_fl = args.meta_file
+
+        ipt_peak_fl = output_dir + '/s1_open_prepare_peak_tn5_final/opt_prepare_peak_acc_dir/opt_peak.bed'
+
+        if os.path.isfile(ipt_peak_sparse_fl) == True:
+
+            ##updating 063025
+            if args.soc_object_fl is not None:
+
+                ipt_soc_obj_fl = args.soc_object_fl
+
+                if re.match('.+/(.+)\.atac\.soc\.qs2', ipt_soc_obj_fl):
+                    mt = re.match('.+/(.+)\.atac\.soc\.qs2', ipt_soc_obj_fl)
+                    input_prefix = mt.group(1)
+                else:
+                    if re.match('(.+)\.atac\.soc\.qs2', ipt_soc_obj_fl):
+                        mt = re.match('(.+)\.atac\.soc\.qs2', ipt_soc_obj_fl)
+                        input_prefix = mt.group(1)
+                    else:
+                        print('Please use *.atac.soc.qs2 file without changing the file name')
+                        return
+
+                cmd = 'Rscript ' + R_script_saveobj + \
+                      ' ' + ipt_peak_sparse_fl + \
+                      ' ' + ipt_meta_fl + \
+                      ' ' + ipt_peak_fl + \
+                      ' ' + ipt_soc_obj_fl + \
+                      ' ' + input_prefix + \
+                      ' ' + output_dir + '/temp_defined_parameters.config' + \
+                      ' ' + s2_open_diff_peak_call_final_dir
+                print(cmd)
+                subprocess.call(cmd,shell=True)
+
+
+            else:
+                ##check the peak sparse fl is existing or not
+                cmd = 'Rscript ' + R_script + \
+                      ' ' + ipt_peak_sparse_fl + \
+                      ' ' + ipt_meta_fl + \
+                      ' ' + ipt_peak_fl + \
+                      ' ' + output_dir + '/temp_defined_parameters.config' + \
+                      ' ' + s2_open_diff_peak_call_final_dir
+                print(cmd)
+                subprocess.call(cmd,shell=True)
+
+        else:
+            print('Please check the step01 and make sure opt_accessibility.txt and opt_peak.bed file existing in the s1_open_prepare_peak_tn5_final_dir/opt_prepare_peak_acc_dir')
+
+
+
+    if s3_open_diff_group_peak_final == 'yes':
+
+        print('Users will call the differential accessible peaks across defined group.')
+
+        s3_open_diff_group_peak_final_dir = output_dir + '/s3_open_diff_group_peak_final_dir'
+        if not os.path.exists(s3_open_diff_group_peak_final_dir):
+            os.makedirs(s3_open_diff_group_peak_final_dir)
+
+        R_script = input_required_scripts_dir + '/utils_diff_peak_calling_python/s3_call_treat_ctACR.Bootstrap.R'
+
+        ipt_peak_sparse_fl = output_dir + '/s1_open_prepare_peak_tn5_final/opt_prepare_peak_acc_dir/opt_accessibility.txt'
+
+        ##updating 063025
+
+        if args.soc_object_fl is not None:
+            ipt_meta_fl = output_dir + '/s1_open_prepare_peak_tn5_final/temp_unmodi_update_meta.txt'
+        else:
+            ipt_meta_fl = args.meta_file
+
+
+        ipt_peak_fl = output_dir + '/s1_open_prepare_peak_tn5_final/opt_prepare_peak_acc_dir/opt_peak.bed'
+
+
+
+        if os.path.isfile(ipt_peak_sparse_fl) == True:
+
+            ##updating 070125
+            ##we need to add one more script which could save soc, if users provide soc object in this step,
+            # otherwise, we will not generate the final soc
+            #if args.soc_object_fl is None:
+
+            cmd = 'Rscript ' + R_script + \
+                  ' ' + ipt_peak_sparse_fl + \
+                  ' ' + ipt_meta_fl + \
+                  ' ' + ipt_peak_fl + \
+                  ' ' + output_dir + '/temp_defined_parameters.config' + \
+                  ' ' + s3_open_diff_group_peak_final_dir
+            print(cmd)
+            subprocess.call(cmd,shell=True)
+
+            #else:
+            #    ##set another R script
+
+            ##we will merge all the results together first and then save them into an object
+            all_cell_type_dir_list = glob.glob(s3_open_diff_group_peak_final_dir + '/*')
+
+            store_final_line_list = []
+            for eachcelltype_dir in all_cell_type_dir_list:
+                mt = re.match('.+/(.+)',eachcelltype_dir)
+                ctname = mt.group(1)
+
+                if os.path.isdir(eachcelltype_dir):
+
+                    if ctname != 'temp_peak_CPM_dir':
+
+                        ##updating 121125
+                        #ipt_target_acr_fl = eachcelltype_dir + '/opt.all_ACRs.classified.bed'
+                        ipt_target_acr_fl = eachcelltype_dir + '/' + prefix_str_final + '.' + threshold_val_final + '.all_ACRs.classified.bed'
+
+                        ##updating 121225 check if the file exist
+                        if os.path.isfile(ipt_target_acr_fl) == True:
+
+                            with open (ipt_target_acr_fl,'r') as ipt:
+                                for eachline in ipt:
+                                    eachline = eachline.strip('\n')
+                                    final_line = eachline + '\t' + ctname
+                                    store_final_line_list.append(final_line)
+
+            with open (s3_open_diff_group_peak_final_dir + '/' + prefix_str_final + '.' + threshold_val_final + '.all_ACRs.celltype.group.classified.bed','w+') as opt:
+                for eachline in store_final_line_list:
+                    opt.write(eachline + '\n')
+
+            ##updating 121225
+            ##make the CPM for the group and treat
+            ipt_peak_ori_sparse_fl = output_dir + '/s1_open_prepare_peak_tn5_final/opt_peak_sparse_sorted_dir/opt_peak_sorted.sparse'
+            ipt_meta_fl = s3_open_diff_group_peak_final_dir + '/temp_add_group_meta.txt'
+
+
+
+
+            temp_peak_CPM_dir = s3_open_diff_group_peak_final_dir + '/temp_peak_CPM_dir'
+            if not os.path.exists(temp_peak_CPM_dir):
+                os.makedirs(temp_peak_CPM_dir)
+
+            cmd = 'Rscript ' + input_required_scripts_dir + '/utils_diff_peak_calling_python/s3_call_treat_ctACR.filtration.R' + \
+                  ' ' + ipt_peak_ori_sparse_fl + \
+                  ' ' + ipt_meta_fl + \
+                  ' ' + temp_peak_CPM_dir
+            print(cmd)
+            subprocess.call(cmd,shell=True)
+
+
+            ##updating 121325
+            ##make a final filtration
+            ipt_classified_fl = s3_open_diff_group_peak_final_dir + '/opt.' + threshold_val_final + '.all_ACRs.celltype.group.classified.bed'
+            ipt_filtration_fl = s3_open_diff_group_peak_final_dir + '/temp_peak_CPM_dir/opt_group_celltypefilteration.peak.list.txt'
+
+            store_group_peak_dic = {}
+            with open (ipt_filtration_fl,'r') as ipt:
+                for eachline in ipt:
+                    eachline = eachline.strip('\n')
+                    col = eachline.strip().split()
+                    group = col[0]
+                    peak = col[1]
+                    if group in store_group_peak_dic:
+                        store_group_peak_dic[group][peak] = 1
+                    else:
+                        store_group_peak_dic[group] = {}
+                        store_group_peak_dic[group][peak] = 1
+
+            store_final_line_list = []
+            with open (ipt_classified_fl,'r') as ipt:
+                for eachline in ipt:
+                    eachline = eachline.strip('\n')
+                    col = eachline.strip().split()
+                    peak = col[0] + '_' + col[1] + '_' + col[2]
+                    mt = re.match('(.+);(.+)',col[3])
+                    treatcontrol = mt.group(2)
+                    grouptype = mt.group(1)
+                    celltype = col[-1]
+                    group = celltype + '.' + treatcontrol
+
+                    if grouptype == 'broadly_accessible':
+                        store_final_line_list.append(eachline)
+                    else:
+                        if group in store_group_peak_dic:
+                            filter_peak_dic = store_group_peak_dic[group]
+                            if peak in filter_peak_dic:
+                                store_final_line_list.append(eachline)
+                        else:
+                            store_final_line_list.append(eachline)
+
+            with open ( s3_open_diff_group_peak_final_dir + '/opt.' + threshold_val_final + '.all_ACRs.celltype.group.classified.filtration.bed','w+') as opt:
+                for eachline in store_final_line_list:
+                    opt.write(eachline + '\n')
+
+
+
+
+
+
+
+            ##updating 121125
+            ##we actually do not want to build the soc as it does not help much and cost a lot spaces
+
+            ##as the first two steps must run, and check if soc is built otherwise check if users provided
+            #all_files_s2_list = glob.glob(output_dir + '/s2_open_diff_peak_call_final_dir/*')
+            #soc_build = 'no'
+            #soc_build_path = ''
+            #input_prefix = 'output'
+            #for eachfl in all_files_s2_list:
+            #    mt = re.match('.+/(.+)',eachfl)
+            #    flnm = mt.group(1)
+            #    if 'atac.soc.qs2' in flnm:
+            #        mt = re.match('(.+)\.atac\.soc\.qs2',flnm)
+            #        input_prefix = mt.group(1)
+            #        soc_build = 'yes'
+            #        soc_build_path = eachfl
+
+            #if soc_build == 'yes':
+
+            #    ipt_R_script = input_required_scripts_dir + '/utils_diff_peak_calling_python/save_object.R'
+            #    cmd = 'Rscript ' + ipt_R_script + \
+            #          ' ' + soc_build_path + \
+            #          ' ' + s3_open_diff_group_peak_final_dir + '/opt.all_ACRs.celltype.group.classified.bed' + \
+            #          ' ' + s3_open_diff_group_peak_final_dir + \
+            #          ' ' + input_prefix
+            #    print(cmd)
+            #    subprocess.call(cmd,shell=True)
+
+            #else:
+
+                ##if users do not build the soc in the second step, it will use the input of soc object to build one
+            #    if args.soc_object_fl is not None:
+
+            #        ipt_soc_obj_fl = args.soc_object_fl
+
+            #        if re.match('.+/(.+)\.atac\.soc\.qs2', ipt_soc_obj_fl):
+            #            mt = re.match('.+/(.+)\.atac\.soc\.qs2', ipt_soc_obj_fl)
+            #            input_prefix = mt.group(1)
+            #        else:
+            #            if re.match('(.+)\.atac\.soc\.qs2', ipt_soc_obj_fl):
+            #                mt = re.match('(.+)\.atac\.soc\.qs2', ipt_soc_obj_fl)
+            #                input_prefix = mt.group(1)
+            #            else:
+            #                print('Please use *.atac.soc.qs2 file without changing the file name')
+            #                return
+
+
+            #        ipt_R_script = input_required_scripts_dir + '/utils_diff_peak_calling_python/save_object.R'
+            #        cmd = 'Rscript ' + ipt_R_script + \
+            #              ' ' + ipt_soc_obj_fl + \
+            #              ' ' + s3_open_diff_group_peak_final_dir + '/opt.all_ACRs.celltype.classified.bed' + \
+            #              ' ' + s3_open_diff_group_peak_final_dir + \
+            #              ' ' + input_prefix
+            #        print(cmd)
+            #        subprocess.call(cmd, shell=True)
+
+                    ##updating 122925
+
+
+            #if args.group_balance is None:
+            #    open_group_balance = 'no'
+            #else:
+            #    if args.group_balance == 'yes':
+            #        open_group_balance = 'yes'
+            #    else:
+            #        print('Please set -gp_balance yes')
+            #        return
+
+            #if open_group_balance == 'yes':
+
+            #    ipt_R_script = input_required_scripts_dir + '/utils_diff_peak_calling_python/s3_balance_treat_meta.R'
+            #    cmd = 'Rscript ' + ipt_R_script + \
+            #          ' ' + ipt_temp_meta_fl + \
+            #          ' ' + s3_open_diff_group_peak_final_dir + \
+            #          ' ' + output_dir + '/temp_defined_parameters.config'
+            #    print(cmd)
+            #    subprocess.call(cmd, shell=True)
+
+            #    ipt_meta_fl = s3_open_diff_group_peak_final_dir + '/temp_add_group_meta_balance_group.txt'
+
+            #else:
+
+            #    ipt_meta_fl = ipt_temp_meta_fl
+
+
+
+
+        else:
+            print('Please check the step01 and make sure opt_accessibility.txt and opt_peak.bed file existing in the s1_open_prepare_peak_tn5_final_dir/opt_prepare_peak_acc_dir')
+
+
+
+
+
+
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+
+
