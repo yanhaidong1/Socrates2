@@ -5,6 +5,8 @@
 `Socrates2` is an R and python package for analyzing Single-Cell Assay for Transposase Accessible Chromatin Sequencing (scATAC-seq) data. `Socrates2` takes the BAM file built from cellranger as the inputs to guild users to conduct a comprehensive scATAC-seq analysis. It updated several functions compared to the `Socrates` to help users perform an end-to-end analysis. 
 
 
+## Updating
+This version (Version-1.2) mainly updates the object storage format in R from rds to qs2. The qs2 format offers significantly faster read and write speeds.
 
 ## Installation
 For the installation manual, please refer to the scPlantReg platform: http://112.126.28.109:8150/pipeline.
